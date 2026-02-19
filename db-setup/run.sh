@@ -1,0 +1,1 @@
+docker run -d --name demo-db-container -p 5433:5432 my-demo-postgres
