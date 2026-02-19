@@ -1,0 +1,1 @@
+docker exec -it demo-db-container psql -U user123 -d demo_db -c "SELECT * FROM users;"

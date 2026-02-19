@@ -1,0 +1,1 @@
+docker rm -vf demo-db-container && docker rmi my-demo-postgres
