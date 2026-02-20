@@ -1,2 +1,2 @@
-docker-compose down
-docker rmi db-setup_db:latest
+docker compose down
+docker rmi db-setup-db:latest
