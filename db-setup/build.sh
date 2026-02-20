@@ -1,1 +1,1 @@
-docker build -t my-demo-postgres .
+docker-compose up --build

@@ -1,1 +1,1 @@
-docker exec -it demo-db-container psql -U user123 -d demo_db -c "SELECT * FROM users;"
+docker exec -it comp_track_db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT * FROM users;"'
