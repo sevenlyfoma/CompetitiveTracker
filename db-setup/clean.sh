@@ -1,1 +1,2 @@
-docker rm -vf demo-db-container && docker rmi my-demo-postgres
+docker compose down
+docker rmi db-setup-db:latest

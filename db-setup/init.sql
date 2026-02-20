@@ -1,10 +1,9 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    pronouns VARCHAR(100) NOT NUll,
+    rating integer NOT NULL
 );
 
-INSERT INTO users (username, email) VALUES 
-('alice_demo', 'alice@example.com'),
-('bob_tester', 'bob@example.com');
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex', 'ex@example.com', 'it/its', 1000);

@@ -1,0 +1,1 @@
+docker volume rm db-setup_postgres_data_comp_track
