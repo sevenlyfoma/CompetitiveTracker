@@ -1,0 +1,34 @@
+services:
+  db:
+    build: 
+      context: ./db-setup
+      dockerfile: Dockerfile
+    container_name: comp_track_db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_comp_track:/var/lib/postgresql
+
+  server:
+    build:
+      context: ./comp-tracker
+      dockerfile: Dockerfile
+    container_name: comp_track_server
+
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://comp_track_db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+
+    
+
+volumes:
+  postgres_data_comp_track:
