@@ -1,0 +1,1 @@
+docker volume rm competitivetracker_postgres_data_comp_track
