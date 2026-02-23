@@ -13,29 +13,70 @@ function App() {
   )
 }
 
+/**
+ * @param {Object} props
+ * @param {number} props.userID - the uniquely identifing id of the user to be deleted
+ * @param {Function} props.onDelete - Callback function executed after a successful deletion.
+ * @returns {JSX.Element} The rendered delete button. 
+*/
+function UserDeleteButton({userID, onDelete}) {
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      const response = await fetch(`/users/${userID}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      console.log(`User ${userID} deleted successfully`);
+      // Trigger update for fetched user list
+      onDelete();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
+
+  
+  return (
+    <>
+      <button onClick={handleDelete} style={{ color: 'red' }}>
+        Delete User
+      </button>
+    </>
+  )
+}
+
 function UserList() {
   const [userList, setUserList] = useState([]);
 
-  useEffect(() => {
-    fetch("/users/all")
-      .then(response => {
-        // Check if the status is in the 200-299 range
-        if (!response.ok) {
-          console.error("not ok")
-          throw new Error(`Server responded with status: ${response.status}`);
-        }
-        return response.json()
-      })
-      .then(userListJson => {
-        console.log(userListJson);
-        setUserList(userListJson);
 
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setMessage([]);
-      });
-    }, []);
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("/users/all");
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+      const userListJson = await response.json();
+      setUserList(userListJson);
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setUserList([]); 
+    }
+  
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <>
@@ -48,6 +89,7 @@ function UserList() {
             <th>Email</th>
             <th>Pronouns</th>
             <th>Rating</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -58,6 +100,7 @@ function UserList() {
               <td>{user.email}</td>
               <td>{user.pronouns}</td>
               <td>{user.rating}</td>
+              <td><UserDeleteButton userID={user.id} onDelete={fetchUsers}/></td>
             </tr>
           ))}
         </tbody>
