@@ -1,3 +1,13 @@
+# Stage 1: Build the React frontend
+FROM node:25-alpine AS frontend-build
+WORKDIR /frontend
+# Copy package files first to leverage Docker cache
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
+
+
 # Stage 1: Build the application
 FROM maven:3.9.12-eclipse-temurin-25-alpine AS build
 WORKDIR /app
@@ -5,6 +15,8 @@ WORKDIR /app
 # Copy the pom.xml and source code
 COPY pom.xml .
 COPY src ./src
+
+COPY --from=frontend-build /frontend/dist ./src/main/resources/static
 
 # Build the jar file, skipping tests for speed (optional)
 RUN mvn clean package -DskipTests
