@@ -12,4 +12,4 @@ curl --header "Content-Type: application/json" --request POST --data '{"name":"j
 
 curl --header "Content-Type: application/json" --request POST --data '{"name":"jane example","email":"jane@example.com","pronouns":"she/her","rating":1000}' http://localhost:8080/users
 
-curl --header "Content-Type: application/json" --request PUT --data '{"name":"jane example","email":"jane@example.com","pronouns":"she/her they/them","rating":1000}' http://localhost:8080/users/5
+curl --header "Content-Type: application/json" --request PUT --data '{"name":"jane e example","email":"jane@example.com","pronouns":"she/her they/them","rating":1000}' http://localhost:8080/users/11

@@ -17,3 +17,11 @@ table {
   border-collapse: collapse; 
   margin-top: 20px;
 }
+
+.EditButton {
+  width: 100px
+}
+
+.ChangeButton {
+  width: 150px
+}
