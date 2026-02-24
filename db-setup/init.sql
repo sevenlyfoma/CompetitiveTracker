@@ -6,6 +6,30 @@ CREATE TABLE users (
     rating integer NOT NULL
 );
 
+CREATE TABLE matches (
+    id SERIAL PRIMARY KEY,
+    date_of_match TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user1_id INTEGER REFERENCES users(id),
+    user2_id INTEGER REFERENCES users(id),
+    winner_id INTEGER REFERENCES users(id),
+    user1_rating_before integer NOT NULL,
+    user1_rating_after integer NOT NULL,
+    user2_rating_before integer NOT NULL,
+    user2_rating_after integer NOT NULL
+);
+
+ALTER TABLE matches 
+ADD CONSTRAINT check_different_users CHECK (user1_id <> user2_id);
+
+ALTER TABLE matches
+ADD CONSTRAINT check_winner_in_match CHECK (user1_id = winner_id OR user2_id = winner_id);
+
+
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex1', 'ex1@example.com', 'it/its', 1000);
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex2', 'ex2@example.com', 'it/its', 1000);
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex3', 'ex3@example.com', 'it/its', 1000);
+
+INSERT INTO matches 
+(date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
+VALUES 
+('2026-02-22', 1, 2, 2, 980, 1000, 1020, 1000);
