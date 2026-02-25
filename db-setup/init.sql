@@ -8,10 +8,10 @@ CREATE TABLE users (
 
 CREATE TABLE matches (
     id SERIAL PRIMARY KEY,
-    date_of_match TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user1_id INTEGER REFERENCES users(id),
-    user2_id INTEGER REFERENCES users(id),
-    winner_id INTEGER REFERENCES users(id),
+    date_of_match TIMESTAMP NOT NULL,
+    user1_id INTEGER NOT NULL REFERENCES users(id),
+    user2_id INTEGER NOT NULL REFERENCES users(id),
+    winner_id INTEGER NOT NULL REFERENCES users(id),
     user1_rating_before integer NOT NULL,
     user1_rating_after integer NOT NULL,
     user2_rating_before integer NOT NULL,
