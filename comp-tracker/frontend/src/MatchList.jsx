@@ -17,7 +17,7 @@ function MatchList(){
 
         } catch (error) {
             console.error('Error fetching data:', error);
-            setUserList([]); 
+            setMatchList([]); 
         }
         
     }

@@ -32,4 +32,14 @@ INSERT INTO users (name, email, pronouns, rating) VALUES ('ex3', 'ex3@example.co
 INSERT INTO matches 
 (date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
 VALUES 
-('2026-02-22', 1, 2, 2, 980, 1000, 1020, 1000);
+('2026-02-22', 1, 2, 1, 980, 1000, 1020, 1000);
+
+INSERT INTO matches 
+(date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
+VALUES 
+('2026-02-22', 1, 2, 2, 1000, 980, 1000, 1020);
+
+INSERT INTO matches 
+(date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
+VALUES 
+('2026-02-22', 1, 3, 1, 980, 1000, 1020, 1000);
