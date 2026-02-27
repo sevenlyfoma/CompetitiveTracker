@@ -3,10 +3,14 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './UserList.css'
 
+import UserMatchList from './UserMatchList'
+
 function UserList() {
   const [userList, setUserList] = useState([]);
 
   const [editingId, setEditingId] = useState(null);
+
+  const [viewingID, setViewingId] = useState(null);
 
   const handleEditClick = (id) => {
     setEditingId(id);
@@ -19,6 +23,10 @@ function UserList() {
   useEffect(() => {
   console.log("Updated Editing ID State:", editingId);
   }, [editingId]);
+
+  useEffect(() => {
+  console.log("Updated Viewing ID State:", viewingID);
+  }, [viewingID]);
 
 
   const fetchUsers = async () => {
@@ -42,6 +50,12 @@ function UserList() {
     fetchUsers();
   }, []);
 
+  let usermatchcontent = <></>;
+
+  if (viewingID != null){
+    usermatchcontent = <UserMatchList user={viewingID}/>
+  }
+
   return (
     <>
       <h2>User List</h2>
@@ -54,6 +68,7 @@ function UserList() {
             <th>Email</th>
             <th>Pronouns</th>
             <th>Rating</th>
+            <th></th>
             <th></th>
           </tr>
         </thead>
@@ -69,7 +84,7 @@ function UserList() {
             }
             else{
               return (
-                <StandardUserRow key={user.id} user={user} handleEditClick={handleEditClick} fetchUsers={fetchUsers}/>
+                <StandardUserRow key={user.id} user={user} handleEditClick={handleEditClick} fetchUsers={fetchUsers} viewButtonSetter={setViewingId}/>
               )
             }
           })}
@@ -77,6 +92,11 @@ function UserList() {
         </tbody>
 
       </table>
+
+      <>
+          {usermatchcontent}
+      
+      </>
     
     </>
   )
@@ -143,7 +163,7 @@ function StopEditUserButton({handleCancel}){
   )
 }
 
-function StandardUserRow({user, handleEditClick, fetchUsers}) {
+function StandardUserRow({user, handleEditClick, fetchUsers, viewButtonSetter}) {
   return (
     <tr>
       <td><EditUserButton userID={user.id} handleEditClick={handleEditClick}/></td>
@@ -153,6 +173,7 @@ function StandardUserRow({user, handleEditClick, fetchUsers}) {
       <td>{user.pronouns}</td>
       <td>{user.rating}</td>
       <td><UserDeleteButton userID={user.id} onDelete={fetchUsers}/></td>
+      <td><button onClick={() => viewButtonSetter(user)}>View User</button></td>
     </tr>
   )
 }
@@ -199,6 +220,8 @@ function CreateUserRow( {onCreate} ) {
       <td>
          <CreateUserButton userData={user} onCreate={onCreate} setUser={setUser}/>
       </td>
+
+      <td></td>
     </tr>
   
 }
@@ -284,6 +307,8 @@ function UpdateUserRow( {user_data, onUpdate, handleCancel} ) {
       <td>
          <UpdateUserButton userData={user} onUpdate={combinedOnUpdate}/>
       </td>
+
+      <td></td>
     </tr>
   
 }
