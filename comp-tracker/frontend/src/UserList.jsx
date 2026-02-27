@@ -3,6 +3,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './UserList.css'
 
+import UserMatchList from './UserMatchList'
+
 function UserList() {
   const [userList, setUserList] = useState([]);
 
