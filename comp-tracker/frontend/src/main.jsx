@@ -1,12 +1,14 @@
-import { StrictMode } from 'react'
+import { StrictMode } from 'react' // React core stuff
 import { createRoot } from 'react-dom/client'
+
+
 import './index.css'
-import UserList from './UserList.jsx'
-import MatchList from './MatchList.jsx'
+
+
+import App from './App'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <UserList />
-    <MatchList />
+    <App />
   </StrictMode>,
 )

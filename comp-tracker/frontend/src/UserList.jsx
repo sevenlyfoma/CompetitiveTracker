@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './UserList.css'
+import { useNavigate } from 'react-router-dom';
 
 import UserMatchList from './UserMatchList'
 
@@ -9,8 +10,6 @@ function UserList() {
   const [userList, setUserList] = useState([]);
 
   const [editingId, setEditingId] = useState(null);
-
-  const [viewingID, setViewingId] = useState(null);
 
   const handleEditClick = (id) => {
     setEditingId(id);
@@ -23,11 +22,6 @@ function UserList() {
   useEffect(() => {
   console.log("Updated Editing ID State:", editingId);
   }, [editingId]);
-
-  useEffect(() => {
-  console.log("Updated Viewing ID State:", viewingID);
-  }, [viewingID]);
-
 
   const fetchUsers = async () => {
     try {
@@ -51,10 +45,6 @@ function UserList() {
   }, []);
 
   let usermatchcontent = <></>;
-
-  if (viewingID != null){
-    usermatchcontent = <UserMatchList user={viewingID}/>
-  }
 
   return (
     <>
@@ -84,7 +74,7 @@ function UserList() {
             }
             else{
               return (
-                <StandardUserRow key={user.id} user={user} handleEditClick={handleEditClick} fetchUsers={fetchUsers} viewButtonSetter={setViewingId}/>
+                <StandardUserRow key={user.id} user={user} handleEditClick={handleEditClick} fetchUsers={fetchUsers}/>
               )
             }
           })}
@@ -92,11 +82,6 @@ function UserList() {
         </tbody>
 
       </table>
-
-      <>
-          {usermatchcontent}
-      
-      </>
     
     </>
   )
@@ -163,7 +148,8 @@ function StopEditUserButton({handleCancel}){
   )
 }
 
-function StandardUserRow({user, handleEditClick, fetchUsers, viewButtonSetter}) {
+function StandardUserRow({user, handleEditClick, fetchUsers}) {
+  const navigate = useNavigate();
   return (
     <tr>
       <td><EditUserButton userID={user.id} handleEditClick={handleEditClick}/></td>
@@ -173,7 +159,7 @@ function StandardUserRow({user, handleEditClick, fetchUsers, viewButtonSetter}) 
       <td>{user.pronouns}</td>
       <td>{user.rating}</td>
       <td><UserDeleteButton userID={user.id} onDelete={fetchUsers}/></td>
-      <td><button onClick={() => viewButtonSetter(user)}>View User</button></td>
+      <td><button onClick={() => navigate(`/userpages/${user.id}`)}>View User</button></td>
     </tr>
   )
 }

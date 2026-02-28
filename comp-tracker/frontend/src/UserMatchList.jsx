@@ -1,12 +1,42 @@
 import { useState, useEffect } from 'react'
 
-function UserMatchList({user}){
+import { useParams, useNavigate } from 'react-router-dom';
+
+function UserMatchList(){
+
+    const navigate = useNavigate();
+
+    const { userID } = useParams();
 
     const [userMatchList, setUserMatchList] = useState([]);
 
+    const [user, setUser] = useState({});
+
+
+    const fetchUser = async () => {
+        try {
+            const response = await fetch(`/users/${userID}`);
+            if (!response.ok){
+                throw new Error(`Server responded with status: ${response.status}`)
+            }
+            const userJson = await response.json();
+            console.log(userJson);
+            setUser(userJson);
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setUser({}) ;
+        }
+    }
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
     const fetchUserMatches = async () => {
         try {
-            const response = await fetch(`matches/all/${user.id}`);
+            const response = await fetch(`/matches/all/${userID}`);
             if (!response.ok){
                 throw new Error(`Server responded with status: ${response.status}`)
             }
@@ -25,7 +55,8 @@ function UserMatchList({user}){
     
     useEffect(() => {
         fetchUserMatches();
-    }, [user]);
+     
+    }, []);
 
 
     return (
@@ -57,7 +88,8 @@ function UserMatchList({user}){
 
 
             </table>
-
+                    
+            <button onClick={() => navigate(`/`)}>Back</button>
         </>
     ) 
 }
