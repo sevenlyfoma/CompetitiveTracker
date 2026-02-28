@@ -103,14 +103,16 @@ function UserMatchRow({match, user}){
         matchResult = "loss";
     }
 
-    let ratingChange = match.user1RatingAfter - match.user1RatingBefore
+    let ratingChange;
 
     let opponent;
     if (match.user1.id == user.id){
         opponent = match.user2.name;
+        ratingChange = match.user1RatingAfter - match.user1RatingBefore
     }
     else{
         opponent = match.user1.name;
+        ratingChange = match.user2RatingAfter - match.user2RatingBefore
     }
 
     return (

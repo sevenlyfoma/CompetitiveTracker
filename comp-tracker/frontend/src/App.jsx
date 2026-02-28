@@ -4,12 +4,6 @@ import UserList from './UserList.jsx'
 import MatchList from './MatchList.jsx'
 import UserMatchList from './UserMatchList.jsx'
 
-function HomeExample() {
-    return (
-        <h1>Hello World</h1>
-    )
-}
-
 function App() {
   return (
     <BrowserRouter>
