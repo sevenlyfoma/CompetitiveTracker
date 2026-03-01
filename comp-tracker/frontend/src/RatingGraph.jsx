@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = () => {
+const LineChart = ({userMatchList}) => {
   const data = {
     labels: ['', '', '', '',],
     datasets: [
@@ -53,11 +53,11 @@ const LineChart = () => {
 };
 
 
-function RatingGraph(){
+function RatingGraph({userMatchList}){
 
     return (
         <>
-            <LineChart />
+            <LineChart userMatchList={userMatchList}/>
         </>
     )
 }
