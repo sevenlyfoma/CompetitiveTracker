@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 
 import { useParams, useNavigate } from 'react-router-dom';
 
+import RatingGraph from './RatingGraph';
+
 function UserMatchList(){
 
     const navigate = useNavigate();
@@ -90,6 +92,8 @@ function UserMatchList(){
             </table>
                     
             <button onClick={() => navigate(`/`)}>Back</button>
+
+            <RatingGraph />
         </>
     ) 
 }
