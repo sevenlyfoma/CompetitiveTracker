@@ -22,15 +22,28 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = ({userMatchList}) => {
+const LineChart = ({user, userMatchList}) => {
+
+  let ratings;
+
+  if (user.id = userMatchList[0]?.user1.id) {
+    ratings = [ userMatchList[0]?.user1RatingBefore, ...userMatchList.map(match => match.user1RatingAfter)];
+  }
+  else {
+    ratings = [ userMatchList[0]?.user2RatingBefore, ...userMatchList.map(match => match.user2RatingAfter)];
+  }
+
+  
+  const labels = ratings.map(x => '')
+  
   const data = {
-    labels: ['', '', '', '',],
+    labels: labels,
     datasets: [
       {
         label: 'Rating',
-        data: [980, 1000, 980, 1000],
+        data: ratings,
         borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        backgroundColor: 'rgba(8, 14, 14, 0.5)',
         tension: 0,
       },
     ],
@@ -47,17 +60,18 @@ const LineChart = ({userMatchList}) => {
         text: 'Rating Change',
       },
     },
+
   };
 
   return <Line options={options} data={data} />;
 };
 
 
-function RatingGraph({userMatchList}){
+function RatingGraph({user, userMatchList}){
 
     return (
         <>
-            <LineChart userMatchList={userMatchList}/>
+            <LineChart user={user} userMatchList={userMatchList}/>
         </>
     )
 }
