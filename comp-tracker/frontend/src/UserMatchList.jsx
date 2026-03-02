@@ -93,7 +93,7 @@ function UserMatchList(){
                     
             <button onClick={() => navigate(`/`)}>Back</button>
 
-            <RatingGraph />
+            <RatingGraph user={user} userMatchList={userMatchList}/>
         </>
     ) 
 }
