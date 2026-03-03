@@ -6,17 +6,27 @@ CREATE TABLE users (
     rating integer NOT NULL
 );
 
+CREATE TABLE tournaments (
+    id SERIAL PRIMARY KEY,
+    tournament_name VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE matches (
     id SERIAL PRIMARY KEY,
     date_of_match TIMESTAMP NOT NULL,
     user1_id INTEGER NOT NULL REFERENCES users(id),
     user2_id INTEGER NOT NULL REFERENCES users(id),
-    winner_id INTEGER NOT NULL REFERENCES users(id),
+    winner_id INTEGER REFERENCES users(id),
     user1_rating_before integer NOT NULL,
     user1_rating_after integer NOT NULL,
     user2_rating_before integer NOT NULL,
-    user2_rating_after integer NOT NULL
+    user2_rating_after integer NOT NULL,
+
+    tournament_id INTEGER REFERENCES tournaments(id),
+    round_id INTEGER
 );
+
+
 
 ALTER TABLE matches 
 ADD CONSTRAINT check_different_users CHECK (user1_id <> user2_id);
