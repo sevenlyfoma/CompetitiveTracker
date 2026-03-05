@@ -11,6 +11,12 @@ CREATE TABLE tournaments (
     tournament_name VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE tournament_entrants (
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    tournament_id INTEGER NOT NULL REFERENCES tournaments(id),
+    PRIMARY KEY (user_id, tournament_id)
+);
+
 CREATE TABLE matches (
     id SERIAL PRIMARY KEY,
     date_of_match TIMESTAMP NOT NULL,
@@ -20,10 +26,32 @@ CREATE TABLE matches (
     user1_rating_before integer NOT NULL,
     user1_rating_after integer NOT NULL,
     user2_rating_before integer NOT NULL,
-    user2_rating_after integer NOT NULL,
+    user2_rating_after integer NOT NULL
+);
 
-    tournament_id INTEGER REFERENCES tournaments(id),
-    round_id INTEGER
+CREATE TABLE tournament_matches (
+    id INTEGER NOT NULL,
+    tournament_id INTEGER NOT NULL REFERENCES tournaments(id),
+
+    user1_id INTEGER REFERENCES users(id), --Can be null since might not be filled in yet
+    user2_id INTEGER REFERENCES users(id),
+
+    parent_match_1_id INTEGER,
+    parent_match_1_tournament_id INTEGER,
+
+    parent_match_2_id INTEGER,
+    parent_match_2_tournament_id INTEGER,
+
+    FOREIGN KEY (parent_match_1_id, parent_match_1_tournament_id) 
+        REFERENCES tournament_matches (id, tournament_id),
+
+    FOREIGN KEY (parent_match_2_id, parent_match_2_tournament_id) 
+        REFERENCES tournament_matches (id, tournament_id),
+
+    match_record_id INTEGER REFERENCES matches(id),
+
+
+    PRIMARY KEY (id, tournament_id)
 );
 
 
