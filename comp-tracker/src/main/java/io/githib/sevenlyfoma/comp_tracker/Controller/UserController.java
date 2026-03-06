@@ -1,4 +1,4 @@
-package io.githib.sevenlyfoma.comp_tracker;
+package io.githib.sevenlyfoma.comp_tracker.Controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import io.githib.sevenlyfoma.comp_tracker.Model.User;
+import io.githib.sevenlyfoma.comp_tracker.Model.UserRepository;
 
 @RestController
 @RequestMapping("/users")

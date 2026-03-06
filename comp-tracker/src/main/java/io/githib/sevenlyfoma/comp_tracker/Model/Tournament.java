@@ -1,4 +1,4 @@
-package io.githib.sevenlyfoma.comp_tracker;
+package io.githib.sevenlyfoma.comp_tracker.Model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
