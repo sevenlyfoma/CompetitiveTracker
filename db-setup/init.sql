@@ -8,7 +8,8 @@ CREATE TABLE users (
 
 CREATE TABLE tournaments (
     id SERIAL PRIMARY KEY,
-    tournament_name VARCHAR(100) NOT NULL
+    tournament_name VARCHAR(100) NOT NULL,
+    closed BOOLEAN NOT NULL
 );
 
 CREATE TABLE tournament_entrants (
