@@ -17,7 +17,7 @@ function UserMatchList(){
 
     const fetchUser = async () => {
         try {
-            const response = await fetch(`/users/${userID}`);
+            const response = await fetch(`/api/users/${userID}`);
             if (!response.ok){
                 throw new Error(`Server responded with status: ${response.status}`)
             }
@@ -38,7 +38,7 @@ function UserMatchList(){
 
     const fetchUserMatches = async () => {
         try {
-            const response = await fetch(`/matches/all/${userID}`);
+            const response = await fetch(`/api/matches/all/${userID}`);
             if (!response.ok){
                 throw new Error(`Server responded with status: ${response.status}`)
             }

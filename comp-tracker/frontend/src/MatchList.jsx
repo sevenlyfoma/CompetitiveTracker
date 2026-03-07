@@ -6,7 +6,7 @@ function MatchList(){
 
     const fetchMatches = async () => {
         try {
-            const response = await fetch("matches/all");
+            const response = await fetch("api/matches/all");
             if (!response.ok){
                 throw new Error(`Server responded with status: ${response.status}`)
             }

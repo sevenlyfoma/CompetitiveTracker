@@ -25,7 +25,7 @@ function UserList() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("/users/all");
+      const response = await fetch("/api/users/all");
       if (!response.ok) {
         throw new Error(`Server responded with status: ${response.status}`);
       }
@@ -100,7 +100,7 @@ function UserDeleteButton({userID, onDelete}) {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      const response = await fetch(`/users/${userID}`, {
+      const response = await fetch(`/api/users/${userID}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ function CreateUserButton({ userData, onCreate, setUser }) {
     if (!window.confirm("Are you sure the users data is correct")) return;
 
     try {
-      const response = await fetch(`/users`, {
+      const response = await fetch(`/api/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -305,7 +305,7 @@ function UpdateUserButton({ userData, onUpdate }) {
 
     console.log(userData.id)
     try {
-      const response = await fetch(`/users/${userData.id}`, {
+      const response = await fetch(`/api/users/${userData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

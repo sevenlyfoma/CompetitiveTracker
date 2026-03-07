@@ -21,7 +21,7 @@ import io.githib.sevenlyfoma.comp_tracker.Model.User;
 import io.githib.sevenlyfoma.comp_tracker.Model.UserRepository;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserRepository userRepository;

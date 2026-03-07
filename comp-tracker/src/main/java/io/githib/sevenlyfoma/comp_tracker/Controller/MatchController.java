@@ -21,7 +21,7 @@ import io.githib.sevenlyfoma.comp_tracker.Model.Match;
 import io.githib.sevenlyfoma.comp_tracker.Model.MatchRepository;
 
 @RestController
-@RequestMapping("/matches")
+@RequestMapping("/api/matches")
 public class MatchController {
 
     private final MatchRepository matchRepository;
