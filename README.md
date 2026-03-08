@@ -6,6 +6,9 @@ Application for storing and acessing data on players in competive games
 # Quick API Test Commands
 curl http://localhost:8080/users/all
 
+curl http://localhost:8080/api/tournaments/all
+
+
 curl --request DELETE http://localhost:8080/users/4
 
 curl --header "Content-Type: application/json" --request POST --data '{"name":"john example","email":"john@example.com","pronouns":"he/him","rating":1000}' http://localhost:8080/users

@@ -61,8 +61,6 @@ public class MatchController {
             .toUri();
 
         return ResponseEntity.created(location).body(savedMatch);
-    
-        //return ResponseEntity.created(new URI("/matches/" + savedMatch.getId())).body(savedMatch);
     }
 
     @DeleteMapping("/{id}")
