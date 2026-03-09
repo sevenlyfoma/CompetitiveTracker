@@ -2,87 +2,152 @@ import { useState, useEffect } from 'react'
 import './UserList.css'
 import { useNavigate } from 'react-router-dom';
 
-function UserList() {
-  const [userList, setUserList] = useState([]);
 
-  const [editingId, setEditingId] = useState(null);
-
-  const handleEditClick = (id) => {
-    setEditingId(id);
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
-  };
-
-  useEffect(() => {
-  console.log("Updated Editing ID State:", editingId);
-  }, [editingId]);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("/api/users/all");
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-      const userListJson = await response.json();
-      console.log(userListJson);
-      setUserList(userListJson);
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setUserList([]); 
-    }
-  
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  let usermatchcontent = <></>;
-
-  return (
-    <>
-      <h2>User List</h2>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Pronouns</th>
-            <th>Rating</th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {userList
-          .slice() 
-          .sort((a, b) => a.id - b.id)
-          .map((user) => {
-            if (editingId === user.id) {
-              return (
-                <UpdateUserRow key={user.id} user_data={user} onUpdate={fetchUsers} handleCancel={handleCancel}/>
-              )
-            }
-            else{
-              return (
-                <StandardUserRow key={user.id} user={user} handleEditClick={handleEditClick} fetchUsers={fetchUsers}/>
-              )
-            }
-          })}
-          <CreateUserRow key={"Create User Row"} onCreate={fetchUsers}/>
-        </tbody>
-
-      </table>
+function CrudTable({data_name}) {
+    const [dataList, setDataList] = useState([]);
+    const [keyNames, setKeyNames] = useState([]);
     
-    </>
-  )
- 
+
+    const [editingId, setEditingId] = useState(null);
+    const handleEditSelect = (id) => { setEditingId(id); };
+    const handleEditCancel = () => { setEditingId(null); };
+
+    // console.log(data_name)
+
+    const fetchData = async () => {
+        try {
+        const response = await fetch("/api/" + data_name + "/all");
+        if (!response.ok) {
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+        const dataListJson = await response.json();
+        console.log(dataListJson);
+
+        setDataList(dataListJson);
+        
+        if (dataListJson.length > 0) {
+            setKeyNames(Object.keys(dataListJson.at(0)));
+        }
+        
+
+        } catch (error) {
+        console.error('Error fetching data:', error);
+        // setDataList([]); 
+        }
+    };
+
+
+    useEffect(() => {
+        fetchData();
+    }, [data_name]);
+
+    // useEffect(() => {
+    // const interval = setInterval(() => {
+    //     console.log("Current dataList:", dataList);
+    // }, 1000);
+
+    // return () => clearInterval(interval);
+    // }, [dataList]);
+
+
+
+    return (
+        <>
+        <h2>{data_name} list</h2>
+        
+        <table>
+            <thead>
+            <tr>
+                <th></th>
+                {keyNames.map((value, index) => (
+                    <th key={index}>
+                    {typeof value === 'object' ? JSON.stringify(value) : value}
+                    </th>
+                ))}
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+                {dataList
+                    .slice() 
+                    .sort((a, b) => a.id - b.id)
+                    .map((item) => {
+                        if (false) {
+                        return (
+                            <></>
+                        )
+                        }
+                        else{
+                        return (
+                            <StandardDataRow key={item.id} item={item} />
+                        )
+                        }
+                    })}
+
+
+            </tbody>
+
+        </table>
+        
+        </>
+    )
 }
+
+function StandardDataRow({ item }) {
+    const cellData = Object.values(item);
+
+    return (
+       <tr>
+             <td></td>
+             {cellData.map((value, index) => (
+                 <td key={index}>
+                 {typeof value === 'object' ? JSON.stringify(value) : value}
+                 </td>
+             ))}
+             <td></td>
+             <td></td>
+         </tr>
+    )
+}
+
+
+
+// function StandardDataRow({ item }) {
+//     console.log(item)
+//     const cellData = Object.values(item);
+
+//     return (
+//         <tr>
+//             <td></td>
+//             {cellData.map((value, index) => (
+//                 <td key={index}>
+//                 {typeof value === 'object' ? JSON.stringify(value) : value}
+//                 </td>
+//             ))}
+//             <td></td>
+//             <td></td>
+//         </tr>
+//     )
+// }
+
+//  {/* {userList
+//             .slice() 
+//             .sort((a, b) => a.id - b.id)
+//             .map((user) => {
+//                 if (editingId === user.id) {
+//                 return (
+//                     <UpdateUserRow key={user.id} user_data={user} onUpdate={fetchUsers} handleCancel={handleCancel}/>
+//                 )
+//                 }
+//                 else{
+//                 return (
+//                     <StandardUserRow key={user.id} user={user} handleEditClick={handleEditClick} fetchUsers={fetchUsers}/>
+//                 )
+//                 }
+//             })}
+//             <CreateUserRow key={"Create User Row"} onCreate={fetchUsers}/> */}
+
 
 /**
  * @param {Object} props
@@ -346,4 +411,4 @@ function UpdateUserButton({ userData, onUpdate }) {
   )
 }
 
-export default UserList
+export default CrudTable
