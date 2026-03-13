@@ -8,6 +8,15 @@ curl http://localhost:8080/users/all
 
 curl http://localhost:8080/api/tournaments/all
 
+curl http://localhost:8080/api/tournament_entrants/all
+
+curl http://localhost:8080/api/tournament_entrants/1
+
+curl http://localhost:8080/api/tournament_entrants/2
+
+curl --request DELETE http://localhost:8080/api/tournament_entrants/1/2
+
+curl --header "Content-Type: application/json" --request DELETE --data '{"user":{"id":1,"name":"ex1","email":"ex1@example.com","pronouns":"it/its","rating":1000},"tournament":{"id":1,"tournamentName":"ex tourney 1","closed":false}}' http://localhost:8080/api/tournament_entrants
 
 curl --request DELETE http://localhost:8080/users/4
 

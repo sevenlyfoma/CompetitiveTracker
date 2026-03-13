@@ -71,6 +71,11 @@ INSERT INTO users (name, email, pronouns, rating) VALUES ('ex3', 'ex3@example.co
 INSERT INTO tournaments (tournament_name, closed) VALUES ('ex tourney 1', false);
 INSERT INTO tournaments (tournament_name, closed) VALUES ('ex tourney 2', true);
 
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 2);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 2);
+
 
 INSERT INTO matches 
 (date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
