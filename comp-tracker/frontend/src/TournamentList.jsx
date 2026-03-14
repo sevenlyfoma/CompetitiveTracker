@@ -77,6 +77,7 @@ function StandardItemRow({item, handleEditClick, fetchItems}) {
   if (item.closed) {
     status = "closed"
   }
+  const navigate = useNavigate();
   return (
     <tr>
       <td><EditItemButton id={item.id} handleEditClick={handleEditClick}/></td>
@@ -84,7 +85,7 @@ function StandardItemRow({item, handleEditClick, fetchItems}) {
       <td>{item.tournamentName}</td>
       <td>{status}</td>
       <td><ItemDeleteButton id={item.id} onDelete={fetchItems}/></td>
-      <td></td>
+      <td><button onClick={() => navigate(`/tournaments/open/${JSON.stringify(item)}`)}>View Tournament</button></td>
     </tr>
   )
 }

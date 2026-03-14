@@ -33,7 +33,7 @@ public class TournamentEntrantController {
     }
 
     @GetMapping("/{id}")
-    public Iterable<TournamentEntrant> getEntrants(@PathVariable Long id){
+    public Iterable<TournamentEntrant> getEntrantsById(@PathVariable Long id){
         var t = Tournament.builder().id(id).tournamentName(null).closed(null).build();
         var tournamentEntrantList = tournamentEntrantRepository.findByTournament(t);
         return tournamentEntrantList;
