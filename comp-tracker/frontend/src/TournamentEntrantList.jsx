@@ -4,6 +4,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import Select from 'react-select'
 
+
+//TODO look at warnings closely like this  2026-03-14T15:44:15.333Z  WARN 22351 --- [comp-tracker] [nio-8080-exec-5] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "{"id":2,"tournamentName":"extourney2","closed":true}"]
+
 function TournamentEntrantList(){
 
     

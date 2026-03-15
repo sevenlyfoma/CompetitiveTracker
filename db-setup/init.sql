@@ -30,32 +30,43 @@ CREATE TABLE matches (
     user2_rating_after integer NOT NULL
 );
 
+-- CREATE TABLE tournament_matches (
+--     id INTEGER NOT NULL,
+--     tournament_id INTEGER NOT NULL REFERENCES tournaments(id),
+
+--     user1_id INTEGER REFERENCES users(id),
+--     user2_id INTEGER REFERENCES users(id),
+
+--     parent_match_1_id INTEGER,
+
+--     parent_match_2_id INTEGER,
+
+--     FOREIGN KEY (parent_match_1_id, tournament_id) 
+--         REFERENCES tournament_matches (id, tournament_id),
+
+--     FOREIGN KEY (parent_match_2_id, tournament_id) 
+--         REFERENCES tournament_matches (id, tournament_id),
+
+--     match_record_id INTEGER REFERENCES matches(id),
+
+
+--     PRIMARY KEY (id, tournament_id)
+-- );
 CREATE TABLE tournament_matches (
-    id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
+
+    match_number INTEGER,
     tournament_id INTEGER NOT NULL REFERENCES tournaments(id),
 
-    user1_id INTEGER REFERENCES users(id), --Can be null since might not be filled in yet
+    user1_id INTEGER REFERENCES users(id),
     user2_id INTEGER REFERENCES users(id),
 
-    parent_match_1_id INTEGER,
-    parent_match_1_tournament_id INTEGER,
-
-    parent_match_2_id INTEGER,
-    parent_match_2_tournament_id INTEGER,
-
-    FOREIGN KEY (parent_match_1_id, parent_match_1_tournament_id) 
-        REFERENCES tournament_matches (id, tournament_id),
-
-    FOREIGN KEY (parent_match_2_id, parent_match_2_tournament_id) 
-        REFERENCES tournament_matches (id, tournament_id),
-
-    match_record_id INTEGER REFERENCES matches(id),
+    parent_match_1_id INTEGER REFERENCES tournament_matches(id),
+    parent_match_2_id INTEGER REFERENCES tournament_matches(id),
 
 
-    PRIMARY KEY (id, tournament_id)
+    match_record_id INTEGER REFERENCES matches(id)
 );
-
-
 
 ALTER TABLE matches 
 ADD CONSTRAINT check_different_users CHECK (user1_id <> user2_id);
@@ -67,15 +78,28 @@ ADD CONSTRAINT check_winner_in_match CHECK (user1_id = winner_id OR user2_id = w
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex1', 'ex1@example.com', 'it/its', 1000);
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex2', 'ex2@example.com', 'it/its', 1000);
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex3', 'ex3@example.com', 'it/its', 1000);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex4', 'ex4@example.com', 'it/its', 1000);
 
 INSERT INTO tournaments (tournament_name, closed) VALUES ('ex tourney 1', false);
-INSERT INTO tournaments (tournament_name, closed) VALUES ('ex tourney 2', true);
+INSERT INTO tournaments (tournament_name, closed) VALUES ('ex tourney 2', false);
+INSERT INTO tournaments (tournament_name, closed) VALUES ('ex tourney 3', true);
+INSERT INTO tournaments (tournament_name, closed) VALUES ('ex tourney 4', true);
+
 
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 1);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 1);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 2);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 2);
 
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 3);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 3);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 3);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 3);
+
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 4);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 4);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 4);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 4);
 
 INSERT INTO matches 
 (date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
@@ -91,3 +115,12 @@ INSERT INTO matches
 (date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
 VALUES 
 ('2026-02-22', 1, 3, 1, 980, 1000, 1020, 1000);
+
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (3, 1, 2);
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (3, 3, 4);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id) VALUES (3, 1, 2);
+
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (4, 1, 2);
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (4, 3, 4);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id) VALUES (4, 4, 5);
+
