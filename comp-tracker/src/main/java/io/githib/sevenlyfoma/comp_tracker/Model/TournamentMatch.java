@@ -40,17 +40,30 @@ public class TournamentMatch {
     @Column(name = "match_number")
     private Long matchNumber;
 
+    @Column(name = "inherits_parent_match_1_winner")
+    private Boolean inheritsParentMatch1Winner;
+
+    @Column(name = "inherits_parent_match_2_winner")
+    private Boolean inheritsParentMatch2Winner;
+
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_match_1_id")
-    private TournamentMatch parentMatch1;
+    // @ManyToOne
+    // @JoinColumn(name = "parent_match_1_id")
+    // private TournamentMatch parentMatch1;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_match_2_id")
-    private TournamentMatch parentMatch2;
+    // @ManyToOne
+    // @JoinColumn(name = "parent_match_2_id")
+    // private TournamentMatch parentMatch2;
+
+    
+    @Column(name = "parent_match_1_id")
+    private Long parentMatch1Id;
+
+    @Column(name = "parent_match_2_id")
+    private Long parentMatch2Id;
 
     @ManyToOne
     @JoinColumn(name = "user1_id")

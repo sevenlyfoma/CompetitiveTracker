@@ -64,6 +64,9 @@ CREATE TABLE tournament_matches (
     parent_match_1_id INTEGER REFERENCES tournament_matches(id),
     parent_match_2_id INTEGER REFERENCES tournament_matches(id),
 
+    inherits_parent_match_1_winner BOOLEAN,
+    inherits_parent_match_2_winner BOOLEAN,
+
 
     match_record_id INTEGER REFERENCES matches(id)
 );
@@ -118,9 +121,11 @@ VALUES
 
 INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (3, 1, 2);
 INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (3, 3, 4);
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id) VALUES (3, 1, 2);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner) 
+VALUES (3, 1, 2, true, true);
 
 INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (4, 1, 2);
 INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (4, 3, 4);
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id) VALUES (4, 4, 5);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner) 
+VALUES (4, 4, 5, true, true);
 

@@ -2,6 +2,11 @@
 Application for storing and acessing data on players in competive games
 
 
+# TODO
+
+Look into RestControllerAdvice as a global error handler so we can give the user good reasons why theyre doing something wrong
+
+
 
 # Quick API Test Commands
 curl http://localhost:8080/users/all
