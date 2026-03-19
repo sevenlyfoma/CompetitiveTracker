@@ -91,7 +91,6 @@ function StandardItemRow({item, handleEditClick, fetchItems}) {
       <td>{item.tournamentName}</td>
       <td>{status}</td>
       <td><ItemDeleteButton id={item.id} onDelete={fetchItems}/></td>
-      {/* <td><button onClick={() => navigate(`/tournaments/open/${JSON.stringify(item)}`)}>View Tournament</button></td> */}
       <td>{button}</td>
     </tr>
   )
