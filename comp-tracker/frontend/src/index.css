@@ -13,6 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -28,6 +29,10 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* height: 100%;
+  width: 100%; */
+  padding: 0;
+  overflow: hidden; 
 }
 
 h1 {
