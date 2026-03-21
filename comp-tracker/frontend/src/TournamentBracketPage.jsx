@@ -3,14 +3,37 @@
 //https://www.npmjs.com/package/@g-loot/react-tournament-brackets
 
 // import { Bracket, RoundProps } from 'react-brackets';
-import React from 'react';
-import ReactFlow, { Position } from 'reactflow';
+import React, {useCallback} from 'react';
+import ReactFlow, { Position, useReactFlow, ReactFlowProvider, useStore } from 'reactflow';
+// import { useViewportHelper } from 'reactflow';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'reactflow/dist/style.css';
 
 import './TournamentBracketPage.css'
 
-function TournamentBracketPage() {
+
+
+ 
+const edgeTypes = {};
+
+const BoundaryNode = ({ data }) => {
+
+  const { colorStart = 'red', colorEnd = 'blue', degree = 90, label } = data;
+  
+  return (
+    <div style={{
+      width: '100%', 
+      height: '100%',
+      background: `linear-gradient(${degree}deg, ${colorStart} 0%, ${colorEnd} 100%)`,}}>
+    </div>
+  );
+};
+
+
+ 
+const nodeTypes = {boundary: BoundaryNode};
+
+function TournamentBracketPageInner() {
 
 
   const navigate = useNavigate();
@@ -21,23 +44,72 @@ function TournamentBracketPage() {
 
   console.log(tournament_json)
 
+  const { setViewport, getViewport } = useReactFlow();
+  const handleMove = useCallback((event, viewport) => {
+    if (viewport.y > 0) {
+      setViewport(
+        { ...viewport, y: 0 }, 
+        { duration: 0 }
+      );
+    }
+    if (viewport.x > 0) {
+      setViewport(
+        { ...viewport, x: 0 }, 
+        { duration: 0 }
+      );
+    }
+  }, [setViewport]);
+
 
   const initialNodes = [
-  { id: '1', position: { x: 0, y: 0}, data: { label: 'Match 1' }, sourcePosition: Position.Right, },
-  { id: '2', position: { x: 200, y: 200}, data: { label: 'Match 2' },targetPosition: Position.Left, },
+  { id: '1', position: { x: 100, y: 100}, data: { label: 'Match 1' }, sourcePosition: Position.Right, },
+  { id: '2', position: { x: 300, y: 300}, data: { label: 'Match 2' },targetPosition: Position.Left, },
 
   { id: '3', position: { x: 1000, y: 1000}, data: { label: 'Match 2' },targetPosition: Position.Left, },
   ];
+
+
+  
+
+  const boundaryBoxes = [
+    { id: 'bb-n', type: 'boundary', position: { x: 0, y: 0}, style: { width: 2000, height: 10,}, data: { 
+      label: 'North', 
+      colorStart: 'red', 
+      colorEnd: 'blue', 
+      degree: 90
+    }},
+    { id: 'bb-s', type: 'boundary', position: { x: 0, y: 1900}, style: { width: 2000, height: 10,}, data: { 
+      label: 'North', 
+      colorStart: 'blue', 
+      colorEnd: 'red', 
+      degree: 90
+    }},
+    { id: 'bb-w', type: 'boundary', position: { x: 0, y: 10}, style: { width: 10, height: 1890,}, data: { 
+      label: 'North', 
+      colorStart: 'red', 
+      colorEnd: 'blue', 
+      degree: 180
+    }},
+    { id: 'bb-e', type: 'boundary', position: { x: 1990, y: 10}, style: { width: 10, height: 1890,}, data: { 
+      label: 'North', 
+      colorStart: 'blue', 
+      colorEnd: 'red', 
+      degree: 180
+    }},
+  ]
+
+  const totalNodes = initialNodes.concat(boundaryBoxes)
+
   const initialEdges = [{ id: 'e1-2', source: '1', target: '2', type: "step"}];
 
   const translateLimit = [
-    [0, 0],
-    [2000, 2000],
+    [-1000, -1000],
+    [2300, 2300],
   ];
 
 
 return (
-  <div id="hell" style={{ 
+  <div style={{ 
     display: 'flex', 
     flexDirection: 'column',
     height: '100vh', 
@@ -45,14 +117,15 @@ return (
     margin: 0,
     padding: 0,
     overflow: 'hidden',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
   }}>
     
     <div style={{ 
       display: 'flex', 
       flexDirection: 'row',  
       alignItems: 'center', 
-      // justifyContent: 'space-between', 
+      justifyContent: 'left',
+      gap: '20px',
       height: '10vh', 
       padding: '0 20px',
       // backgroundColor: '#f8f9fa',
@@ -79,18 +152,38 @@ return (
       </button>
     </div>
 
-    <div style={{ flexGrow: 1, width: '100%' }}>
-      <ReactFlow 
-      nodes={initialNodes} 
-      edges={initialEdges} 
-      translateExtent={translateLimit}
-      >
-
-        </ReactFlow>
+    <div style={{ flexGrow: 1, width: '100%', height: '100%' }}>
+        <ReactFlow 
+          nodes = {totalNodes} 
+          edges={initialEdges} 
+          translateExtent={translateLimit}
+          onMove={handleMove}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          minZoom={0.1}
+          ></ReactFlow>
     </div>
 
   </div>
+
 );
 }
+
+function TournamentBracketPage() {
+
+  const { tournament } = useParams();
+
+  return (
+   <ReactFlowProvider>
+      <TournamentBracketPageInner tournament={tournament}/>
+
+
+   </ReactFlowProvider> 
+  )
+      
+
+}
+
+
 
 export default TournamentBracketPage

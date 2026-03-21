@@ -11,6 +11,14 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  margin: 0;
+  display: flex;
+  place-items: center;
+  /* height: 100%;
+  width: 100%; */
+  padding: 0;
+  overflow: hidden; 
 }
 
 
