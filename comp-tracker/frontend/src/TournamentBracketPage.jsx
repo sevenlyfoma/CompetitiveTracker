@@ -3,7 +3,7 @@
 //https://www.npmjs.com/package/@g-loot/react-tournament-brackets
 
 // import { Bracket, RoundProps } from 'react-brackets';
-import React, {useCallback} from 'react';
+import React, {useCallback, useState, useEffect} from 'react';
 import ReactFlow, { Position, useReactFlow, ReactFlowProvider, useStore } from 'reactflow';
 // import { useViewportHelper } from 'reactflow';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -43,6 +43,30 @@ function TournamentBracketPageInner() {
   const tournament_json = JSON.parse(tournament)
 
   console.log(tournament_json)
+
+
+  const [tournamentMatchList, setTournamentMatchList] = useState([]);
+  
+  const fetchMatches = async () => {
+      try {
+          const response = await fetch(`/api/tournament_matches/${tournament_json.id}`);
+          if (!response.ok){
+              throw new Error(`Server responded with status: ${response.status}`)
+          }
+          const matchesJson = await response.json();
+          console.log(matchesJson);
+          setTournamentMatchList(matchesJson);
+
+
+      } catch (error) {
+          console.error('Error fetching data:', error);
+          setUser({}) ;
+      }
+  }
+
+  useEffect(() => {
+      fetchMatches();
+  }, []);
 
   const { setViewport, getViewport } = useReactFlow();
   const handleMove = useCallback((event, viewport) => {
