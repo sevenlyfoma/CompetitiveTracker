@@ -29,9 +29,13 @@ const BoundaryNode = ({ data }) => {
   );
 };
 
-
- 
 const nodeTypes = {boundary: BoundaryNode};
+
+function makeNodes(tournament_matches){
+  for (let i = 0; i < tournament_matches.length; i++){
+    let match = tournament_matches[i]
+  }
+}
 
 function TournamentBracketPageInner() {
 
