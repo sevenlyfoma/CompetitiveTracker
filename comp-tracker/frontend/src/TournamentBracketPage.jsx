@@ -32,8 +32,15 @@ const BoundaryNode = ({ data }) => {
 const nodeTypes = {boundary: BoundaryNode};
 
 function makeNodes(tournament_matches){
+  let x = 100
+  let y = 100
+  let heigth = 100
+  let width = 100
+  let nodes =[]
   for (let i = 0; i < tournament_matches.length; i++){
     let match = tournament_matches[i]
+
+    nodes.push({id: ("match_"+i.toString), position: { x: x, y: y}, style: { width: width, height: height}})
   }
 }
 
