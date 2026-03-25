@@ -34,14 +34,20 @@ const nodeTypes = {boundary: BoundaryNode};
 function makeNodes(tournament_matches){
   let x = 100
   let y = 100
-  let heigth = 100
+  let height = 100
   let width = 100
   let nodes =[]
   for (let i = 0; i < tournament_matches.length; i++){
     let match = tournament_matches[i]
 
-    nodes.push({id: ("match_"+i.toString), position: { x: x, y: y}, style: { width: width, height: height}})
+    console.log(match)
+
+    nodes.push({id: ("match_"+i), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: match.id }})
+  
+    y += 100
   }
+
+  return nodes
 }
 
 function TournamentBracketPageInner() {
@@ -133,7 +139,11 @@ function TournamentBracketPageInner() {
     }},
   ]
 
-  const totalNodes = initialNodes.concat(boundaryBoxes)
+  const matchNodes = makeNodes(tournamentMatchList);
+
+  console.log(matchNodes)
+
+  const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodes)
 
   const initialEdges = [{ id: 'e1-2', source: '1', target: '2', type: "step"}];
 
