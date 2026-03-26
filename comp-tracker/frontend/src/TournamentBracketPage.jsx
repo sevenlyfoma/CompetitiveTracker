@@ -34,7 +34,7 @@ const nodeTypes = {boundary: BoundaryNode};
 function makeNodes(tournament_matches){
   let x = 100
   let y = 100
-  let height = 100
+  let height = 25
   let width = 100
   let nodes =[]
   for (let i = 0; i < tournament_matches.length; i++){
@@ -42,7 +42,21 @@ function makeNodes(tournament_matches){
 
     console.log(match)
 
-    nodes.push({id: ("match_"+i), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: match.id }})
+    let label1 = "n/a";
+    let label2 = "n/a";
+
+    if (match.user1 !== null){
+      label1 = match.user1.name
+    }
+
+    if (match.user2 !== null){
+      label2 = match.user2.name
+    }
+
+
+
+    nodes.push({id: ("match_"+i+"_1"), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
+    nodes.push({id: ("match_"+i+"_2"), position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
   
     y += 100
   }
@@ -103,10 +117,10 @@ function TournamentBracketPageInner() {
 
 
   const initialNodes = [
-  { id: '1', position: { x: 100, y: 100}, data: { label: 'Match 1' }, sourcePosition: Position.Right, },
-  { id: '2', position: { x: 300, y: 300}, data: { label: 'Match 2' },targetPosition: Position.Left, },
+  // { id: '1', position: { x: 100, y: 100}, data: { label: 'Match 1' }, sourcePosition: Position.Right, },
+  // { id: '2', position: { x: 300, y: 300}, data: { label: 'Match 2' },targetPosition: Position.Left, },
 
-  { id: '3', position: { x: 1000, y: 1000}, data: { label: 'Match 2' },targetPosition: Position.Left, },
+  // { id: '3', position: { x: 1000, y: 1000}, data: { label: 'Match 2' },targetPosition: Position.Left, },
   ];
 
 
