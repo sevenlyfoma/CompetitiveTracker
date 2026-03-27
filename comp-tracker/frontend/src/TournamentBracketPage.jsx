@@ -64,6 +64,25 @@ function makeNodes(tournament_matches){
   return nodes
 }
 
+function find_canvas_size(tournament_matches){
+  let level_1_match_count = 0;
+  for (let i = 0; i < tournament_matches.length; i++){
+      let match = tournament_matches[i]
+
+    if (match.matchNumber < 2) {
+      level_1_match_count += 1;
+    }
+  }
+
+  height = level_1_match_count * 300
+  width = 2300
+
+  return (height, width)
+
+
+}
+
+
 function TournamentBracketPageInner() {
 
 
