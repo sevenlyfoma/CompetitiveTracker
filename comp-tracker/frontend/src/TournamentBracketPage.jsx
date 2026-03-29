@@ -29,6 +29,33 @@ const BoundaryNode = ({ data }) => {
   );
 };
 
+const boundaryBoxes = [
+    { id: 'bb-n', type: 'boundary', position: { x: 0, y: 0}, style: { width: 2000, height: 10,}, data: { 
+      label: 'North', 
+      colorStart: 'red', 
+      colorEnd: 'blue', 
+      degree: 90
+    }},
+    { id: 'bb-s', type: 'boundary', position: { x: 0, y: 1900}, style: { width: 2000, height: 10,}, data: { 
+      label: 'North', 
+      colorStart: 'blue', 
+      colorEnd: 'red', 
+      degree: 90
+    }},
+    { id: 'bb-w', type: 'boundary', position: { x: 0, y: 10}, style: { width: 10, height: 1890,}, data: { 
+      label: 'North', 
+      colorStart: 'red', 
+      colorEnd: 'blue', 
+      degree: 180
+    }},
+    { id: 'bb-e', type: 'boundary', position: { x: 1990, y: 10}, style: { width: 10, height: 1890,}, data: { 
+      label: 'North', 
+      colorStart: 'blue', 
+      colorEnd: 'red', 
+      degree: 180
+    }},
+  ]
+
 const nodeTypes = {boundary: BoundaryNode};
 
 function makeNodes(tournament_matches){
@@ -63,6 +90,8 @@ function makeNodes(tournament_matches){
 
   return nodes
 }
+
+const initialNodes = [];
 
 function find_canvas_size(tournament_matches){
   let level_1_match_count = 0;
@@ -100,8 +129,6 @@ function TournamentBracketPageInner() {
   
   const tournament_json = JSON.parse(tournament)
 
-  console.log(tournament_json)
-
 
   const [tournamentMatchList, setTournamentMatchList] = useState([]);
   
@@ -127,6 +154,7 @@ function TournamentBracketPageInner() {
   }, []);
 
   const { setViewport, getViewport } = useReactFlow();
+  
   const handleMove = useCallback((event, viewport) => {
     if (viewport.y > 0) {
       setViewport(
@@ -143,46 +171,7 @@ function TournamentBracketPageInner() {
   }, [setViewport]);
 
 
-  const initialNodes = [
-  // { id: '1', position: { x: 100, y: 100}, data: { label: 'Match 1' }, sourcePosition: Position.Right, },
-  // { id: '2', position: { x: 300, y: 300}, data: { label: 'Match 2' },targetPosition: Position.Left, },
-
-  // { id: '3', position: { x: 1000, y: 1000}, data: { label: 'Match 2' },targetPosition: Position.Left, },
-  ];
-
-
-  
-
-  const boundaryBoxes = [
-    { id: 'bb-n', type: 'boundary', position: { x: 0, y: 0}, style: { width: 2000, height: 10,}, data: { 
-      label: 'North', 
-      colorStart: 'red', 
-      colorEnd: 'blue', 
-      degree: 90
-    }},
-    { id: 'bb-s', type: 'boundary', position: { x: 0, y: 1900}, style: { width: 2000, height: 10,}, data: { 
-      label: 'North', 
-      colorStart: 'blue', 
-      colorEnd: 'red', 
-      degree: 90
-    }},
-    { id: 'bb-w', type: 'boundary', position: { x: 0, y: 10}, style: { width: 10, height: 1890,}, data: { 
-      label: 'North', 
-      colorStart: 'red', 
-      colorEnd: 'blue', 
-      degree: 180
-    }},
-    { id: 'bb-e', type: 'boundary', position: { x: 1990, y: 10}, style: { width: 10, height: 1890,}, data: { 
-      label: 'North', 
-      colorStart: 'blue', 
-      colorEnd: 'red', 
-      degree: 180
-    }},
-  ]
-
   const matchNodes = makeNodes(tournamentMatchList);
-
-  console.log(matchNodes)
 
   const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodes)
 
@@ -195,7 +184,49 @@ function TournamentBracketPageInner() {
 
 
 return (
-  <div style={{ 
+  
+  <div style={{ height: '100vh', width: '100vw', }}>
+
+    <div style={{ width: '100%', height: '100%' }}>
+        <ReactFlow 
+          nodes = {totalNodes} 
+          edges={initialEdges} 
+          translateExtent={translateLimit}
+          onMove={handleMove}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          minZoom={0.1}
+          ></ReactFlow>
+    </div>
+
+  </div>
+
+);
+}
+
+function TournamentBracketPage() {
+
+  const { tournament } = useParams();
+
+  return (
+   <ReactFlowProvider>
+      <TournamentBracketPageInner tournament={tournament}/>
+
+
+   </ReactFlowProvider> 
+  )
+      
+
+}
+
+
+
+export default TournamentBracketPage
+
+
+
+/* 
+<div style={{ 
     display: 'flex', 
     flexDirection: 'column',
     height: '100vh', 
@@ -251,25 +282,4 @@ return (
     </div>
 
   </div>
-
-);
-}
-
-function TournamentBracketPage() {
-
-  const { tournament } = useParams();
-
-  return (
-   <ReactFlowProvider>
-      <TournamentBracketPageInner tournament={tournament}/>
-
-
-   </ReactFlowProvider> 
-  )
-      
-
-}
-
-
-
-export default TournamentBracketPage
+*/
