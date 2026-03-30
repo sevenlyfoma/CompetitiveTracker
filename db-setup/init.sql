@@ -124,8 +124,8 @@ INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (3, 3,
 INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner) 
 VALUES (3, 1, 2, true, true);
 
-INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (4, 1, 2);
-INSERT INTO tournament_matches (tournament_id, user1_id, user2_id) VALUES (4, 3, 4);
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner) 
-VALUES (4, 4, 5, true, true);
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number) VALUES (4, 1, 2, 1);
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number) VALUES (4, 3, 4, 1);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
+VALUES (4, 4, 5, true, true, 2);
 

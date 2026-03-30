@@ -29,33 +29,6 @@ const BoundaryNode = ({ data }) => {
   );
 };
 
-const boundaryBoxes = [
-    { id: 'bb-n', type: 'boundary', position: { x: 0, y: 0}, style: { width: 2000, height: 10,}, data: { 
-      label: 'North', 
-      colorStart: 'red', 
-      colorEnd: 'blue', 
-      degree: 90
-    }},
-    { id: 'bb-s', type: 'boundary', position: { x: 0, y: 1900}, style: { width: 2000, height: 10,}, data: { 
-      label: 'North', 
-      colorStart: 'blue', 
-      colorEnd: 'red', 
-      degree: 90
-    }},
-    { id: 'bb-w', type: 'boundary', position: { x: 0, y: 10}, style: { width: 10, height: 1890,}, data: { 
-      label: 'North', 
-      colorStart: 'red', 
-      colorEnd: 'blue', 
-      degree: 180
-    }},
-    { id: 'bb-e', type: 'boundary', position: { x: 1990, y: 10}, style: { width: 10, height: 1890,}, data: { 
-      label: 'North', 
-      colorStart: 'blue', 
-      colorEnd: 'red', 
-      degree: 180
-    }},
-  ]
-
 const nodeTypes = {boundary: BoundaryNode};
 
 function makeNodes(tournament_matches){
@@ -96,6 +69,9 @@ const initialNodes = [];
 function find_canvas_size(tournament_matches){
   let level_1_match_count = 0;
   let highest_level = 1;
+
+  console.log("tournamentMatches:")
+  console.log(tournament_matches)
   
   for (let i = 0; i < tournament_matches.length; i++){
       let match = tournament_matches[i]
@@ -109,14 +85,43 @@ function find_canvas_size(tournament_matches){
     }
   }
 
-  l
+  let height = level_1_match_count * 300
+  let width = highest_level * 500
 
-  height = level_1_match_count * 300
-  width = highest_level * 500
-
-  return (height, width)
+  return [height, width]
 
 
+}
+
+function create_boundary_boxes(height, width){
+  let boundaryBoxes = [
+    { id: 'bb-n', type: 'boundary', position: { x: 0, y: 0}, style: { width: width, height: 10,}, data: { 
+      label: 'North', 
+      colorStart: 'red', 
+      colorEnd: 'blue', 
+      degree: 90
+    }},
+    { id: 'bb-s', type: 'boundary', position: { x: 0, y: height-10}, style: { width: width, height: 10,}, data: { 
+      label: 'North', 
+      colorStart: 'blue', 
+      colorEnd: 'red', 
+      degree: 90
+    }},
+    { id: 'bb-w', type: 'boundary', position: { x: 0, y: 10}, style: { width: 10, height: height-10,}, data: { 
+      label: 'North', 
+      colorStart: 'red', 
+      colorEnd: 'blue', 
+      degree: 180
+    }},
+    { id: 'bb-e', type: 'boundary', position: { x: width-10, y: 10}, style: { width: 10, height: height-10,}, data: { 
+      label: 'North', 
+      colorStart: 'blue', 
+      colorEnd: 'red', 
+      degree: 180
+    }},
+  ]
+
+  return boundaryBoxes
 }
 
 
@@ -173,13 +178,22 @@ function TournamentBracketPageInner() {
 
   const matchNodes = makeNodes(tournamentMatchList);
 
-  const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodes)
+ 
 
   const initialEdges = [{ id: 'e1-2', source: '1', target: '2', type: "step"}];
 
+
+  const canvasDimensions = find_canvas_size(tournamentMatchList);
+
+  const boundaryBoxes = create_boundary_boxes(canvasDimensions[0], canvasDimensions[1]);
+
+  const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodes)
+
+  console.log(canvasDimensions)
+
   const translateLimit = [
     [-1000, -1000],
-    [2300, 2300],
+    canvasDimensions,
   ];
 
 
@@ -191,8 +205,8 @@ return (
         <ReactFlow 
           nodes = {totalNodes} 
           edges={initialEdges} 
-          translateExtent={translateLimit}
-          onMove={handleMove}
+          // translateExtent={translateLimit}
+          // onMove={handleMove}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           minZoom={0.1}
