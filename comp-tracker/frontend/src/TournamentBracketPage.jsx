@@ -37,10 +37,16 @@ function makeNodes(tournament_matches){
   let height = 25
   let width = 100
   let nodes =[]
+
+  let info_table = []
+  
+  tournament_matches.sort(function(a,b){return a.matchNumber-b.matchNumber})
+
   for (let i = 0; i < tournament_matches.length; i++){
     let match = tournament_matches[i]
 
-    console.log(match)
+    
+    info_table.push({id: match.id, x: x, y: y})
 
     let label1 = "n/a";
     let label2 = "n/a";
@@ -53,12 +59,25 @@ function makeNodes(tournament_matches){
       label2 = match.user2.name
     }
 
+    if (match.parentMatch1Id == null){
+      nodes.push({id: ("match_"+i+"_1"), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
+      nodes.push({id: ("match_"+i+"_2"), position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
+    
+      y += 100
+    }
+    else{
+        let nx = info_table.find(({ id }) => id === match.parentMatch1Id).x + 200
+        let ny = info_table.find(({ id }) => id === match.parentMatch1Id).y + 50
 
 
-    nodes.push({id: ("match_"+i+"_1"), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
-    nodes.push({id: ("match_"+i+"_2"), position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
-  
-    y += 100
+        nodes.push({id: ("match_"+i+"_1"), position: { x: nx, y: ny}, style: { width: width, height: height}, data: { label: label1 }})
+        nodes.push({id: ("match_"+i+"_2"), position: { x: nx, y: ny+25}, style: { width: width, height: height}, data: { label: label2 }})
+    
+    }
+
+
+
+    
   }
 
   return nodes
@@ -72,6 +91,9 @@ function find_canvas_size(tournament_matches){
 
   console.log("tournamentMatches:")
   console.log(tournament_matches)
+
+
+  
   
   for (let i = 0; i < tournament_matches.length; i++){
       let match = tournament_matches[i]
