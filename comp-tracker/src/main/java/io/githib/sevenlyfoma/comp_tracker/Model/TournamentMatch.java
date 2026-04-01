@@ -50,20 +50,20 @@ public class TournamentMatch {
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
-    // @ManyToOne
-    // @JoinColumn(name = "parent_match_1_id")
-    // private TournamentMatch parentMatch1;
+    @ManyToOne
+    @JoinColumn(name = "parent_match_1_id")
+    private TournamentMatch parentMatch1;
 
-    // @ManyToOne
-    // @JoinColumn(name = "parent_match_2_id")
-    // private TournamentMatch parentMatch2;
+    @ManyToOne
+    @JoinColumn(name = "parent_match_2_id")
+    private TournamentMatch parentMatch2;
 
     
-    @Column(name = "parent_match_1_id")
-    private Long parentMatch1Id;
+    // @Column(name = "parent_match_1_id")
+    // private Long parentMatch1Id;
 
-    @Column(name = "parent_match_2_id")
-    private Long parentMatch2Id;
+    // @Column(name = "parent_match_2_id")
+    // private Long parentMatch2Id;
 
     @ManyToOne
     @JoinColumn(name = "user1_id")

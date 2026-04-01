@@ -24,10 +24,17 @@ public class TournamentMatchController {
         return tournamentMatchRepository.findAll();
     }
 
-    @GetMapping("/{tid}")
+    @GetMapping("/all/{tid}")
      public Iterable<TournamentMatch> getTMatchesByTId(@PathVariable Long tid){
         var t = Tournament.builder().id(tid).tournamentName(null).closed(null).build();
         var tournamentEntrantList = tournamentMatchRepository.findByTournament(t);
+        return tournamentEntrantList;
+    }
+
+    @GetMapping("/{tid}")
+     public Iterable<TournamentMatch> getTopLevelTMatchesByTId(@PathVariable Long tid){
+        var t = Tournament.builder().id(tid).tournamentName(null).closed(null).build();
+        var tournamentEntrantList = tournamentMatchRepository.findByTournamentAndMatchNumber(t, Long.valueOf(1));
         return tournamentEntrantList;
     }
 
