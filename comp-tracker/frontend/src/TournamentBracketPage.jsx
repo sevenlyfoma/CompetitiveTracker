@@ -31,7 +31,7 @@ const BoundaryNode = ({ data }) => {
 
 const nodeTypes = {boundary: BoundaryNode};
 
-function makeNodes(tournament_matches){
+function makeNodes(tournament_matches, setMatchNodes){
 
 
   // let x = 100
@@ -83,9 +83,57 @@ function makeNodes(tournament_matches){
 
   let nodes =[]
 
-  // let topMatch = 
+  let topMatch = tournament_matches[0];
+
+  console.log("make nodes")
+  console.log(topMatch)
+
+  nodes = makeNodesRecursive(topMatch, 0, 300, 300)
+
+  console.log("make nodes done")
+  console.log(nodes);
 
   return nodes
+}
+
+function makeNodesRecursive(match, minY, maxY, x){
+
+  console.log("make nodes rc")
+  console.log(match)
+
+  if (match !== undefined && match !== null){
+    console.log("make nodes rc not null")
+    console.log(match)
+
+    let nodes =[]
+    let label1 = "n/a";
+    let label2 = "n/a";
+    if (match.user1 !== null){label1 = match.user1.name}
+    if (match.user2 !== null){label2 = match.user2.name}
+
+    let height = 25
+    let width = 100
+
+    let y = ((minY + maxY) / 2) - 25
+
+
+    nodes.push({id: ("match_"+match.id+"_1"), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
+    nodes.push({id: ("match_"+match.id+"_2"), position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
+
+    
+
+    let topNodes = makeNodesRecursive(match.parentMatch1, minY, y, x - 200)
+    let botNodes = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
+
+
+    return nodes.concat(topNodes).concat(botNodes)
+  }
+
+  
+ 
+
+
+  return [];
 }
 
 const initialNodes = [];
@@ -163,6 +211,8 @@ function TournamentBracketPageInner() {
 
 
   const [tournamentMatchList, setTournamentMatchList] = useState([]);
+
+  // const [matchNodes, setMatchNodes] = useState([]);
   
   const fetchMatches = async () => {
       try {
@@ -203,7 +253,12 @@ function TournamentBracketPageInner() {
   }, [setViewport]);
 
 
-  const matchNodes = makeNodes(tournamentMatchList);
+  const matchNodes = makeNodes(tournamentMatchList, {});
+
+  // useEffect(() => {
+  //     makeNodes(tournamentMatchList, setMatchNodes)
+  // }, [tournamentMatchList]);
+
 
  
 
