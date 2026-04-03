@@ -4,7 +4,7 @@
 
 // import { Bracket, RoundProps } from 'react-brackets';
 import React, {useCallback, useState, useEffect} from 'react';
-import ReactFlow, { Position, useReactFlow, ReactFlowProvider, useStore } from 'reactflow';
+import ReactFlow, { Position, useReactFlow, ReactFlowProvider, useStore, Handle } from 'reactflow';
 // import { useViewportHelper } from 'reactflow';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'reactflow/dist/style.css';
@@ -29,83 +29,53 @@ const BoundaryNode = ({ data }) => {
   );
 };
 
-const nodeTypes = {boundary: BoundaryNode};
+const MatchUserNode = ({ data }) => {
+
+  const {label, showLeftHandle, showRightHandle} = data;
+
+  return (
+    <div style={{
+      width: '100%', 
+      height: '100%',
+      label: label,
+      // background: 'red',
+      color: 'black',
+      border: '1px solid black',
+      boxSizing: 'border-box',    
+      display: 'flex',          
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      {showLeftHandle && (
+        <Handle type="target" position={Position.Left} />
+      )}
+      <p>{label}</p>
+      {showRightHandle && (
+        <Handle type="source" position={Position.Right} />
+      )}
+    </div>
+  );
+};
+
+const nodeTypes = {boundary: BoundaryNode, matchUser: MatchUserNode};
 
 function makeNodes(tournament_matches, setMatchNodes){
 
-
-  // let x = 100
-  // let y = 100
-  // let height = 25
-  // let width = 100
- 
-  // let info_table = []
-  
-  // tournament_matches.sort(function(a,b){return a.matchNumber-b.matchNumber})
-
-  // for (let i = 0; i < tournament_matches.length; i++){
-  //   let match = tournament_matches[i]
-
-    
-  //   info_table.push({id: match.id, x: x, y: y})
-
-  //   let label1 = "n/a";
-  //   let label2 = "n/a";
-
-  //   if (match.user1 !== null){
-  //     label1 = match.user1.name
-  //   }
-
-  //   if (match.user2 !== null){
-  //     label2 = match.user2.name
-  //   }
-
-  //   if (match.parentMatch1Id == null){
-  //     nodes.push({id: ("match_"+i+"_1"), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
-  //     nodes.push({id: ("match_"+i+"_2"), position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
-    
-  //     y += 100
-  //   }
-  //   else{
-  //       let nx = info_table.find(({ id }) => id === match.parentMatch1Id).x + 200
-  //       let ny = info_table.find(({ id }) => id === match.parentMatch1Id).y + 50
-
-
-  //       nodes.push({id: ("match_"+i+"_1"), position: { x: nx, y: ny}, style: { width: width, height: height}, data: { label: label1 }})
-  //       nodes.push({id: ("match_"+i+"_2"), position: { x: nx, y: ny+25}, style: { width: width, height: height}, data: { label: label2 }})
-    
-  //   }
-
-
-
-    
-  // }
-
-  let nodes =[]
-
   let topMatch = tournament_matches[0];
 
-  console.log("make nodes")
-  console.log(topMatch)
+  let nodesAndEdges = makeNodesRecursive(topMatch, 0, 300, 300)
 
-  nodes = makeNodesRecursive(topMatch, 0, 300, 300)
-
-  console.log("make nodes done")
-  console.log(nodes);
-
-  return nodes
+  return nodesAndEdges
 }
 
 function makeNodesRecursive(match, minY, maxY, x){
 
-  console.log("make nodes rc")
-  console.log(match)
 
   if (match !== undefined && match !== null){
-    console.log("make nodes rc not null")
-    console.log(match)
 
     let nodes =[]
+    let edges = []
+    
     let label1 = "n/a";
     let label2 = "n/a";
     if (match.user1 !== null){label1 = match.user1.name}
@@ -116,24 +86,35 @@ function makeNodesRecursive(match, minY, maxY, x){
 
     let y = ((minY + maxY) / 2) - 25
 
-
-    nodes.push({id: ("match_"+match.id+"_1"), position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
-    nodes.push({id: ("match_"+match.id+"_2"), position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
+    nodes.push({id: ("match_"+match.id+"_0"), type: 'matchUser', position: { x: x, y: y}, style: { width: width, height: height*2}, data: { showLeftHandle: true, showRightHandle: true }})
+    nodes.push({id: ("match_"+match.id+"_1"), type: 'matchUser', position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
+    nodes.push({id: ("match_"+match.id+"_2"), type: 'matchUser', position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
 
     
 
-    let topNodes = makeNodesRecursive(match.parentMatch1, minY, y, x - 200)
-    let botNodes = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
+    let topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, y, x - 200)
+    let botNodesAndEdges = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
+
+    let topTopNode = topNodesAndEdges.nodes[0];
+    let topBotNode = botNodesAndEdges.nodes[0];
+
+    if (match.parentMatch1 !== null){
+      edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source:topTopNode.id, target:("match_"+match.id+"_0"), type: "step"})
+    }
+    if (match.parentMatch2 !== null){
+      edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:topBotNode.id, target:("match_"+match.id+"_0"), type: "step"})
+    }
+    
 
 
-    return nodes.concat(topNodes).concat(botNodes)
+    return {nodes: nodes.concat(topNodesAndEdges.nodes).concat(botNodesAndEdges.nodes), edges: edges.concat(topNodesAndEdges.edges).concat(botNodesAndEdges.edges)}
   }
 
   
  
 
 
-  return [];
+  return {nodes: [], edges: []};
 }
 
 const initialNodes = [];
@@ -253,7 +234,7 @@ function TournamentBracketPageInner() {
   }, [setViewport]);
 
 
-  const matchNodes = makeNodes(tournamentMatchList, {});
+  const matchNodesAndEdges = makeNodes(tournamentMatchList, {});
 
   // useEffect(() => {
   //     makeNodes(tournamentMatchList, setMatchNodes)
@@ -262,14 +243,17 @@ function TournamentBracketPageInner() {
 
  
 
-  const initialEdges = [{ id: 'e1-2', source: '1', target: '2', type: "step"}];
+  const initialEdges = [];
 
 
   const canvasDimensions = find_canvas_size(tournamentMatchList);
 
   const boundaryBoxes = create_boundary_boxes(canvasDimensions[0], canvasDimensions[1]);
 
-  const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodes)
+  const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodesAndEdges.nodes)
+
+  const totalEdges = initialEdges.concat(matchNodesAndEdges.edges)
+  console.log(totalEdges);
 
   console.log(canvasDimensions)
 
@@ -286,7 +270,8 @@ return (
     <div style={{ width: '100%', height: '100%' }}>
         <ReactFlow 
           nodes = {totalNodes} 
-          edges={initialEdges} 
+          // edges={initialEdges} 
+          edges={totalEdges} 
           // translateExtent={translateLimit}
           // onMove={handleMove}
           nodeTypes={nodeTypes}
