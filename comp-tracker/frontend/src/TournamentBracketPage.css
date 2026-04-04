@@ -27,6 +27,19 @@
   flex-shrink: 0; /* Keep an eye on this */
 }
 
+.matchUserNodeInner p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin: 0; 
+  padding: 0 5px;
+  box-sizing: border-box;
+}
+
+
+
+
 .matchUserNodeOuter {
   color: black;
   border: 1px solid black;
