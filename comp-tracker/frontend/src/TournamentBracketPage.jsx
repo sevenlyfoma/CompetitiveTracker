@@ -58,11 +58,13 @@ const MatchUserNode = ({ data }) => {
 
 const nodeTypes = {boundary: BoundaryNode, matchUser: MatchUserNode};
 
-function makeNodes(tournament_matches, setMatchNodes){
+function makeNodes(tournament_matches, canvasDimensions){
+
+  const {width, height} = canvasDimensions;
 
   let topMatch = tournament_matches[0];
 
-  let nodesAndEdges = makeNodesRecursive(topMatch, 0, 300, 300)
+  let nodesAndEdges = makeNodesRecursive(topMatch, 0, height, width-200)
 
   return nodesAndEdges
 }
@@ -83,11 +85,11 @@ function makeNodesRecursive(match, minY, maxY, x){
     let height = 25
     let width = 100
 
-    let y = ((minY + maxY) / 2) - 25
+    let y = ((minY + maxY) / 2)
 
     let node_id = "match_"+match.id
 
-    nodes.push({id: node_id, type: 'matchUser', position: { x: x, y: y}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
+    nodes.push({id: node_id, type: 'matchUser', position: { x: x, y: y-25}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
     
     let topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, y, x - 200)
     let botNodesAndEdges = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
@@ -116,37 +118,43 @@ function makeNodesRecursive(match, minY, maxY, x){
 
 const initialNodes = [];
 
-function find_canvas_size(tournament_matches){
-  let level_1_match_count = 0;
-  let highest_level = 1;
-
-  console.log("tournamentMatches:")
-  console.log(tournament_matches)
-
-
-  
-  
-  for (let i = 0; i < tournament_matches.length; i++){
-      let match = tournament_matches[i]
-
-    if (match.matchNumber < 2) {
-      level_1_match_count += 1;
+function find_tourney_depth(match){
+  if (match !== undefined && match !== null){
+    if (match.parentMatch1 == null && match.parentMatch2 == null){
+      return 1;
     }
+    else{
+      let p1Depth = find_tourney_depth(match.parentMatch1)
+      let p2Depth = find_tourney_depth(match.parentMatch2)
 
-    if (match.matchNumber > highest_level) {
-      highest_level = match.matchNumber;
+      if (p1Depth >= p2Depth){
+        return p1Depth + 1;
+      }
+      else {
+        return p2Depth + 1;
+      }
     }
   }
-
-  let height = level_1_match_count * 300
-  let width = highest_level * 500
-
-  return [height, width]
-
-
+  return 0;
 }
 
-function create_boundary_boxes(height, width){
+function find_canvas_size(tournament_matches){
+
+  let topMatch = tournament_matches[0];
+
+  let depth = find_tourney_depth(topMatch);
+
+  let maxBotMatches = 2 ** (depth - 1)
+
+  let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
+
+  return dimensions
+}
+
+function create_boundary_boxes(canvasDimensions){
+
+  const {width, height} = canvasDimensions;
+
   let boundaryBoxes = [
     { id: 'bb-n', type: 'boundary', position: { x: 0, y: 0}, style: { width: width, height: 10,}, data: { 
       label: 'North', 
@@ -231,7 +239,7 @@ function TournamentBracketPageInner() {
   }, [setViewport]);
 
 
-  const matchNodesAndEdges = makeNodes(tournamentMatchList, {});
+  
 
   // useEffect(() => {
   //     makeNodes(tournamentMatchList, setMatchNodes)
@@ -245,7 +253,9 @@ function TournamentBracketPageInner() {
 
   const canvasDimensions = find_canvas_size(tournamentMatchList);
 
-  const boundaryBoxes = create_boundary_boxes(canvasDimensions[0], canvasDimensions[1]);
+  const matchNodesAndEdges = makeNodes(tournamentMatchList, canvasDimensions);
+
+  const boundaryBoxes = create_boundary_boxes(canvasDimensions);
 
   const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodesAndEdges.nodes)
 
