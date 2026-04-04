@@ -31,28 +31,27 @@ const BoundaryNode = ({ data }) => {
 
 const MatchUserNode = ({ data }) => {
 
-  const {label, showLeftHandle, showRightHandle} = data;
+  const {match, showLeftHandle, showRightHandle} = data;
+
+  let label1 = "n/a";
+  let label2 = "n/a";
+  if (match.user1 !== null){label1 = match.user1.name}
+  if (match.user2 !== null){label2 = match.user2.name}
 
   return (
-    <div style={{
-      width: '100%', 
-      height: '100%',
-      label: label,
-      // background: 'red',
-      color: 'black',
-      border: '1px solid black',
-      boxSizing: 'border-box',    
-      display: 'flex',          
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      {showLeftHandle && (
-        <Handle type="target" position={Position.Left} />
-      )}
-      <p>{label}</p>
-      {showRightHandle && (
-        <Handle type="source" position={Position.Right} />
-      )}
+    <div className="matchUserNodeDiv" style={{width: '100%', height: '100%',}}>
+      
+      {showLeftHandle && (<Handle type="target" position={Position.Left} />)}
+      
+      <div className="matchUserNodeDiv" style={{width: '100%', height: '50%',}}>
+        <p>{label1}</p>
+      </div>
+
+      <div className="matchUserNodeDiv" style={{width: '100%', height: '50%',}}>
+        <p>{label2}</p>
+      </div>
+      
+      {showRightHandle && (<Handle type="source" position={Position.Right} />)}
     </div>
   );
 };
@@ -86,12 +85,10 @@ function makeNodesRecursive(match, minY, maxY, x){
 
     let y = ((minY + maxY) / 2) - 25
 
-    nodes.push({id: ("match_"+match.id+"_0"), type: 'matchUser', position: { x: x, y: y}, style: { width: width, height: height*2}, data: { showLeftHandle: true, showRightHandle: true }})
-    nodes.push({id: ("match_"+match.id+"_1"), type: 'matchUser', position: { x: x, y: y}, style: { width: width, height: height}, data: { label: label1 }})
-    nodes.push({id: ("match_"+match.id+"_2"), type: 'matchUser', position: { x: x, y: y+25}, style: { width: width, height: height}, data: { label: label2 }})
+    let node_id = "match_"+match.id
 
+    nodes.push({id: node_id, type: 'matchUser', position: { x: x, y: y}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
     
-
     let topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, y, x - 200)
     let botNodesAndEdges = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
 
@@ -99,10 +96,10 @@ function makeNodesRecursive(match, minY, maxY, x){
     let topBotNode = botNodesAndEdges.nodes[0];
 
     if (match.parentMatch1 !== null){
-      edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source:topTopNode.id, target:("match_"+match.id+"_0"), type: "step"})
+      edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source:topTopNode.id, target: node_id, type: "step"})
     }
     if (match.parentMatch2 !== null){
-      edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:topBotNode.id, target:("match_"+match.id+"_0"), type: "step"})
+      edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:topBotNode.id, target: node_id, type: "step"})
     }
     
 
