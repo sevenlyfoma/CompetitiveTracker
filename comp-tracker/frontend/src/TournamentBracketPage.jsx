@@ -76,32 +76,40 @@ function makeNodesRecursive(match, minY, maxY, x){
 
     let nodes =[]
     let edges = []
-    
-    let label1 = "n/a";
-    let label2 = "n/a";
-    if (match.user1 !== null){label1 = match.user1.name}
-    if (match.user2 !== null){label2 = match.user2.name}
-
+  
     let height = 25
     let width = 100
 
+    let nx = x;
+    console.log(match);
+    if (match.inheritsParentMatch1Winner == false && match.inheritsParentMatch2Winner == false) {nx -= 50;}
     let y = ((minY + maxY) / 2)
 
     let node_id = "match_"+match.id
-
-    nodes.push({id: node_id, type: 'matchUser', position: { x: x, y: y-25}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
+    nodes.push({id: node_id, type: 'matchUser', position: { x: nx, y: y-25}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
     
-    let topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, y, x - 200)
-    let botNodesAndEdges = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
-
+    let topNodesAndEdges = {nodes: [], edges: []};
+    let botNodesAndEdges = {nodes: [], edges: []};
+    if (match.inheritsParentMatch1Winner == true) {
+      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, y, x - 200)
+    }
+    if (match.inheritsParentMatch2Winner == true) {
+      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
+    }
+    
+    
     let topTopNode = topNodesAndEdges.nodes[0];
     let topBotNode = botNodesAndEdges.nodes[0];
 
     if (match.parentMatch1 !== null){
-      edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source:topTopNode.id, target: node_id, type: "step"})
+      let parent1_node_id = "match_"+match.parentMatch1.id
+      let col = match.inheritsParentMatch1Winner == true ? 'green' : 'red';
+      edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source: parent1_node_id, target: node_id, type: "step", style : {stroke: col, namestrokeWidth: 5,}})
     }
     if (match.parentMatch2 !== null){
-      edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:topBotNode.id, target: node_id, type: "step"})
+      let parent2_node_id = "match_"+match.parentMatch2.id
+      let col = match.inheritsParentMatch2Winner == true ? 'green' : 'red';
+      edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:parent2_node_id, target: node_id, type: "step", style : {stroke: col, namestrokeWidth: 5,}})
     }
     
 
