@@ -138,5 +138,7 @@ INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2
 VALUES (4, 4, 5, false, false, 2);
 
 INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
-VALUES (4, 6, 7, true, true, 1);
+VALUES (4, 6, 7, false, true, 2);
 
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
+VALUES (4, 6, 8, true, true, 1);

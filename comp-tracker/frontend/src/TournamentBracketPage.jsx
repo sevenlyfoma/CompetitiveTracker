@@ -82,7 +82,7 @@ function makeNodesRecursive(match, minY, maxY, x){
 
     let nx = x;
     console.log(match);
-    if (match.inheritsParentMatch1Winner == false && match.inheritsParentMatch2Winner == false) {nx -= 50;}
+    if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false) {nx += 50;}
     let y = ((minY + maxY) / 2)
 
     let node_id = "match_"+match.id
@@ -96,10 +96,6 @@ function makeNodesRecursive(match, minY, maxY, x){
     if (match.inheritsParentMatch2Winner == true) {
       botNodesAndEdges = makeNodesRecursive(match.parentMatch2, y, maxY, x - 200)
     }
-    
-    
-    let topTopNode = topNodesAndEdges.nodes[0];
-    let topBotNode = botNodesAndEdges.nodes[0];
 
     if (match.parentMatch1 !== null){
       let parent1_node_id = "match_"+match.parentMatch1.id
@@ -132,6 +128,10 @@ function find_tourney_depth(match){
       return 1;
     }
     else{
+      //Hack to avoid double counting of depth on double elim brackets
+      if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false){
+        return 0
+      }
       let p1Depth = find_tourney_depth(match.parentMatch1)
       let p2Depth = find_tourney_depth(match.parentMatch2)
 
@@ -152,9 +152,13 @@ function find_canvas_size(tournament_matches){
 
   let depth = find_tourney_depth(topMatch);
 
+  console.log("depth: " + depth)
+
   let maxBotMatches = 2 ** (depth - 1)
 
   let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
+
+  console.log("dimensions {height : " + dimensions.height + ", width : " + dimensions.width + "}")
 
   return dimensions
 }
