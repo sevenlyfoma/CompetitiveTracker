@@ -12,7 +12,7 @@ import 'reactflow/dist/style.css';
 import './TournamentBracketPage.css'
 
 
-
+//TODO logic for resolving tournament matches
  
 const edgeTypes = {};
 
@@ -39,19 +39,23 @@ const MatchUserNode = ({ data }) => {
   if (match.user2 !== null){label2 = match.user2.name}
 
   return (
-    <div className="matchUserNodeDiv" style={{width: '100%', height: '100%',}}>
+    <div className="matchUserNodeOuter" style={{width: '100%', height: '100%',}}>
+      <button style={{width: '20%', height: '100%',}}> </button>
       
-      {showLeftHandle && (<Handle type="target" position={Position.Left} />)}
-      
-      <div className="matchUserNodeDiv" style={{width: '100%', height: '50%',}}>
-        <p>{label1}</p>
-      </div>
+      <div className="matchUserNodeDiv" style={{width: '80%', height: '100%',}}>
+        
+        {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Left} />)}
+        
+        <div className="matchUserNodeInner" style={{width: '100%', height: '50%',}}>
+          <p>{label1}</p>
+        </div>
 
-      <div className="matchUserNodeDiv" style={{width: '100%', height: '50%',}}>
-        <p>{label2}</p>
+        <div className="matchUserNodeInner" style={{width: '100%', height: '50%',}}>
+          <p>{label2}</p>
+        </div>
+        
+        {showRightHandle && (<Handle className='matchUserNodeHandle' type="source" position={Position.Right} />)}
       </div>
-      
-      {showRightHandle && (<Handle type="source" position={Position.Right} />)}
     </div>
   );
 };
@@ -100,12 +104,12 @@ function makeNodesRecursive(match, minY, maxY, x){
     if (match.parentMatch1 !== null){
       let parent1_node_id = "match_"+match.parentMatch1.id
       let col = match.inheritsParentMatch1Winner == true ? 'green' : 'red';
-      edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source: parent1_node_id, target: node_id, type: "step", style : {stroke: col, namestrokeWidth: 5,}})
+      edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source: parent1_node_id, target: node_id, type: "step", style : {stroke: col, namestrokeWidth: 5,},})
     }
     if (match.parentMatch2 !== null){
       let parent2_node_id = "match_"+match.parentMatch2.id
       let col = match.inheritsParentMatch2Winner == true ? 'green' : 'red';
-      edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:parent2_node_id, target: node_id, type: "step", style : {stroke: col, namestrokeWidth: 5,}})
+      edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:parent2_node_id, target: node_id, type: "step", style : {stroke: col, namestrokeWidth: 5,},})
     }
     
 
