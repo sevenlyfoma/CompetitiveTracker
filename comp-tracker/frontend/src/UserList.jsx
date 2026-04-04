@@ -42,6 +42,8 @@ function UserList() {
 
   let usermatchcontent = <></>;
 
+  const navigate = useNavigate();
+
   return (
     <>
       <h2>User List</h2>
@@ -78,6 +80,8 @@ function UserList() {
         </tbody>
 
       </table>
+
+      <button onClick={() => navigate(`/tournaments`)}>View Tournaments</button>
     
     </>
   )

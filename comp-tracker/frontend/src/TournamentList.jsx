@@ -32,6 +32,8 @@ function TournamentList() {
     fetchTournaments();
   }, []);
 
+  const navigate = useNavigate();
+
   return (
     <>
       <h2>Tournament List</h2>
@@ -66,6 +68,8 @@ function TournamentList() {
         </tbody>
 
       </table>
+
+      <button onClick={() => navigate(`/`)}>View Users</button>
     
     </>
   )
