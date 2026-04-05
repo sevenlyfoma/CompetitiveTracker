@@ -22,6 +22,7 @@ function UserMatchList(){
                 throw new Error(`Server responded with status: ${response.status}`)
             }
             const userJson = await response.json();
+            console.log("fetchUser")
             console.log(userJson);
             setUser(userJson);
 
@@ -99,6 +100,9 @@ function UserMatchList(){
 }
 
 function UserMatchRow({match, user}){
+
+    console.log("UserMatchRow")
+    console.log(user.id);
 
     let matchResult;
     if (match.winner.id === user.id) {

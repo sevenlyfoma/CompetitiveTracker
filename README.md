@@ -9,7 +9,7 @@ Look into RestControllerAdvice as a global error handler so we can give the user
 
 
 # Quick API Test Commands
-curl http://localhost:8080/users/all
+curl http://localhost:8080/api/users/all
 
 curl http://localhost:8080/api/tournaments/all
 
@@ -33,7 +33,7 @@ curl --header "Content-Type: application/json" --request POST --data '{"name":"j
 
 curl --header "Content-Type: application/json" --request PUT --data '{"name":"jane e example","email":"jane@example.com","pronouns":"she/her they/them","rating":1000}' http://localhost:8080/users/11
 
-curl http://localhost:8080/matches/all
+curl http://localhost:8080/api/matches/all
 
 curl -X POST http://localhost:8080/matches \
 -H "Content-Type: application/json" \
@@ -47,3 +47,15 @@ curl -X POST http://localhost:8080/matches \
     "user2RatingBefore": 1200,
     "user2RatingAfter": 1185
 }'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+-H "Content-Type: application/json" \
+-d '{
+    "tournamentMatchID": 4,
+    "winnerID": 1,
+}'
+
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 4, "winnerID": 1}'

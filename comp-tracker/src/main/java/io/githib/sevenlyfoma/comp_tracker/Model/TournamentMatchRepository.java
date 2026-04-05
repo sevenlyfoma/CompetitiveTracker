@@ -8,5 +8,7 @@ public interface TournamentMatchRepository extends CrudRepository<TournamentMatc
     List<TournamentMatch> findByTournament(Tournament tournament);
 
     List<TournamentMatch> findByTournamentAndMatchNumber(Tournament tournament, Long matchNumber);
+
+    List<TournamentMatch> findByParentMatch1OrParentMatch2(TournamentMatch p1, TournamentMatch p2);
 }
 

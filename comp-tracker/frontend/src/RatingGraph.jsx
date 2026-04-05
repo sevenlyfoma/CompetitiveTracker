@@ -26,7 +26,7 @@ const LineChart = ({user, userMatchList}) => {
 
   let ratings;
 
-  if (user.id = userMatchList[0]?.user1.id) {
+  if (user.id == userMatchList[0]?.user1.id) {
     ratings = [ userMatchList[0]?.user1RatingBefore, ...userMatchList.map(match => match.user1RatingAfter)];
   }
   else {
