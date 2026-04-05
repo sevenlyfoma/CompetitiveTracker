@@ -218,7 +218,7 @@ function TournamentBracketPageInner() {
   
   const fetchMatches = async () => {
       try {
-          const response = await fetch(`/api/tournament_matches/${tournament_json.id}`);
+          const response = await fetch(`/api/tournament_matches/top/${tournament_json.id}`);
           if (!response.ok){
               throw new Error(`Server responded with status: ${response.status}`)
           }
