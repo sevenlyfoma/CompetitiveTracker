@@ -6,7 +6,7 @@
 import React, {useCallback, useState, useEffect} from 'react';
 import ReactFlow, { Position, useReactFlow, ReactFlowProvider, useStore, Handle } from 'reactflow';
 // import { useViewportHelper } from 'reactflow';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, redirect } from 'react-router-dom';
 import 'reactflow/dist/style.css';
 
 import './TournamentBracketPage.css'
@@ -39,6 +39,21 @@ const MatchUserNode = ({ data }) => {
   if (match.user1 !== null){label1 = match.user1.name}
   if (match.user2 !== null){label2 = match.user2.name}
 
+  let user1BgColor = null;
+  let user2BgColor = null;
+
+  if (match?.matchRecord != null){
+    if (match?.matchRecord?.winner?.id == match?.user1?.id){
+      user1BgColor = "lightgreen";
+      user2BgColor = "red";
+    }
+    else {
+      user1BgColor = "red";
+      user2BgColor = "lightgreen";
+    }
+  }
+
+
   return (
     <div className="matchUserNodeOuter" style={{width: '100%', height: '100%',}}>
       <button 
@@ -51,11 +66,11 @@ const MatchUserNode = ({ data }) => {
         
         {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Left} />)}
         
-        <div className="matchUserNodeInner" style={{width: '100%', height: '50%',}}>
+        <div className="matchUserNodeInner" style={{width: '100%', height: '50%', backgroundColor: user1BgColor}}>
           <p>{label1}</p>
         </div>
 
-        <div className="matchUserNodeInner" style={{width: '100%', height: '50%',}}>
+        <div className="matchUserNodeInner" style={{width: '100%', height: '50%', backgroundColor: user2BgColor}}>
           <p>{label2}</p>
         </div>
         
@@ -90,7 +105,7 @@ function makeNodesRecursive(match, minY, maxY, x){
     let width = 100
 
     let nx = x;
-    console.log(match);
+    // console.log(match);
     if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false) {nx += 50;}
     let y = ((minY + maxY) / 2)
 
@@ -161,13 +176,13 @@ function find_canvas_size(tournament_matches){
 
   let depth = find_tourney_depth(topMatch);
 
-  console.log("depth: " + depth)
+  // console.log("depth: " + depth)
 
   let maxBotMatches = 2 ** (depth - 1)
 
   let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
 
-  console.log("dimensions {height : " + dimensions.height + ", width : " + dimensions.width + "}")
+  // console.log("dimensions {height : " + dimensions.height + ", width : " + dimensions.width + "}")
 
   return dimensions
 }
@@ -211,25 +226,32 @@ function TournamentBracketPageInner() {
 
 
   const navigate = useNavigate();
-  const { tournament } = useParams();
+  const { tournamentID } = useParams();
       
-  
-  const tournament_json = JSON.parse(tournament)
-
 
   const [tournamentMatchList, setTournamentMatchList] = useState([]);
+  const [tournament, setTournament] = useState({})
 
   // const [matchNodes, setMatchNodes] = useState([]);
   
   const fetchMatches = async () => {
       try {
-          const response = await fetch(`/api/tournament_matches/top/${tournament_json.id}`);
+          console.log("fetch Matches")
+          const response = await fetch(`/api/tournament_matches/top/${tournamentID}`);
           if (!response.ok){
               throw new Error(`Server responded with status: ${response.status}`)
           }
           const matchesJson = await response.json();
           console.log(matchesJson);
           setTournamentMatchList(matchesJson);
+
+          const response2 = await fetch(`/api/tournaments/${tournamentID}`);
+          if (!response2.ok){
+              throw new Error(`Server responded with status: ${response2.status}`)
+          }
+          const tournamentJson = await response2.json();
+          console.log(tournamentJson);
+          setTournament(tournamentJson);
 
 
       } catch (error) {
@@ -281,9 +303,9 @@ function TournamentBracketPageInner() {
   const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodesAndEdges.nodes)
 
   const totalEdges = initialEdges.concat(matchNodesAndEdges.edges)
-  console.log(totalEdges);
+  // console.log(totalEdges);
 
-  console.log(canvasDimensions)
+  // console.log(canvasDimensions)
 
   const translateLimit = [
     [-1000, -1000],

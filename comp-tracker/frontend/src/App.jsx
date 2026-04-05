@@ -17,8 +17,8 @@ function App() {
          <Route path="/userpages/:userID" element={<UserMatchList />} />
          <Route path="/matches" element={<MatchList />} />
          <Route path="/tournaments" element={<TournamentList />} />
-         <Route path="/tournaments/open/:tournament" element={<TournamentEntrantList/>} />
-         <Route path="/tournaments/closed/:tournament" element={<TournamentBracketPage/>} />
+         <Route path="/tournaments/open/:tournamentID" element={<TournamentEntrantList/>} />
+         <Route path="/tournaments/closed/:tournamentID" element={<TournamentBracketPage/>} />
          <Route path="/tournaments/matches/:tournamentID/:tournamentMatchID" element={<TournamentMatchPage />} />
       </Routes>
     </BrowserRouter>

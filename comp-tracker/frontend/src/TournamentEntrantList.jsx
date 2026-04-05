@@ -10,24 +10,31 @@ import Select from 'react-select'
 function TournamentEntrantList(){
 
     
-    const { tournament } = useParams();
+    const { tournamentID } = useParams();
     
-
-    const tournament_json = JSON.parse(tournament)
 
     const navigate = useNavigate();
 
     const [tournamentEntrantList, setTournamentEntrantList] = useState([]);
+    const [tournament, setTournament] = useState({})
 
     const fetchEntrants = async () => {
         try {
-            const response = await fetch(`/api/tournament_entrants/${tournament_json.id}`);
+            const response = await fetch(`/api/tournament_entrants/${tournamentID}`);
             if (!response.ok){
                 throw new Error(`Server responded with status: ${response.status}`)
             }
             const entrantsJson = await response.json();
             console.log(entrantsJson);
             setTournamentEntrantList(entrantsJson);
+
+            const response2 = await fetch(`/api/tournaments/${tournamentID}`);
+            if (!response2.ok){
+                throw new Error(`Server responded with status: ${response2.status}`)
+            }
+            const tournamentJson = await response2.json();
+            console.log(tournamentJson);
+            setTournament(tournamentJson);
 
 
         } catch (error) {
@@ -67,7 +74,7 @@ function TournamentEntrantList(){
     return (
         <>
             <h2>
-                Entrants for Tournament: {tournament_json.name}
+                Entrants for Tournament: {tournament?.tournamentName}
             </h2>
 
             <table>
@@ -87,7 +94,7 @@ function TournamentEntrantList(){
                         )
                     })}
 
-                    <AddEntrantRow key={"Add Entrant Row"} userList={userList} tournament={tournament_json} onCreate={fetchEntrants}/>
+                    <AddEntrantRow key={"Add Entrant Row"} userList={userList} tournament={tournament} onCreate={fetchEntrants}/>
                 </tbody>
 
 

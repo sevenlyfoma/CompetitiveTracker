@@ -78,10 +78,10 @@ function TournamentList() {
 
 function StandardItemRow({item, handleEditClick, fetchItems}) {
   let status = "open";
-  let button = <button onClick={() => navigate(`/tournaments/open/${JSON.stringify(item)}`)}>View Tournament</button>
+  let button = <button onClick={() => navigate(`/tournaments/open/${item.id}`)}>View Tournament</button>
   if (item.closed) {
     status = "closed"
-    button = <button onClick={() => navigate(`/tournaments/closed/${JSON.stringify(item)}`)}>View Tournament</button>
+    button = <button onClick={() => navigate(`/tournaments/closed/${item.id}`)}>View Tournament</button>
   }
   const navigate = useNavigate();
 
