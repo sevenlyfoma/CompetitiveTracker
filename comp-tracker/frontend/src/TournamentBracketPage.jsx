@@ -147,6 +147,8 @@ function makeNodesRecursive(match, minY, maxY, x){
 const initialNodes = [];
 
 function find_tourney_depth(match){
+  //ONLY ONE PARENT = DONT COUNT THE DEPTH???
+
   if (match !== undefined && match !== null){
     if (match.parentMatch1 == null && match.parentMatch2 == null){
       return 1;

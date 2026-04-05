@@ -3,6 +3,7 @@ package io.githib.sevenlyfoma.comp_tracker.Controller;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,12 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentMatchResult;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentRepository;
+import io.githib.sevenlyfoma.comp_tracker.Service.TournamentService;
 
 @RestController
 @RequestMapping("/api/tournaments")
 public class TournamentController {
+
+    @Autowired
+    private TournamentService tournamentService;
     
     private final TournamentRepository tournamentRepository;
 
@@ -66,5 +72,11 @@ public class TournamentController {
         currentTournament = tournamentRepository.save(currentTournament);
 
         return ResponseEntity.ok(currentTournament);
+    }
+
+    @PostMapping("/close/{tournamentId}")
+    public ResponseEntity<String> closeTournament(@PathVariable long tournamentId) {
+        tournamentService.closeTournament(tournamentId);
+        return ResponseEntity.ok("Tournament Closed, Tournament Matches Created");
     }
 }

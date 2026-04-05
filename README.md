@@ -90,5 +90,7 @@ curl -X POST http://localhost:8080/api/tournament_matches/report \
      -H "Content-Type: application/json" \
      -d '{"tournamentMatchID": 9, "winnerID": 4, "loserID": 1}'
 
+
+curl -X POST http://localhost:8080/api/tournaments/close/1
      
      
