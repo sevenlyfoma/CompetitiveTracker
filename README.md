@@ -56,6 +56,39 @@ curl -X POST http://localhost:8080/api/tournament_matches/report \
 }'
 
 
+
+
 curl -X POST http://localhost:8080/api/tournament_matches/report \
      -H "Content-Type: application/json" \
-     -d '{"tournamentMatchID": 4, "winnerID": 1}'
+     -d '{"tournamentMatchID": 5, "winnerID": 1, "loserID": 2}'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 6, "winnerID": 1, "loserID": null}'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 4, "winnerID": 1, "loserID": 2}'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 5, "winnerID": 3, "loserID": 4}'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 6, "winnerID": 1, "loserID": 3}'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 7, "winnerID": 4, "loserID": 2}'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 8, "winnerID": 4, "loserID": 3}'
+
+curl -X POST http://localhost:8080/api/tournament_matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"tournamentMatchID": 9, "winnerID": 4, "loserID": 1}'
+
+     
+     

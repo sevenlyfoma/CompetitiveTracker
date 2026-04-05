@@ -2,6 +2,8 @@ package io.githib.sevenlyfoma.comp_tracker.Service;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import io.githib.sevenlyfoma.comp_tracker.Model.UserRepository;
 @Service
 public class TournamentMatchService {
     
+    private static final Logger logger = LoggerFactory.getLogger(TournamentMatchService.class);
+
     @Autowired
     private UserRepository userRepository;
 
@@ -31,6 +35,11 @@ public class TournamentMatchService {
     @Transactional
     public void processMatchResult(TournamentMatchResult result){
         TournamentMatch tMatch = tournamentMatchRepository.findById(result.getTournamentMatchID()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament Match not found"));
+
+        validateAllUsersPresent(tMatch);
+        validateNoResult(tMatch);
+        validateParticipants(tMatch, result);
+        
 
         User winner = tMatch.getUser2();
         User loser = tMatch.getUser1();
@@ -89,6 +98,36 @@ public class TournamentMatchService {
                 }
             }
             tournamentMatchRepository.save(c);
+        }
+    }
+
+    private void validateParticipants(TournamentMatch tMatch, TournamentMatchResult result) {
+        Long u1 = tMatch.getUser1().getId();
+        Long u2 = tMatch.getUser2().getId();
+        Long winner = result.getWinnerID();
+        Long loser = result.getLoserID();
+
+        boolean winnerIsValid = winner.equals(u1) || winner.equals(u2);
+        boolean loserIsValid = loser.equals(u1) || loser.equals(u2);
+        boolean notPlayingThemselves = !winner.equals(loser);
+
+        if (!winnerIsValid || !loserIsValid || !notPlayingThemselves) {
+            logger.error("Validation failed for Match ID {}: One or More of the participants in result were not valid for the given Tournament Match", tMatch.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Participant mismatch");
+        }
+    }
+
+    private void validateNoResult(TournamentMatch tMatch){
+        if (tMatch.getMatchRecord() != null){
+            logger.error("Validation failed for Match ID {}: match result has already been decided", tMatch.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Record Already Exists");
+        }
+    }
+
+    private void validateAllUsersPresent(TournamentMatch tMatch){
+        if (tMatch.getUser1() == null || tMatch.getUser2() == null){
+            logger.error("Validation failed for Match ID {}: match does not have all required participants registered", tMatch.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing Participant");
         }
     }
 }
