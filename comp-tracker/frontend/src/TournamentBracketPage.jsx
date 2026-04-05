@@ -30,6 +30,7 @@ const BoundaryNode = ({ data }) => {
 };
 
 const MatchUserNode = ({ data }) => {
+  const navigate = useNavigate();
 
   const {match, showLeftHandle, showRightHandle} = data;
 
@@ -40,7 +41,11 @@ const MatchUserNode = ({ data }) => {
 
   return (
     <div className="matchUserNodeOuter" style={{width: '100%', height: '100%',}}>
-      <button style={{width: '20%', height: '100%',}}> </button>
+      <button 
+        style={{width: '20%', height: '100%',}} 
+        onClick={() => navigate(`/tournaments/matches/${match.tournament.id}/${match.id}`)}>
+
+      </button>
       
       <div className="matchUserNodeDiv" style={{width: '80%', height: '100%',}}>
         
