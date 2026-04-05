@@ -40,6 +40,9 @@ public class TournamentMatch {
     @Column(name = "match_number")
     private Long matchNumber;
 
+    @Column(name = "match_title", nullable = false)
+    private String matchTitle;
+
     @Column(name = "inherits_parent_match_1_winner")
     private Boolean inheritsParentMatch1Winner;
 

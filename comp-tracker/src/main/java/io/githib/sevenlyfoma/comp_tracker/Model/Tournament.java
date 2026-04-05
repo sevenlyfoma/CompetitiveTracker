@@ -37,4 +37,7 @@ public class Tournament {
     @Column(name = "closed", nullable = false)
     private Boolean closed;
 
+    @Column(name = "style", nullable = false)
+    private String style;
+
 }

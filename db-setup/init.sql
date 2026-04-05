@@ -57,6 +57,7 @@ CREATE TABLE tournament_matches (
     id SERIAL PRIMARY KEY,
 
     match_number INTEGER,
+    match_title VARCHAR(100) NOT NULL,
     tournament_id INTEGER NOT NULL REFERENCES tournaments(id),
 
     user1_id INTEGER REFERENCES users(id),
@@ -88,10 +89,10 @@ INSERT INTO users (name, email, pronouns, rating) VALUES ('ex6', 'ex6@example.co
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex7', 'ex7@example.com', 'it/its', 1000);
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex8', 'ex8@example.com', 'it/its', 1000);
 
-INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 1', false, 'double');
-INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 2', false, 'single');
-INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 3', true, 'double');
-INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 4', true, 'single');
+INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 1', false, 'single');
+INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 2', false, 'double');
+INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 3', true, 'single');
+INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 4', true, 'double');
 
 
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 1);
@@ -124,21 +125,21 @@ INSERT INTO matches
 VALUES 
 ('2026-02-22', 1, 3, 1, 980, 1000, 1020, 1000);
 
-INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number) VALUES (3, 1, 2, 2);
-INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number) VALUES (3, 3, 4, 2);
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
-VALUES (3, 1, 2, true, true, 1);
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number, match_title) VALUES (3, 1, 2, 2, 'semi-final');
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number, match_title) VALUES (3, 3, 4, 2, 'semi-final');
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number, match_title) 
+VALUES (3, 1, 2, true, true, 1, 'final');
 
-INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number) VALUES (4, 1, 2, 3);
-INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number) VALUES (4, 3, 4, 3);
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
-VALUES (4, 4, 5, true, true, 2);
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number, match_title) VALUES (4, 1, 2, 3, 'winners-semi-final');
+INSERT INTO tournament_matches (tournament_id, user1_id, user2_id, match_number, match_title) VALUES (4, 3, 4, 3, 'winners-semi-final');
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number, match_title) 
+VALUES (4, 4, 5, true, true, 2, 'winners-final');
 
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
-VALUES (4, 4, 5, false, false, 2);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number, match_title) 
+VALUES (4, 4, 5, false, false, 2, 'losers-semi-final');
 
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
-VALUES (4, 6, 7, false, true, 2);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number, match_title) 
+VALUES (4, 6, 7, false, true, 2, 'losers-final');
 
-INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number) 
-VALUES (4, 6, 8, true, true, 1);
+INSERT INTO tournament_matches (tournament_id, parent_match_1_id, parent_match_2_id, inherits_parent_match_1_winner, inherits_parent_match_2_winner, match_number, match_title) 
+VALUES (4, 6, 8, true, true, 1, 'grand-final');
