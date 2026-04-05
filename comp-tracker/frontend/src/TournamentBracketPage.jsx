@@ -170,7 +170,7 @@ function find_tourney_depth(match){
   return 0;
 }
 
-function find_canvas_size(tournament_matches){
+function find_canvas_size(tournament_matches, setCanvasDimensions){
 
   let topMatch = tournament_matches[0];
 
@@ -183,8 +183,8 @@ function find_canvas_size(tournament_matches){
   let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
 
   // console.log("dimensions {height : " + dimensions.height + ", width : " + dimensions.width + "}")
-
-  return dimensions
+  //return dimensions
+  setCanvasDimensions(dimensions)
 }
 
 function create_boundary_boxes(canvasDimensions){
@@ -282,19 +282,24 @@ function TournamentBracketPageInner() {
   }, [setViewport]);
 
 
-  
-
   // useEffect(() => {
-  //     makeNodes(tournamentMatchList, setMatchNodes)
-  // }, [tournamentMatchList]);
+  //   if (tournamentMatchList.length > 0) {
+  //     window.requestAnimationFrame(() => {
+  //       setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 0 });
+  //     });
+  //   }
+  // }, [tournamentMatchList, setViewport]);
 
 
- 
+   
 
   const initialEdges = [];
 
+  const [canvasDimensions, setCanvasDimensions] = useState({width: 4000, height: 4000})
 
-  const canvasDimensions = find_canvas_size(tournamentMatchList);
+  useEffect(() => {
+    find_canvas_size(tournamentMatchList, setCanvasDimensions)
+  }, [tournamentMatchList]);
 
   const matchNodesAndEdges = makeNodes(tournamentMatchList, canvasDimensions);
 
@@ -303,30 +308,36 @@ function TournamentBracketPageInner() {
   const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodesAndEdges.nodes)
 
   const totalEdges = initialEdges.concat(matchNodesAndEdges.edges)
-  // console.log(totalEdges);
-
-  // console.log(canvasDimensions)
 
   const translateLimit = [
     [-1000, -1000],
-    canvasDimensions,
+    [canvasDimensions.width, canvasDimensions.height],
   ];
 
 
 return (
-  
-  <div style={{ height: '100vh', width: '100vw', }}>
+  <div className='TournamentBracketPageOuterDiv'>
+    
+    <div className='TournamentBracketPageTitleDiv' >
+      
+      <h1>
+        Bracket for {tournament.tournamentName}
+      </h1>
 
-    <div style={{ width: '100%', height: '100%' }}>
+      <button onClick={() => navigate(`/tournaments`)}>
+        Back
+      </button>
+    </div>
+
+    <div className='TournamentBracketPageCanvasDiv' style={{  }}>
         <ReactFlow 
           nodes = {totalNodes} 
-          // edges={initialEdges} 
           edges={totalEdges} 
-          // translateExtent={translateLimit}
-          // onMove={handleMove}
+          translateExtent={translateLimit}
+          onMove={handleMove}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          minZoom={0.1}
+          // minZoom={0.1}
           ></ReactFlow>
     </div>
 
@@ -353,64 +364,3 @@ function TournamentBracketPage() {
 
 
 export default TournamentBracketPage
-
-
-
-/* 
-<div style={{ 
-    display: 'flex', 
-    flexDirection: 'column',
-    height: '100vh', 
-    width: '100vw', 
-    margin: 0,
-    padding: 0,
-    overflow: 'hidden',
-    boxSizing: 'border-box',
-  }}>
-    
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'row',  
-      alignItems: 'center', 
-      justifyContent: 'left',
-      gap: '20px',
-      height: '10vh', 
-      padding: '0 20px',
-      // backgroundColor: '#f8f9fa',
-      boxSizing: 'border-box'
-    }}>
-      
-      <h1 style={{ 
-        margin: 0, 
-        fontSize: '1.5rem' 
-      }}>
-        Bracket for {tournament_json.tournamentName}
-      </h1>
-
-      <button style={{ 
-        height: '5vh',   
-        padding: '0 15px',
-        cursor: 'pointer',
-        // backgroundColor: '#007bff',
-        // color: 'white',
-        // border: 'none',
-        // borderRadius: '4px'
-      }} onClick={() => navigate(`/tournaments`)}>
-        Back
-      </button>
-    </div>
-
-    <div style={{ flexGrow: 1, width: '100%', height: '100%' }}>
-        <ReactFlow 
-          nodes = {totalNodes} 
-          edges={initialEdges} 
-          translateExtent={translateLimit}
-          onMove={handleMove}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          minZoom={0.1}
-          ></ReactFlow>
-    </div>
-
-  </div>
-*/
