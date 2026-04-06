@@ -80,14 +80,16 @@ ALTER TABLE matches
 ADD CONSTRAINT check_winner_in_match CHECK (user1_id = winner_id OR user2_id = winner_id);
 
 
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex1', 'ex1@example.com', 'it/its', 1000);
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex2', 'ex2@example.com', 'it/its', 1000);
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex3', 'ex3@example.com', 'it/its', 1000);
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex4', 'ex4@example.com', 'it/its', 1000);
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex5', 'ex5@example.com', 'it/its', 1000);
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex6', 'ex6@example.com', 'it/its', 1000);
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex7', 'ex7@example.com', 'it/its', 1000);
-INSERT INTO users (name, email, pronouns, rating) VALUES ('ex8', 'ex8@example.com', 'it/its', 1000);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex1', 'ex1@example.com', 'it/its', 1100);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex2', 'ex2@example.com', 'it/its', 1200);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex3', 'ex3@example.com', 'it/its', 1300);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex4', 'ex4@example.com', 'it/its', 1400);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex5', 'ex5@example.com', 'it/its', 1500);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex6', 'ex6@example.com', 'it/its', 1600);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex7', 'ex7@example.com', 'it/its', 1700);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex8', 'ex8@example.com', 'it/its', 1800);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex9', 'ex9@example.com', 'it/its', 1900);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex10', 'ex10@example.com', 'it/its', 2000);
 
 INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 1', false, 'single');
 INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 2', false, 'double');
@@ -97,8 +99,21 @@ INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 4',
 
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 1);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (5, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (6, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (7, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (8, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (9, 1);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (10, 1);
+
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 2);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 2);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 2);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 2);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (5, 2);
+
 
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 3);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 3);
