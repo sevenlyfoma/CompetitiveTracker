@@ -176,13 +176,14 @@ function find_canvas_size(tournament_matches, setCanvasDimensions){
 
   let topMatch = tournament_matches[0];
 
-  let depth = find_tourney_depth(topMatch);
+  let depth = find_tourney_depth(topMatch); //Added 2 to see a graph TODO FIX
 
   // console.log("depth: " + depth)
 
   let maxBotMatches = 2 ** (depth - 1)
+  // let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
 
-  let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
+  let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 400 * depth};
 
   // console.log("dimensions {height : " + dimensions.height + ", width : " + dimensions.width + "}")
   //return dimensions

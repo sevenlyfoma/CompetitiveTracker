@@ -90,11 +90,20 @@ INSERT INTO users (name, email, pronouns, rating) VALUES ('ex7', 'ex7@example.co
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex8', 'ex8@example.com', 'it/its', 1800);
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex9', 'ex9@example.com', 'it/its', 1900);
 INSERT INTO users (name, email, pronouns, rating) VALUES ('ex10', 'ex10@example.com', 'it/its', 2000);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex11', 'ex11@example.com', 'it/its', 2100);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex12', 'ex12@example.com', 'it/its', 2200);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex13', 'ex13@example.com', 'it/its', 2300);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex14', 'ex14@example.com', 'it/its', 2400);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex15', 'ex15@example.com', 'it/its', 2500);
+INSERT INTO users (name, email, pronouns, rating) VALUES ('ex16', 'ex16@example.com', 'it/its', 2600);
 
 INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 1', false, 'single');
 INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 2', false, 'double');
 INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 3', true, 'single');
 INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 4', true, 'double');
+
+INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 5', false, 'double');
+INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 6', false, 'double');
 
 
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 1);
@@ -124,6 +133,36 @@ INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 4);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 4);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 4);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 4);
+
+
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (5, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (6, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (7, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (8, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (9, 5);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (10, 5);
+
+
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (5, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (6, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (7, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (8, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (9, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (10, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (11, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (12, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (13, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (14, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (15, 6);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (16, 6);
 
 INSERT INTO matches 
 (date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
