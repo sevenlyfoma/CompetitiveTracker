@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrant;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrantRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
@@ -84,6 +83,8 @@ public class TournamentService {
 
              tournamentMatches.add(tm2);
         }
+
+        // logger.info("Hello");
 
 
         // // From difference *2 to leng - diffence
