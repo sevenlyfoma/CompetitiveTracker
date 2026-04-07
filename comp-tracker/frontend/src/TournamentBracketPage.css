@@ -76,6 +76,20 @@
   height: 0; */
 }
 
+
+.lossNode {
+  color: red;
+  border: 2px solid red;
+  background-color: white;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+
+
 .TournamentBracketPageOuterDiv {
   display: flex; 
   flex-direction: column;
