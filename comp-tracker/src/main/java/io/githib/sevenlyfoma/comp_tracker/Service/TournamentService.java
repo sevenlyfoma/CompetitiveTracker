@@ -90,6 +90,8 @@ public class TournamentService {
     private List<TournamentMatch> generateDoubleElimBracket(List<User> users, Tournament t){
         List<TournamentMatch> tms = new ArrayList<>();
 
+        long matchNumber = 1L;
+
         for (int i = 0; i < users.size()/2; i++){
             User user1 = users.get(i);
             User user2 = users.get(users.size()-1-i);
@@ -98,11 +100,13 @@ public class TournamentService {
                 .user1(user1)
                 .user2(user2)
                 .matchTitle("Match in Winners Round of " + users.size())
-                .matchNumber( ((long) Integer.numberOfTrailingZeros(users.size())) )
+                .matchNumber( matchNumber++ )
                 .build();
 
             tms.add(tm);
         }
+
+        long loserMatchNumber = (matchNumber * 2);
 
         List<TournamentMatch> totalTMs = new ArrayList<>();
 
@@ -115,7 +119,7 @@ public class TournamentService {
 
         while (tms.size() > 1){
             List<TournamentMatch> sortedTMs = tms.stream()
-                .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
+                .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating(), Comparator.reverseOrder()))
                 .collect(Collectors.toList());
 
             
@@ -134,7 +138,7 @@ public class TournamentService {
                     .parentMatch2(tm2)
                     .inheritsParentMatch1Winner(true)
                     .inheritsParentMatch2Winner(true)
-                    .matchNumber( 18L )
+                    .matchNumber( matchNumber++ )
                     .build();
 
                 tms.add(tm);
@@ -148,7 +152,7 @@ public class TournamentService {
                         .parentMatch2(tm2)
                         .inheritsParentMatch1Winner(false)
                         .inheritsParentMatch2Winner(false)
-                        .matchNumber( 16L )
+                        .matchNumber( loserMatchNumber++ )
                         .build();
 
                     loserTMs.add(tmL);
@@ -179,7 +183,7 @@ public class TournamentService {
                             .parentMatch2(tm2)
                             .inheritsParentMatch1Winner(true)
                             .inheritsParentMatch2Winner(true)
-                            .matchNumber( 15L )
+                            .matchNumber( loserMatchNumber++ )
                             .build();
 
                     loserTMs.add(tmL);
@@ -193,19 +197,23 @@ public class TournamentService {
                 loserTMs = new ArrayList<>();
             }
 
+            sortedTMs = tms.stream()
+                .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
+                .collect(Collectors.toList());
+                
             List<TournamentMatch> tempLosers = new ArrayList<>();
-            for (int i = 0; i < tms.size(); i++){
-                var tm1 = tms.get(i);
+            for (int i = 0; i < sortedTMs.size(); i++){
+                var tm1 = sortedTMs.get(i);
                 var tm2 = sortedLoserTMs.get(i);
 
                 TournamentMatch tmL = TournamentMatch.builder()
                         .tournament(t)
-                        .matchTitle("Match in Losers Round of " + tms.size()*2)
+                        .matchTitle("Match in Losers Round of " + sortedTMs.size()*2)
                         .parentMatch1(tm1)
                         .parentMatch2(tm2)
                         .inheritsParentMatch1Winner(false)
                         .inheritsParentMatch2Winner(true)
-                        .matchNumber( 100L )
+                        .matchNumber( loserMatchNumber++ )
                         .build();
                 
                 tempLosers.add(tmL);
@@ -235,7 +243,7 @@ public class TournamentService {
             .parentMatch2(loserTMs.get(0))
             .inheritsParentMatch1Winner(true)
             .inheritsParentMatch2Winner(true)
-            .matchNumber( 1L )
+            .matchNumber( 0L )
             .build();
 
         
@@ -409,7 +417,7 @@ public class TournamentService {
                 .user1(user1)
                 .user2(user2)
                 .matchTitle("Match in Round of " + users.size())
-                .matchNumber( ((long) Integer.numberOfTrailingZeros(users.size())) )
+                .matchNumber( ((long) Integer.numberOfTrailingZeros(users.size())) - 1L )
                 .build();
 
             tms.add(tm);
@@ -475,7 +483,7 @@ public class TournamentService {
                     .parentMatch2(p2)
                     .inheritsParentMatch1Winner(p1InheritsWinner)
                     .inheritsParentMatch2Winner(p2InheritsWinner)
-                    .matchNumber( ((long) Integer.numberOfTrailingZeros(sortedTMs.size())) )
+                    .matchNumber( ((long) Integer.numberOfTrailingZeros(sortedTMs.size())) - 1L )
                     .build();
 
                 logger.info(tm.getMatchNumber().toString());
@@ -493,7 +501,42 @@ public class TournamentService {
 
         return totalTMs;
     }
+    
+    
+    private User findExpectedLoser(TournamentMatch tm){
+        User u;
 
+        User u1 = tm.getUser1();
+        User u2 = tm.getUser2();
+
+        if (u1 == null){
+            if (tm.getInheritsParentMatch1Winner()){
+                u1 = findExpectedWinner(tm.getParentMatch1());
+            }
+            else {
+                u1 = findExpectedLoser(tm.getParentMatch1());
+            }
+            
+        }
+        if (u2 == null) {
+            if (tm.getInheritsParentMatch2Winner()){
+                u2 = findExpectedWinner(tm.getParentMatch2());
+            }
+            else {
+                u2 = findExpectedLoser(tm.getParentMatch2());
+            }
+        }
+
+        if (u1.getRating() < u2.getRating()){
+            u = u1;
+        }
+        else{
+            u = u2;
+        }
+
+        return u;
+    }
+    
     private User findExpectedWinner(TournamentMatch tm){
         User u;
 
@@ -501,10 +544,21 @@ public class TournamentService {
         User u2 = tm.getUser2();
 
         if (u1 == null){
-            u1 = findExpectedWinner(tm.getParentMatch1());
+            if (tm.getInheritsParentMatch1Winner()){
+                u1 = findExpectedWinner(tm.getParentMatch1());
+            }
+            else {
+                u1 = findExpectedLoser(tm.getParentMatch1());
+            }
+            
         }
         if (u2 == null) {
-            u2 = findExpectedWinner(tm.getParentMatch2());
+            if (tm.getInheritsParentMatch2Winner()){
+                u2 = findExpectedWinner(tm.getParentMatch2());
+            }
+            else {
+                u2 = findExpectedLoser(tm.getParentMatch2());
+            }
         }
 
         if (u1.getRating() > u2.getRating()){

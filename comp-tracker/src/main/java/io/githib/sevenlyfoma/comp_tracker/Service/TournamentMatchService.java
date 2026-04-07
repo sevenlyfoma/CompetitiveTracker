@@ -81,7 +81,7 @@ public class TournamentMatchService {
         var childMatches = tournamentMatchRepository.findByParentMatch1OrParentMatch2(tMatch, tMatch);
 
         for (TournamentMatch c: childMatches){
-            if (c.getParentMatch1().getId().equals(tMatch.getId())){
+            if (c.getParentMatch1() != null && c.getParentMatch1().getId().equals(tMatch.getId())){
                 if (c.getInheritsParentMatch1Winner()){
                     c.setUser1(winner);
                 }
