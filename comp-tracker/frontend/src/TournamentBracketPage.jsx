@@ -155,11 +155,17 @@ function find_tourney_depth(match){
     }
     else{
       //Hack to avoid double counting of depth on double elim brackets
-      if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false){
-        return 0
-      }
+      // if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false){
+      //   return 0
+      // }
       let p1Depth = find_tourney_depth(match.parentMatch1)
       let p2Depth = find_tourney_depth(match.parentMatch2)
+      if (match.inheritsParentMatch1Winner == false){
+        p1Depth = 0;
+      }
+      if (match.inheritsParentMatch2Winner == false){
+        p2Depth = 0;
+      }
 
       if (p1Depth >= p2Depth){
         return p1Depth + 1;
@@ -178,12 +184,12 @@ function find_canvas_size(tournament_matches, setCanvasDimensions){
 
   let depth = find_tourney_depth(topMatch); //Added 2 to see a graph TODO FIX
 
-  // console.log("depth: " + depth)
+  console.log("depth: " + depth)
 
   let maxBotMatches = 2 ** (depth - 1)
-  // let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
+  let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 200 * depth};
 
-  let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 400 * depth};
+  // let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 400 * depth};
 
   // console.log("dimensions {height : " + dimensions.height + ", width : " + dimensions.width + "}")
   //return dimensions

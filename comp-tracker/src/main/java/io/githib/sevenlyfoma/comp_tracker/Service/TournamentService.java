@@ -38,22 +38,16 @@ public class TournamentService {
     @Transactional
     public void closeTournament(long tournamentID){
         var t = tournamentRepository.findById(tournamentID).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
+        
+        validateNotAlreadyClosed(t);
+        
         var entrants = tournamentEntrantRepository.findByTournament(t);
 
-        // for (TournamentEntrant e: entrants){
-        //     logger.info(e.getUser().getName() + " " + e.getUser().getRating().toString());
-        // }
-
-        // logger.info(entrants.toString());
 
         List<User> sortedUsers = entrants.stream()
             .sorted(Comparator.comparing(entrant -> entrant.getUser().getRating()))
             .map(TournamentEntrant::getUser)
             .collect(Collectors.toList());
-
-        // for (User u: sortedUsers){
-        //     logger.info(u.getName() + " " + u.getRating().toString());
-        // }
 
         var leng = sortedUsers.size();
         var closestPowerOfTwo = Integer.highestOneBit(leng);
@@ -61,12 +55,13 @@ public class TournamentService {
 
         logger.info(Integer.toString(leng) + " " + Integer.toString(closestPowerOfTwo) + " " + Integer.toString(difference));
 
-        // List<TournamentMatch> tournamentMatches = new ArrayList<>();
-
-        for (int i = 0; i < closestPowerOfTwo*2 - leng; i++){
-            var u = User.builder().name("bye").email("x"+i).rating(0).build();
-            sortedUsers.add(0, u);
+        if (leng != closestPowerOfTwo){
+            for (int i = 0; i < closestPowerOfTwo*2 - leng; i++){
+                 var u = User.builder().name("bye").email("x"+i).rating(0).build();
+                sortedUsers.add(0, u);
+            }
         }
+        
 
         for (User u: sortedUsers){
             logger.info(u.getId() + " " + u.getName() + " " + u.getRating().toString());
@@ -92,7 +87,7 @@ public class TournamentService {
 
     }
 
-    public List<TournamentMatch> generateDoubleElimBracket(List<User> users, Tournament t){
+    private List<TournamentMatch> generateDoubleElimBracket(List<User> users, Tournament t){
         List<TournamentMatch> tms = new ArrayList<>();
 
         for (int i = 0; i < users.size()/2; i++){
@@ -116,17 +111,17 @@ public class TournamentService {
         List<TournamentMatch> totalLoserTMs = new ArrayList<>();
         List<TournamentMatch> loserTMs = new ArrayList<>();
 
+        int count = 0;
+
         while (tms.size() > 1){
             List<TournamentMatch> sortedTMs = tms.stream()
                 .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
                 .collect(Collectors.toList());
 
-            List<TournamentMatch> sortedLoserTMs = loserTMs.stream()
-                .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
-                .collect(Collectors.toList());
+            
         
             tms = new ArrayList<>();
-            loserTMs = new ArrayList<>();
+            
 
             for (int i = 0; i < sortedTMs.size()/2; i++){
                 var tm1 = sortedTMs.get(i);
@@ -139,12 +134,13 @@ public class TournamentService {
                     .parentMatch2(tm2)
                     .inheritsParentMatch1Winner(true)
                     .inheritsParentMatch2Winner(true)
-                    .matchNumber( 2L )
+                    .matchNumber( 18L )
                     .build();
 
                 tms.add(tm);
 
-                if (sortedLoserTMs.isEmpty()){
+                //If we're on the first cycle
+                if (count == 0){
                     TournamentMatch tmL = TournamentMatch.builder()
                         .tournament(t)
                         .matchTitle("Match in Losers Round of " + sortedTMs.size())
@@ -152,17 +148,27 @@ public class TournamentService {
                         .parentMatch2(tm2)
                         .inheritsParentMatch1Winner(false)
                         .inheritsParentMatch2Winner(false)
-                        .matchNumber( 2L )
+                        .matchNumber( 16L )
                         .build();
 
                     loserTMs.add(tmL);
                     totalLoserTMs.add(tmL);
+
+                    logger.info("Creating losers round 1 match " + i);
                 }
 
             }
 
-            if (!sortedLoserTMs.isEmpty()){ 
-                for (int i = 0; i < sortedLoserTMs.size() - tms.size(); i++){
+            List<TournamentMatch> sortedLoserTMs = loserTMs.stream()
+                .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
+                .collect(Collectors.toList());
+
+            logger.info("sltms: " +sortedLoserTMs.size() + ", tms:" + tms.size() );
+
+            loserTMs = new ArrayList<>();
+
+            if (sortedLoserTMs.size() != tms.size()){
+                for (int i = 0; i < sortedLoserTMs.size()/2; i++){
                     var tm1 = sortedLoserTMs.get(i);
                     var tm2 = sortedLoserTMs.get(sortedLoserTMs.size()-1-i);
 
@@ -173,43 +179,53 @@ public class TournamentService {
                             .parentMatch2(tm2)
                             .inheritsParentMatch1Winner(true)
                             .inheritsParentMatch2Winner(true)
-                            .matchNumber( 2L )
+                            .matchNumber( 15L )
                             .build();
 
                     loserTMs.add(tmL);
                     totalLoserTMs.add(tmL);
                 }
 
-                List<TournamentMatch> tempLosers = new ArrayList<>();
-                for (int i = 0; i < tms.size(); i++){
-                    var tm1 = tms.get(i);
-                    var tm2 = loserTMs.get(i);
-
-                    TournamentMatch tmL = TournamentMatch.builder()
-                            .tournament(t)
-                            .matchTitle("Match in Losers Round of " + tms.size()*2)
-                            .parentMatch1(tm1)
-                            .parentMatch2(tm2)
-                            .inheritsParentMatch1Winner(false)
-                            .inheritsParentMatch2Winner(true)
-                            .matchNumber( 100L )
-                            .build();
-                    
-                    tempLosers.add(tmL);
-                    totalLoserTMs.add(tmL);
-                }
+                sortedLoserTMs = loserTMs.stream()
+                .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
+                .collect(Collectors.toList());
                 
-
-                if (!tempLosers.isEmpty()){
-                    loserTMs = tempLosers;
-                }
+                loserTMs = new ArrayList<>();
             }
+
+            List<TournamentMatch> tempLosers = new ArrayList<>();
+            for (int i = 0; i < tms.size(); i++){
+                var tm1 = tms.get(i);
+                var tm2 = sortedLoserTMs.get(i);
+
+                TournamentMatch tmL = TournamentMatch.builder()
+                        .tournament(t)
+                        .matchTitle("Match in Losers Round of " + tms.size()*2)
+                        .parentMatch1(tm1)
+                        .parentMatch2(tm2)
+                        .inheritsParentMatch1Winner(false)
+                        .inheritsParentMatch2Winner(true)
+                        .matchNumber( 100L )
+                        .build();
+                
+                tempLosers.add(tmL);
+                totalLoserTMs.add(tmL);
+            }
+            
+
+            if (!tempLosers.isEmpty()){
+                loserTMs = tempLosers;
+            }
+
+            if (count == 0){logger.info("ltms: "  + loserTMs.size() );}
+
+            
 
 
             totalTMs.addAll(tms);
 
 
-            
+            count++;
         }
 
         TournamentMatch grandfinal = TournamentMatch.builder()
@@ -222,94 +238,166 @@ public class TournamentService {
             .matchNumber( 1L )
             .build();
 
+        
+        // logTournamentShape();
 
 
         totalTMs.addAll(totalLoserTMs);
         totalTMs.add(grandfinal);
-        var removedByes = removeByes(totalTMs);
 
+        removeByesRecursive(grandfinal);
+        var cleanTMs = removeUnusedMatches(totalTMs);
 
-        return removedByes;
+        return cleanTMs;
     }
 
-    public List<TournamentMatch> removeByes(List<TournamentMatch> tms){
-        List<TournamentMatch> byelessTMs = new ArrayList<>();
-        
-        for (int i = 0; i < tms.size(); i++){
-            // var tm = tms.get(tms.size()-1-i);
-            var tm = tms.get(i);
-            var p1 = tm.getParentMatch1();
-            var p2 = tm.getParentMatch2();
+    private Boolean isBye(User u){
+        return (u != null && u.getId() == null);
+    }
 
-            if (p1 != null && p1.getUser1() != null && p1.getUser1().getId() == null){
+    private void removeByesRecursive(TournamentMatch tm){
+
+        if (tm == null){
+            return;
+        }
+
+        TournamentMatch p1 = tm.getParentMatch1();
+        TournamentMatch p2 = tm.getParentMatch2();
+
+        removeByesRecursive(p1);
+        removeByesRecursive(p2);
+
+        if (p1 != null){
+            if (isBye(p1.getUser1())){
                 if (p1.getUser2() != null){
-                    tm.setUser1(p1.getUser2());
-                    tm.setParentMatch1(null);
+                    if (tm.getInheritsParentMatch1Winner()){
+                        tm.setUser1(p1.getUser2());
+                    }
+                    else{
+                        tm.setUser1(p1.getUser1());
+                    }
                     tm.setInheritsParentMatch1Winner(null);
+                    tm.setParentMatch1(null);
                 }
                 else{
-                    tm.setParentMatch1(p1.getParentMatch2());
-                    tm.setInheritsParentMatch1Winner(p1.getInheritsParentMatch2Winner());
-                }
-               
+                    if (p1.getParentMatch1() == null){
+                        tm.setParentMatch1(p1.getParentMatch2());
+                        tm.setInheritsParentMatch1Winner(p1.getInheritsParentMatch2Winner());
+                    }
+                    else{
+                        tm.setParentMatch1(p1.getParentMatch1());
+                        tm.setInheritsParentMatch1Winner(p1.getInheritsParentMatch1Winner());
+                    }
+                }  
             }
-
-            if (p1 != null && p1.getUser2() != null && p1.getUser2().getId() == null){
+            else if (isBye(p1.getUser2())){
                 if (p1.getUser1() != null){
-                    tm.setUser1(p1.getUser1());
-                    tm.setParentMatch1(null);
+                    if (tm.getInheritsParentMatch1Winner()){
+                        tm.setUser1(p1.getUser1());
+                    }
+                    else{
+                        tm.setUser1(p1.getUser2());
+                    }
                     tm.setInheritsParentMatch1Winner(null);
+                    tm.setParentMatch1(null);
                 }
                 else{
-                    tm.setParentMatch1(p1.getParentMatch1());
-                    tm.setInheritsParentMatch1Winner(p1.getInheritsParentMatch1Winner());
-                }
-               
+                    if (p1.getParentMatch1() == null){
+                        tm.setParentMatch1(p1.getParentMatch2());
+                        tm.setInheritsParentMatch1Winner(p1.getInheritsParentMatch2Winner());
+                    }
+                    else{
+                        tm.setParentMatch1(p1.getParentMatch1());
+                        tm.setInheritsParentMatch1Winner(p1.getInheritsParentMatch1Winner());
+                    }
+                }  
             }
+        }
 
-            if (p2 != null && p2.getUser1() != null && p2.getUser1().getId() == null){
+
+        if (p2 != null){
+            if (isBye(p2.getUser1())){
                 if (p2.getUser2() != null){
-                    tm.setUser2(p2.getUser2());
-                    tm.setParentMatch2(null);
+                    if (tm.getInheritsParentMatch2Winner()){
+                        tm.setUser2(p2.getUser2());
+                    }
+                    else{
+                        tm.setUser2(p2.getUser1());
+                    }
                     tm.setInheritsParentMatch2Winner(null);
+                    tm.setParentMatch2(null);
                 }
                 else{
-                    tm.setParentMatch2(p2.getParentMatch2());
-                    tm.setInheritsParentMatch2Winner(p2.getInheritsParentMatch2Winner());
-                }
-               
+                    if (p2.getParentMatch1() == null){
+                        tm.setParentMatch2(p2.getParentMatch2());
+                        tm.setInheritsParentMatch2Winner(p2.getInheritsParentMatch2Winner());
+                    }
+                    else{
+                        tm.setParentMatch2(p2.getParentMatch1());
+                        tm.setInheritsParentMatch2Winner(p2.getInheritsParentMatch1Winner());
+                    }
+                }  
             }
-
-            if (p2 != null && p2.getUser2() != null && p2.getUser2().getId() == null){
+            else if (isBye(p2.getUser2())){
                 if (p2.getUser1() != null){
-                    tm.setUser2(p2.getUser1());
-                    tm.setParentMatch2(null);
+                    if (tm.getInheritsParentMatch2Winner()){
+                        tm.setUser2(p2.getUser1());
+                    }
+                    else{
+                        tm.setUser2(p2.getUser2());
+                    }
                     tm.setInheritsParentMatch2Winner(null);
+                    tm.setParentMatch2(null);
                 }
                 else{
-                    tm.setParentMatch2(p2.getParentMatch1());
-                    tm.setInheritsParentMatch2Winner(p2.getInheritsParentMatch1Winner());
-                }
-               
+                    if (p2.getParentMatch1() == null){
+                        tm.setParentMatch2(p2.getParentMatch2());
+                        tm.setInheritsParentMatch2Winner(p2.getInheritsParentMatch2Winner());
+                    }
+                    else{
+                        tm.setParentMatch2(p2.getParentMatch1());
+                        tm.setInheritsParentMatch2Winner(p2.getInheritsParentMatch1Winner());
+                    }
+                }  
             }
-
-            if ((tm.getUser1() != null && tm.getUser1().getId() == null) || (tm.getUser2() != null && tm.getUser2().getId() == null)){
-            }
-            else{
-                byelessTMs.add(tm);
-            }
-
-            
-
         }
 
 
 
+        // if (p1 != null && p1.getUser1() != null && p1.getUser1().getId() == null){
+        //     p1.setUser1(null);
+        // }
+        
+        // if (p1 != null && p1.getUser2() != null && p1.getUser2().getId() == null){
+        //     p1.setUser2(null);
+        // }
 
-        return byelessTMs;
+        // if (p2 != null && p2.getUser1() != null && p2.getUser1().getId() == null){
+        //     p2.setUser1(null);
+        // }
+        
+        // if (p2 != null && p2.getUser2() != null && p2.getUser2().getId() == null){
+        //     p2.setUser2(null);
+        // }
+
+
+
     }
 
-    public List<TournamentMatch> generateSingleElimBracket(List<User> users, Tournament t){
+    private List<TournamentMatch> removeUnusedMatches(List<TournamentMatch> tms){
+        List<TournamentMatch> cleanTMs = new ArrayList<>();
+
+        for (TournamentMatch tm: tms){
+            if (!isBye(tm.getUser1()) && !isBye(tm.getUser2())){
+                cleanTMs.add(tm);
+            }
+        }
+
+
+        return cleanTMs;
+    }
+
+    private List<TournamentMatch> generateSingleElimBracket(List<User> users, Tournament t){
 
         List<TournamentMatch> tms = new ArrayList<>();
 
@@ -406,7 +494,7 @@ public class TournamentService {
         return totalTMs;
     }
 
-    public User findExpectedWinner(TournamentMatch tm){
+    private User findExpectedWinner(TournamentMatch tm){
         User u;
 
         User u1 = tm.getUser1();
@@ -427,6 +515,15 @@ public class TournamentService {
         }
 
         return u;
+    }
+
+
+    private void validateNotAlreadyClosed(Tournament t) {
+
+        if (t.getClosed()) {
+            logger.error("Validation failed for Tournament ID {}: The tournament has already been closed", t.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Already Closed");
+        }
     }
 
 }
