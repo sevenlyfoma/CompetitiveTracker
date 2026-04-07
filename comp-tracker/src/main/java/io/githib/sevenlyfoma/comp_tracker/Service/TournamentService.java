@@ -417,7 +417,7 @@ public class TournamentService {
                 .user1(user1)
                 .user2(user2)
                 .matchTitle("Match in Round of " + users.size())
-                .matchNumber( ((long) Integer.numberOfTrailingZeros(users.size())) )
+                .matchNumber( ((long) Integer.numberOfTrailingZeros(users.size())) - 1L )
                 .build();
 
             tms.add(tm);
@@ -483,7 +483,7 @@ public class TournamentService {
                     .parentMatch2(p2)
                     .inheritsParentMatch1Winner(p1InheritsWinner)
                     .inheritsParentMatch2Winner(p2InheritsWinner)
-                    .matchNumber( ((long) Integer.numberOfTrailingZeros(sortedTMs.size())) )
+                    .matchNumber( ((long) Integer.numberOfTrailingZeros(sortedTMs.size())) - 1L )
                     .build();
 
                 logger.info(tm.getMatchNumber().toString());

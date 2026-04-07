@@ -85,7 +85,7 @@ const LossNode = ({data}) =>{
   // console.log("lossnode: " + label)
   return (
   <div className="lossNode" style={{width: '100%', height: '100%',}}>
-    {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Top} />)}
+    {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Left} />)}
 
     <p>{label}</p>
 
@@ -101,7 +101,7 @@ function makeNodes(tournament_matches, canvasDimensions){
 
   let topMatch = tournament_matches[0];
 
-  let {nodes, edges, lossLinkMarks} = makeNodesRecursive(topMatch, 0, height, width-200)
+  let {nodes, edges, lossLinkMarks} = makeNodesRecursive(topMatch, 0, height, width-200, topMatch?.tournament?.style, 0)
 
   let lossNodes = [];
 
@@ -114,7 +114,7 @@ function makeNodes(tournament_matches, canvasDimensions){
     let node = nodes.find(x => {return x.id === id})
 
     let lossNodeId = "sendLoss"+node.id;
-    let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+125, y: node.position.y+75}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
+    let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+160, y: node.position.y+12.5}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
     edges.push({id: "e-"+lossNodeId+"-"+node.id, source: node.id, target: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
     lossNodes.push(lossNode);
   }
@@ -122,7 +122,7 @@ function makeNodes(tournament_matches, canvasDimensions){
   return {nodes: nodes.concat(lossNodes), edges: edges}
 }
 
-function makeNodesRecursive(match, minY, maxY, x, style){
+function makeNodesRecursive(match, minY, maxY, x, style, depth){
 
 
   if (match !== undefined && match !== null){
@@ -169,10 +169,10 @@ function makeNodesRecursive(match, minY, maxY, x, style){
     
     
     if (match.inheritsParentMatch1Winner == true) {
-      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, x - 200, style)
+      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, x - 200, style, depth +1)
     }
     if (match.inheritsParentMatch2Winner == true) {
-      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, x - 200, style)
+      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, x - 200, style, depth +1)
     }
 
     let lossNodes = []
