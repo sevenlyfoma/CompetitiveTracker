@@ -82,10 +82,10 @@ const MatchUserNode = ({ data }) => {
 
 const LossNode = ({data}) =>{
   const {label, showLeftHandle=false, showRightHandle=false} = data;
-  console.log("lossnode: " + label)
+  // console.log("lossnode: " + label)
   return (
   <div className="lossNode" style={{width: '100%', height: '100%',}}>
-    {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Left} />)}
+    {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Top} />)}
 
     <p>{label}</p>
 
@@ -101,9 +101,25 @@ function makeNodes(tournament_matches, canvasDimensions){
 
   let topMatch = tournament_matches[0];
 
-  let nodesAndEdges = makeNodesRecursive(topMatch, 0, height, width-200)
+  let {nodes, edges, lossLinkMarks} = makeNodesRecursive(topMatch, 0, height, width-200)
 
-  return nodesAndEdges
+  let lossNodes = [];
+
+  for (let i = 0; i < lossLinkMarks.length; i++) {
+    let mark = lossLinkMarks[i].id;
+    let match = lossLinkMarks[i].match;
+
+    let id = "match_"+mark
+
+    let node = nodes.find(x => {return x.id === id})
+
+    let lossNodeId = "sendLoss"+node.id;
+    let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+125, y: node.position.y+75}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
+    edges.push({id: "e-"+lossNodeId+"-"+node.id, source: node.id, target: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
+    lossNodes.push(lossNode);
+  }
+
+  return {nodes: nodes.concat(lossNodes), edges: edges}
 }
 
 function makeNodesRecursive(match, minY, maxY, x, style){
@@ -113,6 +129,7 @@ function makeNodesRecursive(match, minY, maxY, x, style){
 
     let nodes =[]
     let edges = []
+    let lossLinkMarks = []
   
     let height = 25
     let width = 100
@@ -125,7 +142,7 @@ function makeNodesRecursive(match, minY, maxY, x, style){
     if (match.inheritsParentMatch1Winner == true && match.inheritsParentMatch2Winner == true){
       splitpoint = match.parentMatch1.height / (match.parentMatch1.height + match.parentMatch2.height)
     }
-    console.log("Split-point: " + splitpoint)
+    // console.log("Split-point: " + splitpoint)
     
 
 
@@ -136,8 +153,8 @@ function makeNodesRecursive(match, minY, maxY, x, style){
     
     
     
-    let topNodesAndEdges = {nodes: [], edges: []};
-    let botNodesAndEdges = {nodes: [], edges: []};
+    let topNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: []};
+    let botNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: []};
 
 
     //Makes it so if only one parent is a winner, then we dont brach, we draw in a straight line
@@ -166,13 +183,13 @@ function makeNodesRecursive(match, minY, maxY, x, style){
       if (match.inheritsParentMatch1Winner == true) {
         edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source: parent1_node_id, target: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
       }
-      else {
+      else if (match.inheritsParentMatch1Winner == false){
         let lossNodeId = "receiveLoss1"+node_id;
-        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y-40}, style: { width: 25, height: 25}, data: { label: match.parentMatch1.id, showRightHandle: true }}
-        edges.push({id: "e-"+lossNodeId+"-"+match.id, source: lossNodeId, target: node_id, type: "smoothstep", style : {stroke: col, strokeWidth: 3,},})
+        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y-40}, style: { width: 25, height: 25}, data: { label: match.parentMatch1.matchNumber, showRightHandle: true }}
+        edges.push({id: "e-"+lossNodeId+"-"+match.id, source: lossNodeId, target: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
         lossNodes.push(receiveLossNode);
 
-        
+        lossLinkMarks.push({id: match.parentMatch1.id, match: match.parentMatch1});
       }
     }
     if (match.parentMatch2 !== null){
@@ -181,27 +198,34 @@ function makeNodesRecursive(match, minY, maxY, x, style){
       if (match.inheritsParentMatch2Winner == true) {
         edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:parent2_node_id, target: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
       }
-      else {
+      else if (match.inheritsParentMatch2Winner == false){
         let lossNodeId = "receiveLoss2"+node_id;
-        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y+15}, style: { width: 25, height: 25}, data: { label: match.parentMatch2.id, showRightHandle: true }}
+        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y+15}, style: { width: 25, height: 25}, data: { label: match.parentMatch2.matchNumber, showRightHandle: true }}
         edges.push({id: "e-"+lossNodeId+"-"+match.id, source: lossNodeId, target: node_id, type: "smoothstep", style : {stroke: col, strokeWidth: 3,},})
         lossNodes.push(receiveLossNode);
+
+        lossLinkMarks.push({id: match.parentMatch2.id, match: match.parentMatch2});
       }
     } 
       
+  
+    // console.log(lossLinkMarks)
     
 
 
     return {
       nodes: nodes.concat(topNodesAndEdges.nodes).concat(botNodesAndEdges.nodes).concat(lossNodes), 
-      edges: edges.concat(topNodesAndEdges.edges).concat(botNodesAndEdges.edges)}
+      edges: edges.concat(topNodesAndEdges.edges).concat(botNodesAndEdges.edges),
+      lossLinkMarks: lossLinkMarks.concat(topNodesAndEdges.lossLinkMarks).concat(botNodesAndEdges.lossLinkMarks)
+    
+    }
   }
 
   
  
 
 
-  return {nodes: [], edges: []};
+  return {nodes: [], edges: [], lossLinkMarks: []};
 }
 
 const initialNodes = [];
@@ -364,17 +388,17 @@ function TournamentBracketPageInner() {
   
   const fetchMatches = async () => {
       try {
-          console.log("fetch Matches")
+          // console.log("fetch Matches")
           const response = await fetch(`/api/tournament_matches/top/${tournamentID}`);
           if (!response.ok){
               throw new Error(`Server responded with status: ${response.status}`)
           }
           const matchesJson = await response.json();
-          console.log(matchesJson);
+          // console.log(matchesJson);
 
           let newTopMatch = find_tourney_height(matchesJson[0]);
 
-          console.log(newTopMatch);
+          // console.log(newTopMatch);
 
 
 
@@ -385,7 +409,7 @@ function TournamentBracketPageInner() {
               throw new Error(`Server responded with status: ${response2.status}`)
           }
           const tournamentJson = await response2.json();
-          console.log(tournamentJson);
+          // console.log(tournamentJson);
           setTournament(tournamentJson);
 
 

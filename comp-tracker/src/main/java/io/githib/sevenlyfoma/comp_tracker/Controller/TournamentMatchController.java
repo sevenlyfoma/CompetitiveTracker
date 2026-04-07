@@ -45,7 +45,7 @@ public class TournamentMatchController {
     @GetMapping("/top/{tid}")
      public Iterable<TournamentMatch> getTopLevelTMatchesByTId(@PathVariable Long tid){
         var t = Tournament.builder().id(tid).tournamentName(null).closed(null).build();
-        var tournamentEntrantList = tournamentMatchRepository.findByTournamentAndMatchNumber(t, Long.valueOf(1));
+        var tournamentEntrantList = tournamentMatchRepository.findByTournamentAndMatchNumber(t, Long.valueOf(0));
         return tournamentEntrantList;
     }
 
