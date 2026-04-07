@@ -99,11 +99,44 @@ function TournamentEntrantList(){
 
 
             </table>
+
+            <CloseTournamentButton tournament={tournament} onClose={() => navigate(`/tournaments/closed/${tournament.id}`)}/>
                     
             <button onClick={() => navigate(`/tournaments`)}>Back</button>
 
         </>
     ) 
+}
+
+function CloseTournamentButton({tournament, onClose}){
+    const handleClose = async () => {
+        if (!window.confirm("Are you want to close the tournament")) return;
+
+        try {
+        const response = await fetch(`/api/tournaments/close/${tournament.id}`, {
+            method: 'POST',
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to close tournament');
+        }
+
+        onClose();
+
+        } catch (error) {
+        console.error("Error closing tournament:", error);
+        }
+    };
+
+  
+  return (
+    <>
+      <button className='CloseButton' onClick={handleClose} style={{ color: 'blue' }}>
+        Close Tournament
+      </button>
+    </>
+  )
+
 }
 
 function AddUserButton({user, tournament, onCreate}){
