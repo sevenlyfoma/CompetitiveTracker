@@ -24,14 +24,35 @@ ChartJS.register(
 
 const LineChart = ({user, userMatchList}) => {
 
-  let ratings;
+  let ratings = [];
 
-  if (user.id = userMatchList[0]?.user1.id) {
-    ratings = [ userMatchList[0]?.user1RatingBefore, ...userMatchList.map(match => match.user1RatingAfter)];
+  console.log(userMatchList);
+
+
+  if (user.id == userMatchList[0]?.user1.id) {
+    ratings.push(userMatchList[0]?.user1RatingBefore);
   }
-  else {
-    ratings = [ userMatchList[0]?.user2RatingBefore, ...userMatchList.map(match => match.user2RatingAfter)];
+  else{
+    ratings.push(userMatchList[0]?.user2RatingBefore);
   }
+
+  userMatchList.forEach(element => {
+    if (user.id == element.user1.id){
+      ratings.push(element.user1RatingAfter);
+    }
+    else{
+       ratings.push(element.user2RatingAfter);
+    }
+  });
+
+  // if (user.id == userMatchList[0]?.user1.id) {
+  //   ratings = [ userMatchList[0]?.user1RatingBefore, ...userMatchList.map(match => match.user1RatingAfter)];
+  // }
+  // else {
+  //   ratings = [ userMatchList[0]?.user2RatingBefore, ...userMatchList.map(match => match.user2RatingAfter)];
+  // }
+
+  // console.log(userMatchList);
 
   
   const labels = ratings.map(x => '')

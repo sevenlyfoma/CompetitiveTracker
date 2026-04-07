@@ -17,11 +17,12 @@ function UserMatchList(){
 
     const fetchUser = async () => {
         try {
-            const response = await fetch(`/users/${userID}`);
+            const response = await fetch(`/api/users/${userID}`);
             if (!response.ok){
                 throw new Error(`Server responded with status: ${response.status}`)
             }
             const userJson = await response.json();
+            console.log("fetchUser")
             console.log(userJson);
             setUser(userJson);
 
@@ -38,7 +39,7 @@ function UserMatchList(){
 
     const fetchUserMatches = async () => {
         try {
-            const response = await fetch(`/matches/all/${userID}`);
+            const response = await fetch(`/api/matches/all/${userID}`);
             if (!response.ok){
                 throw new Error(`Server responded with status: ${response.status}`)
             }
@@ -99,6 +100,9 @@ function UserMatchList(){
 }
 
 function UserMatchRow({match, user}){
+
+    console.log("UserMatchRow")
+    console.log(user.id);
 
     let matchResult;
     if (match.winner.id === user.id) {

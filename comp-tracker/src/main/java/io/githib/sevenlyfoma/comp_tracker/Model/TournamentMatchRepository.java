@@ -1,0 +1,14 @@
+package io.githib.sevenlyfoma.comp_tracker.Model;
+
+import java.util.List;
+
+import org.springframework.data.repository.CrudRepository; 
+
+public interface TournamentMatchRepository extends CrudRepository<TournamentMatch, Long> {
+    List<TournamentMatch> findByTournament(Tournament tournament);
+
+    List<TournamentMatch> findByTournamentAndMatchNumber(Tournament tournament, Long matchNumber);
+
+    List<TournamentMatch> findByParentMatch1OrParentMatch2(TournamentMatch p1, TournamentMatch p2);
+}
+

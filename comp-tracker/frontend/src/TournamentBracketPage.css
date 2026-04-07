@@ -1,0 +1,120 @@
+/* :root {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+} */
+
+.matchUserNodeDiv {
+  color: black;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.matchUserNodeInner {
+  color: black;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  /* justify-content: left; */
+  flex-direction: row;
+
+  flex-shrink: 0; /* Keep an eye on this */
+}
+
+.matchUserNodeInner p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin: 0; 
+  padding: 0 5px;
+  box-sizing: border-box;
+}
+
+
+
+
+.matchUserNodeOuter {
+  color: black;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  /* justify-content: left; */
+  flex-direction: row;
+}
+
+.matchUserNodeOuter button {
+  box-sizing: border-box; 
+  margin: 0;             
+  padding: 0;            
+  flex-shrink: 0;  
+  background-color: blue;
+  border-radius: 0;
+}
+
+.matchUserNodeOuter button:hover {
+  box-sizing: border-box; 
+  margin: 0;             
+  padding: 0;            
+  flex-shrink: 0;  
+  background-color: cyan;
+  border-radius: 0;
+}
+
+.matchUserNodeHandle {
+  /* background: none; */
+  /* border: none;
+  width: 0;
+  height: 0; */
+}
+
+.TournamentBracketPageOuterDiv {
+  display: flex; 
+  flex-direction: column;
+  height: 100vh; 
+  width: 100vw; 
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.TournamentBracketPageTitleDiv {
+  display:  flex ; 
+  flex-direction:  row ;  
+  align-items:  center ; 
+  justify-content:  left ;
+  gap:  20px ;
+  height:  10vh ; 
+  padding:  0 20px ;
+  background-color:  #ffffff ;
+  box-sizing:  border-box 
+}
+
+.TournamentBracketPageTitleDiv h1{
+  margin: 0; 
+  font-size: 1.5rem
+}
+.TournamentBracketPageTitleDiv button{
+  height:  5vh ;   
+  padding:  0 15px ;
+  cursor:  pointer ;
+  /*   backgroundColor:  #007bff ;
+    color:  white ;
+    border:  none ;
+    borderRadius:  4px  */
+}
+
+.TournamentBracketPageCanvasDiv {
+  flex-grow: 1; 
+  width: '100%'; 
+  height: '100%'
+}

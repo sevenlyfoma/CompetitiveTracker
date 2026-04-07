@@ -15,6 +15,7 @@ export default defineConfig({
       //In dev mode we want to proxy to our server running on port 8080
       '/users': 'http://localhost:8080',
       '/matches': 'http://localhost:8080',
+      '/api': 'http://localhost:8080',
     },
   },
 })

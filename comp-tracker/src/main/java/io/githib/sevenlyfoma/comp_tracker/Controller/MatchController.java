@@ -1,4 +1,4 @@
-package io.githib.sevenlyfoma.comp_tracker;
+package io.githib.sevenlyfoma.comp_tracker.Controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import io.githib.sevenlyfoma.comp_tracker.Model.Match;
+import io.githib.sevenlyfoma.comp_tracker.Model.MatchRepository;
+
 @RestController
-@RequestMapping("/matches")
+@RequestMapping("/api/matches")
 public class MatchController {
 
     private final MatchRepository matchRepository;
@@ -58,8 +61,6 @@ public class MatchController {
             .toUri();
 
         return ResponseEntity.created(location).body(savedMatch);
-    
-        //return ResponseEntity.created(new URI("/matches/" + savedMatch.getId())).body(savedMatch);
     }
 
     @DeleteMapping("/{id}")
