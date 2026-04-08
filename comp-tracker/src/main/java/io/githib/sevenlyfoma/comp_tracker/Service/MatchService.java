@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
+import io.githib.sevenlyfoma.comp_tracker.DTO.RatingPair;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
 import io.githib.sevenlyfoma.comp_tracker.Model.MatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
@@ -20,13 +21,16 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class MatchService {
-    private static final Logger logger = LoggerFactory.getLogger(TournamentMatchService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
     
     @Autowired
     private MatchRepository matchRepository;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RatingService ratingService;
 
     @Transactional
     public List<Match> getMatchesByUser(Long userId) {
@@ -48,10 +52,10 @@ public class MatchService {
         Integer winnerRatingBefore = winner.getRating();
         Integer loserRatingBefore = loser.getRating();
 
-        Result result = getRatingChangeElo(winnerRatingBefore, loserRatingBefore);
+        RatingPair result = ratingService.getRatingChange(new RatingPair(winnerRatingBefore, loserRatingBefore));
 
-        winner.setRating(result.winnerRatingAfter);
-        loser.setRating(result.loserRatingAfter);
+        winner.setRating(result.winnerRating());
+        loser.setRating(result.loserRating());
 
         userRepository.save(winner);
         userRepository.save(loser);
@@ -72,22 +76,7 @@ public class MatchService {
         return match;
 
     }
-    
-    private record Result (Integer winnerRatingAfter, Integer loserRatingAfter) {}
 
-    private Result getRatingChangeElo(Integer winnerEloBefore, Integer loserEloBefore){
-        
-        int kFactor = 32;
-        double expectedScore = 1.0 / (1.0 + Math.pow(10, (loserEloBefore - winnerEloBefore) / 400.0));
-        int eloChange = (int) Math.round(kFactor * (1 - expectedScore));
-
-        Integer winnerEloAfter = winnerEloBefore + eloChange;
-        Integer loserEloAfter = loserEloBefore - eloChange;
-
-
-        return new Result(winnerEloAfter, loserEloAfter);
-
-    }
 
     private void validateUserExists(Long userId){
         Optional<User> u = userRepository.findById(userId);

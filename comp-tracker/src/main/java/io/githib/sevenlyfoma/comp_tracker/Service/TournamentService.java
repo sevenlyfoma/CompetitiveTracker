@@ -24,7 +24,7 @@ import io.githib.sevenlyfoma.comp_tracker.Model.User;
 @Service
 public class TournamentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TournamentMatchService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     
     @Autowired
     private TournamentRepository tournamentRepository;
