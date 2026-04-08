@@ -1,5 +1,7 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
 import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentMatchResult;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
+import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
@@ -24,7 +27,26 @@ public class TournamentMatchService {
     private TournamentMatchRepository tournamentMatchRepository;
 
     @Autowired
+    private TournamentService tournamentService;
+
+    @Autowired
     private MatchService matchService;
+
+    public TournamentMatch getTMatch(Long id){
+        var tournamentMatch = tournamentMatchRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return tournamentMatch;
+    }
+
+    public TournamentMatch getTournamentTopMatch(Long tournamentID){
+        Tournament t = tournamentService.getTournament(tournamentID);
+
+        List<TournamentMatch> tournamentTopMatchList = tournamentMatchRepository.findByTournamentAndMatchNumber(t, Long.valueOf(0));
+
+        TournamentMatch topMatch = validateTopMatchPresent(t, tournamentTopMatchList);
+        
+        return topMatch;
+
+    }
 
     @Transactional
     public void processMatchResult(TournamentMatchResult result){
@@ -69,6 +91,21 @@ public class TournamentMatchService {
             }
             tournamentMatchRepository.save(c);
         }
+    }
+
+    private TournamentMatch validateTopMatchPresent(Tournament t, List<TournamentMatch> tms){
+
+        if (tms.isEmpty()){
+            logger.error("Validation failed for Tournament ID {}: No matches found for this tournament", t.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament No Matches");
+        }
+
+        if (tms.size() > 1){
+            logger.error("Validation failed for Tournament ID {}: Tournament Badly Formatted", t.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Badly Formatted");
+        }
+
+        return tms.get(0);
     }
 
     private void validateParticipants(TournamentMatch tMatch, TournamentMatchResult result) {
