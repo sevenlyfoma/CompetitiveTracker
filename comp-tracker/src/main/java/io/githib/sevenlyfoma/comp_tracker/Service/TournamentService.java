@@ -43,6 +43,8 @@ public class TournamentService {
         
         var entrants = tournamentEntrantRepository.findByTournament(t);
 
+        validateEnoughEntrants(t, entrants);
+
 
         List<User> sortedUsers = entrants.stream()
             .sorted(Comparator.comparing(entrant -> entrant.getUser().getRating()))
@@ -53,7 +55,7 @@ public class TournamentService {
         var closestPowerOfTwo = Integer.highestOneBit(leng);
         var difference = leng - closestPowerOfTwo;
 
-        logger.info(Integer.toString(leng) + " " + Integer.toString(closestPowerOfTwo) + " " + Integer.toString(difference));
+        // logger.info(Integer.toString(leng) + " " + Integer.toString(closestPowerOfTwo) + " " + Integer.toString(difference));
 
         if (leng != closestPowerOfTwo){
             for (int i = 0; i < closestPowerOfTwo*2 - leng; i++){
@@ -63,9 +65,9 @@ public class TournamentService {
         }
         
 
-        for (User u: sortedUsers){
-            logger.info(u.getId() + " " + u.getName() + " " + u.getRating().toString());
-        }
+        // for (User u: sortedUsers){
+        //     logger.info(u.getId() + " " + u.getName() + " " + u.getRating().toString());
+        // }
         
         List<TournamentMatch> tms = new ArrayList<>();
         if (t.getStyle().equals("single")){
@@ -158,7 +160,7 @@ public class TournamentService {
                     loserTMs.add(tmL);
                     totalLoserTMs.add(tmL);
 
-                    logger.info("Creating losers round 1 match " + i);
+                    // logger.info("Creating losers round 1 match " + i);
                 }
 
             }
@@ -167,7 +169,7 @@ public class TournamentService {
                 .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
                 .collect(Collectors.toList());
 
-            logger.info("sltms: " +sortedLoserTMs.size() + ", tms:" + tms.size() );
+            // logger.info("sltms: " +sortedLoserTMs.size() + ", tms:" + tms.size() );
 
             loserTMs = new ArrayList<>();
 
@@ -225,7 +227,7 @@ public class TournamentService {
                 loserTMs = tempLosers;
             }
 
-            if (count == 0){logger.info("ltms: "  + loserTMs.size() );}
+            // if (count == 0){logger.info("ltms: "  + loserTMs.size() );}
 
             
 
@@ -486,7 +488,7 @@ public class TournamentService {
                     .matchNumber( ((long) Integer.numberOfTrailingZeros(sortedTMs.size())) - 1L )
                     .build();
 
-                logger.info(tm.getMatchNumber().toString());
+                // logger.info(tm.getMatchNumber().toString());
 
                 tms.add(tm);
             }
@@ -577,6 +579,13 @@ public class TournamentService {
         if (t.getClosed()) {
             logger.error("Validation failed for Tournament ID {}: The tournament has already been closed", t.getId());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Already Closed");
+        }
+    }
+
+    private void validateEnoughEntrants(Tournament t, List<TournamentEntrant> entrants){
+        if (entrants.size() < 3){
+            logger.error("Validation failed for Tournament ID {}: The tournament must have at least 3 entrants", t.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Not Enough Entrants");
         }
     }
 

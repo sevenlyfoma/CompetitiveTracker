@@ -13,14 +13,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString(onlyExplicitlyIncluded = true)
-public class TournamentMatchResult {
-    @ToString.Include
-    private Long tournamentMatchID;
+public class MatchCreationObject {
     @ToString.Include
     private Long winnerID;
     @ToString.Include
     private Long loserID;
-    
-
-    
 }

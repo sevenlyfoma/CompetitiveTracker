@@ -94,3 +94,12 @@ curl -X POST http://localhost:8080/api/tournament_matches/report \
 curl -X POST http://localhost:8080/api/tournaments/close/1
      
      
+
+curl -X POST http://localhost:8080/api/matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"winnerID": 4, "loserID": 1}'
+
+
+curl -X POST http://localhost:8080/api/matches/report \
+     -H "Content-Type: application/json" \
+     -d '{"winnerID": 1, "loserID": 16}'

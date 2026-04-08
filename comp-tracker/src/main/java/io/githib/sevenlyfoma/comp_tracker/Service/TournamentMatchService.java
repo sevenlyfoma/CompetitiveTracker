@@ -1,7 +1,5 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
-import java.time.LocalDateTime;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
 import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentMatchResult;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
-import io.githib.sevenlyfoma.comp_tracker.Model.MatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
-import io.githib.sevenlyfoma.comp_tracker.Model.UserRepository;
 
 @Service
 public class TournamentMatchService {
@@ -24,13 +21,10 @@ public class TournamentMatchService {
     private static final Logger logger = LoggerFactory.getLogger(TournamentMatchService.class);
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private MatchRepository matchRepository;
-
-    @Autowired
     private TournamentMatchRepository tournamentMatchRepository;
+
+    @Autowired
+    private MatchService matchService;
 
     @Transactional
     public void processMatchResult(TournamentMatchResult result){
@@ -49,31 +43,7 @@ public class TournamentMatchService {
             loser = tMatch.getUser2();
         }
 
-        int kFactor = 32;
-        double expectedScore = 1.0 / (1.0 + Math.pow(10, (loser.getRating() - winner.getRating()) / 400.0));
-        int eloChange = (int) Math.round(kFactor * (1 - expectedScore));
-
-        int winnerEloBefore = winner.getRating();
-        int loserEloBefore = loser.getRating();
-
-        winner.setRating(winner.getRating() + eloChange);
-        loser.setRating(loser.getRating() - eloChange);
-
-        userRepository.save(winner);
-        userRepository.save(loser);
-
-        Match match = Match.builder().dateOfMatch(LocalDateTime.now())
-            .user1(winner)
-            .user2(loser)
-            .winner(winner)
-            .user1RatingBefore(winnerEloBefore)
-            .user1RatingAfter(winner.getRating())
-            .user2RatingBefore(loserEloBefore)
-            .user2RatingAfter(loser.getRating())
-            .build();
-
-        
-        matchRepository.save(match);
+        Match match = matchService.createMatch(MatchCreationObject.builder().loserID(loser.getId()).winnerID(winner.getId()).build());
 
         tMatch.setMatchRecord(match);
         tournamentMatchRepository.save(tMatch);
