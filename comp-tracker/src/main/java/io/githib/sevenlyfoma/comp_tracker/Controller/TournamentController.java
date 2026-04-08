@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentMatchResult;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentRepository;
 import io.githib.sevenlyfoma.comp_tracker.Service.TournamentService;

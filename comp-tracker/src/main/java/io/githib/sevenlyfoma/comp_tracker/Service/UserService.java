@@ -1,5 +1,7 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ public class UserService {
     
     private static final Logger logger = LoggerFactory.getLogger( UserService.class);
 
+    @Autowired
+    private RatingService ratingService;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -29,15 +34,49 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public User createUser(UserDTO udto){
 
         validateUserNameAndEmailNotTaken(udto, null);
 
-        User u = User.builder().build();
+        User u = User.builder()
+            .name(udto.getName())
+            .email(udto.getEmail())
+            .pronouns(udto.getPronouns())
+            .rating(ratingService.getInitialRating())
+            .build();
+        
+        userRepository.save(u);
+
+
+        return u;
+    }
+
+    @Transactional
+    public User updateUser(Long id, UserDTO udto){
+
         
 
+        User u = validateUserExists(id);
+        validateUserNameAndEmailNotTaken(udto, u);
 
-        return null;
+        u.setEmail(udto.getEmail());
+        u.setName(udto.getName());
+        u.setPronouns(udto.getPronouns());
+        
+        userRepository.save(u);
+
+
+        return u;
+    }
+
+    private User validateUserExists(Long userId){
+        Optional<User> u = userRepository.findById(userId);
+        if (u.isEmpty()){
+            logger.error("Validation failed in Match Service for User ID {}: user does not exist", userId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Does Not Exist");
+        }
+        return u.get();
     }
 
     private void validateUserNameAndEmailNotTaken(UserDTO udto, User u){
