@@ -8,3 +8,5 @@ spring.jpa.hibernate.ddl-auto=update
 
 #toogle to WARN if needed
 logging.level.root=INFO 
+
+rating.system.type=eloStrategy

@@ -1,38 +1,32 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.RatingPair;
+import io.githib.sevenlyfoma.comp_tracker.Strategy.RatingStrategy;
 
 @Service
 public class RatingService {
 
-    public Integer getInitialRating(){
-        return getInitialRatingElo();
-    }
+    private final RatingStrategy activeStrategy;
 
-    private Integer getInitialRatingElo(){
-        return 1000;
-    }
+    public RatingService(Map<String, RatingStrategy> strategies, @Value("${rating.system.type}") String strategyName) {
 
-
-    public RatingPair getRatingChange(RatingPair beforePair){
-        return getRatingChangeElo(beforePair);
-    }
-
-
-    private RatingPair getRatingChangeElo(RatingPair beforePair){
+        this.activeStrategy = strategies.get(strategyName);
         
-        int kFactor = 32;
-        double expectedScore = 1.0 / (1.0 + Math.pow(10, (beforePair.loserRating() - beforePair.winnerRating()) / 400.0));
-        int eloChange = (int) Math.round(kFactor * (1 - expectedScore));
-
-        Integer winnerEloAfter = beforePair.winnerRating() + eloChange;
-        Integer loserEloAfter = beforePair.loserRating() - eloChange;
-
-
-        return new RatingPair(winnerEloAfter, loserEloAfter);
-
+        if (this.activeStrategy == null) {
+            throw new IllegalArgumentException("Invalid rating system configured: " + strategyName);
+        }
     }
 
+    public Integer getInitialRating() {
+        return activeStrategy.getInitialRating();
+    }
+
+    public RatingPair getRatingChange(RatingPair beforePair) {
+        return activeStrategy.getRatingChange(beforePair);
+    }
 }
