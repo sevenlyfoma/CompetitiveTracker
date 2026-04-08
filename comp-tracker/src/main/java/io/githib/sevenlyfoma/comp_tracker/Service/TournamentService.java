@@ -35,6 +35,11 @@ public class TournamentService {
     @Autowired
     private TournamentEntrantRepository tournamentEntrantRepository;
 
+    public Tournament getTournament(long tournamentID){
+        var t = tournamentRepository.findById(tournamentID).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
+        return t;
+    }
+
     @Transactional
     public void closeTournament(long tournamentID){
         var t = tournamentRepository.findById(tournamentID).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
