@@ -194,7 +194,7 @@ function UpdateItemRow( {item_data, onUpdate, handleCancel} ) {
       <td>{item.id}</td>
 
       <td>
-        <input type="text" name="tournamentName" value={item.tournamentName} onChange={handleChange}/> 
+        <input type="text" name="name" value={item.name} onChange={handleChange}/> 
       </td>
 
       <td>
@@ -214,7 +214,7 @@ function UpdateItemRow( {item_data, onUpdate, handleCancel} ) {
 
 
       <td>
-         <UpdateItemButton itemData={item} onUpdate={combinedOnUpdate}/>
+         <UpdateItemButton id={item_data.id} itemData={item} onUpdate={combinedOnUpdate}/>
       </td>
 
       <td></td>
@@ -314,12 +314,12 @@ function CreateItemButton({ itemData, onCreate, setItem }) {
   )
 }
 
-function UpdateItemButton({ itemData, onUpdate }) {
+function UpdateItemButton({ id, itemData, onUpdate }) {
   const handleUpdate = async () => {
     if (!window.confirm("Are you sure the items data is correct")) return;
 
     try {
-      const response = await fetch(`/api/tournaments/${itemData.id}`, {
+      const response = await fetch(`/api/tournaments/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

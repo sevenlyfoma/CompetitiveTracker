@@ -86,6 +86,8 @@ public class TournamentService {
 
     @Transactional
     public Tournament updateTournament(TournamentDTO tdto, Long id){
+
+        logger.info(id + " " + tdto.toString());
         Tournament t = validateTournamentExists(id);
 
         validateNotAlreadyClosed(t);
@@ -360,7 +362,7 @@ public class TournamentService {
             if (current.getParentMatch2() != null && current.getInheritsParentMatch2Winner() == true){
                 queue.add(current.getParentMatch2());
             }
-            
+
             if (current.getParentMatch1() != null && current.getInheritsParentMatch1Winner() == true){
                 queue.add(current.getParentMatch1());
             }
@@ -618,6 +620,10 @@ public class TournamentService {
 
             
         }
+
+        addMatchNumbers(totalTMs.getLast(), 1);
+
+        totalTMs.getLast().setMatchNumber(0L);
 
 
 
