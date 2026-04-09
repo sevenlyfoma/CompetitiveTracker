@@ -97,10 +97,12 @@ const nodeTypes = {boundary: BoundaryNode, matchUser: MatchUserNode, loss: LossN
 
 function makeNodes(topMatch, canvasDimensions){
 
-  console.log("topmatchL:")
-  console.log(topMatch)
+  // console.log("topmatchL:")
+  // console.log(topMatch)
 
   const {width, height} = canvasDimensions;
+
+  // console.log("height " + height)
 
   let {nodes, edges, lossLinkMarks} = makeNodesRecursive(topMatch, 0, height, width-200, topMatch?.tournament?.style, 0)
 
@@ -125,7 +127,7 @@ function makeNodes(topMatch, canvasDimensions){
 
 function makeNodesRecursive(match, minY, maxY, x, style, depth){
 
-  console.log(match)
+  // console.log(match)
 
 
   if (match !== undefined && match !== null){
@@ -147,9 +149,12 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
     }
     // console.log("Split-point: " + splitpoint)
     
+    
 
 
-    let y = ((minY + maxY) * splitpoint)
+    let y = minY + ((maxY -minY) * splitpoint)
+
+    // console.log(match.id + " " + minY + " " + maxY + " " + splitpoint + " " + y)
 
     let node_id = "match_"+match.id
     nodes.push({id: node_id, type: 'matchUser', position: { x: nx, y: y-25}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
@@ -163,12 +168,16 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
     //Makes it so if only one parent is a winner, then we dont brach, we draw in a straight line
     let nMinY = minY;
     let nMaxY = maxY
+    
     if (match.inheritsParentMatch1Winner == true){
       nMinY = y;
     }
     if (match.inheritsParentMatch2Winner == true){
       nMaxY = y;
     }
+
+    // if (match.id == 46){console.log(nMinY + " " + nMaxY)}
+
     
     
     if (match.inheritsParentMatch1Winner == true) {
@@ -399,7 +408,7 @@ function TournamentBracketPageInner() {
 
           let newTopMatch = find_tourney_height(topMatchJson);
 
-          console.log(newTopMatch);
+          // console.log(newTopMatch);
 
 
 
