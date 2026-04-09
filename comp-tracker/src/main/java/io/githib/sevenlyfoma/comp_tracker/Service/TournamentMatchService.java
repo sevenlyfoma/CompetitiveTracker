@@ -51,6 +51,9 @@ public class TournamentMatchService {
 
     @Transactional
     public void processMatchResult(MatchCreationObject mco, Long matchId){
+        logger.info(matchId + " " + mco.toString());
+
+
         TournamentMatch tMatch = tournamentMatchRepository.findById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament Match not found"));
 
         validateAllUsersPresent(tMatch);

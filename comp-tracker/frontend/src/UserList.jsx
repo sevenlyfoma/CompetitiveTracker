@@ -96,37 +96,38 @@ function UserList() {
 */
 function UserDeleteButton({userID, onDelete}) {
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+  // const handleDelete = async () => {
+  //   if (!window.confirm("Are you sure you want to delete this user?")) return;
 
-    try {
-      const response = await fetch(`/api/users/${userID}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  //   try {
+  //     const response = await fetch(`/api/users/${userID}`, {
+  //       method: 'DELETE',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
 
-      if (!response.ok) {
-        throw new Error('Failed to delete user');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Failed to delete user');
+  //     }
 
-      console.log(`User ${userID} deleted successfully`);
-      // Trigger update for fetched user list
-      onDelete();
-    } catch (error) {
-      console.error("Error deleting user:", error);
-    }
-  };
+  //     console.log(`User ${userID} deleted successfully`);
+  //     // Trigger update for fetched user list
+  //     onDelete();
+  //   } catch (error) {
+  //     console.error("Error deleting user:", error);
+  //   }
+  // };
 
   
-  return (
-    <>
-      <button className='ChangeButton' onClick={handleDelete} style={{ color: 'red' }}>
-        Delete User
-      </button>
-    </>
-  )
+  // return (
+  //   <>
+  //     <button className='ChangeButton' onClick={handleDelete} style={{ color: 'red' }}>
+  //       Delete User
+  //     </button>
+  //   </>
+  // )
+  return (<></>)
 }
 
 function EditUserButton({userID, handleEditClick}){
@@ -181,7 +182,7 @@ function StandardUserRow({user, handleEditClick, fetchUsers}) {
 // }
 
 function CreateUserRow( {onCreate} ) {
-  const [user, setUser] = useState({name: "", email: "", pronouns: "", rating: ""});
+  const [user, setUser] = useState({name: "", email: "", pronouns: ""});
 
   useEffect(() => {
   console.log("Updated User State:", user);
@@ -216,7 +217,6 @@ function CreateUserRow( {onCreate} ) {
       </td>
 
       <td>
-        <input type="number" name="rating" value={user.rating} onChange={handleChange}/> 
       </td>
 
       <td>
@@ -264,7 +264,7 @@ function CreateUserButton({ userData, onCreate, setUser }) {
 }
 
 function UpdateUserRow( {user_data, onUpdate, handleCancel} ) {
-  const [user, setUser] = useState(user_data);
+  const [user, setUser] = useState({name: user_data.name, email: user_data.email, pronouns: user_data.pronouns});
 
   // useEffect(() => {
   // console.log("Updated User State:", user);
@@ -303,11 +303,10 @@ function UpdateUserRow( {user_data, onUpdate, handleCancel} ) {
       </td>
 
       <td>
-        <input type="number" name="rating" value={user.rating} onChange={handleChange}/> 
       </td>
 
       <td>
-         <UpdateUserButton userData={user} onUpdate={combinedOnUpdate}/>
+         <UpdateUserButton userID={user_data.id} userData={user} onUpdate={combinedOnUpdate}/>
       </td>
 
       <td></td>
@@ -315,13 +314,13 @@ function UpdateUserRow( {user_data, onUpdate, handleCancel} ) {
   
 }
 
-function UpdateUserButton({ userData, onUpdate }) {
+function UpdateUserButton({ userID, userData, onUpdate }) {
   const handleUpdate = async () => {
     if (!window.confirm("Are you sure the users data is correct")) return;
 
-    console.log(userData.id)
+    console.log(userID)
     try {
-      const response = await fetch(`/api/users/${userData.id}`, {
+      const response = await fetch(`/api/users/${userID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -95,11 +95,12 @@ const LossNode = ({data}) =>{
 
 const nodeTypes = {boundary: BoundaryNode, matchUser: MatchUserNode, loss: LossNode};
 
-function makeNodes(tournament_matches, canvasDimensions){
+function makeNodes(topMatch, canvasDimensions){
+
+  console.log("topmatchL:")
+  console.log(topMatch)
 
   const {width, height} = canvasDimensions;
-
-  let topMatch = tournament_matches[0];
 
   let {nodes, edges, lossLinkMarks} = makeNodesRecursive(topMatch, 0, height, width-200, topMatch?.tournament?.style, 0)
 
@@ -123,6 +124,8 @@ function makeNodes(tournament_matches, canvasDimensions){
 }
 
 function makeNodesRecursive(match, minY, maxY, x, style, depth){
+
+  console.log(match)
 
 
   if (match !== undefined && match !== null){
@@ -313,9 +316,7 @@ function find_tourney_depth(match){
   return 0;
 }
 
-function find_canvas_size(tournament_matches, setCanvasDimensions, setTournamentMatchList){
-
-  let topMatch = tournament_matches[0];
+function find_canvas_size(topMatch, setCanvasDimensions, setTopTournamentMatch){
 
   let depth = find_tourney_depth(topMatch); //Added 2 to see a graph TODO FIX
   // console.log("Find tourney height:")
@@ -334,7 +335,7 @@ function find_canvas_size(tournament_matches, setCanvasDimensions, setTournament
 
   // console.log("dimensions {height : " + dimensions.height + ", width : " + dimensions.width + "}")
   //return dimensions
-  // setTournamentMatchList([newTopMatch])
+  // setTopTournamentMatch([newTopMatch])
   setCanvasDimensions(dimensions)
   
 }
@@ -381,7 +382,7 @@ function TournamentBracketPageInner() {
   const { tournamentID } = useParams();
       
 
-  const [tournamentMatchList, setTournamentMatchList] = useState([]);
+  const [topTournamentMatch, setTopTournamentMatch] = useState(null);
   const [tournament, setTournament] = useState({})
 
   // const [matchNodes, setMatchNodes] = useState([]);
@@ -393,16 +394,16 @@ function TournamentBracketPageInner() {
           if (!response.ok){
               throw new Error(`Server responded with status: ${response.status}`)
           }
-          const matchesJson = await response.json();
+          const topMatchJson = await response.json();
           // console.log(matchesJson);
 
-          let newTopMatch = find_tourney_height(matchesJson[0]);
+          let newTopMatch = find_tourney_height(topMatchJson);
 
-          // console.log(newTopMatch);
+          console.log(newTopMatch);
 
 
 
-          setTournamentMatchList([newTopMatch]);
+          setTopTournamentMatch(newTopMatch);
 
           const response2 = await fetch(`/api/tournaments/${tournamentID}`);
           if (!response2.ok){
@@ -442,12 +443,12 @@ function TournamentBracketPageInner() {
 
 
   // useEffect(() => {
-  //   if (tournamentMatchList.length > 0) {
+  //   if (topTournamentMatch.length > 0) {
   //     window.requestAnimationFrame(() => {
   //       setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 0 });
   //     });
   //   }
-  // }, [tournamentMatchList, setViewport]);
+  // }, [topTournamentMatch, setViewport]);
 
 
    
@@ -457,10 +458,10 @@ function TournamentBracketPageInner() {
   const [canvasDimensions, setCanvasDimensions] = useState({width: 4000, height: 4000})
 
   useEffect(() => {
-    find_canvas_size(tournamentMatchList, setCanvasDimensions, setTournamentMatchList)
-  }, [tournamentMatchList]);
+    find_canvas_size(topTournamentMatch, setCanvasDimensions, setTopTournamentMatch)
+  }, [topTournamentMatch]);
 
-  const matchNodesAndEdges = makeNodes(tournamentMatchList, canvasDimensions);
+  const matchNodesAndEdges = makeNodes(topTournamentMatch, canvasDimensions);
 
   const boundaryBoxes = create_boundary_boxes(canvasDimensions);
 

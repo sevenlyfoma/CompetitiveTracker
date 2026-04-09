@@ -32,7 +32,7 @@ public class TournamentMatchController {
     }
 
     @PutMapping("/report/{mid}")
-    public ResponseEntity<String> reportMatch(@RequestBody MatchCreationObject mco, Long mid) {
+    public ResponseEntity<String> reportMatch(@RequestBody MatchCreationObject mco, @PathVariable Long mid) {
         tournamentMatchService.processMatchResult(mco, mid);
         return ResponseEntity.ok("Match processed and ELO updated.");
     }

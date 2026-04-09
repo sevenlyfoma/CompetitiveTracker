@@ -48,6 +48,8 @@ public class TournamentService {
 
     @Transactional
     public Tournament createTournament(TournamentDTO tdto){
+
+        logger.info(tdto.toString());
         
         validateStyleExists(tdto.getStyle());
 

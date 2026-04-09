@@ -114,7 +114,7 @@ function CloseTournamentButton({tournament, onClose}){
 
         try {
         const response = await fetch(`/api/tournaments/close/${tournament.id}`, {
-            method: 'POST',
+            method: 'PUT',
         });
 
         if (!response.ok) {
@@ -146,12 +146,8 @@ function AddUserButton({user, tournament, onCreate}){
         if (!window.confirm("Are you sure the data is correct")) return;
 
         try {
-        const response = await fetch(`/api/tournament_entrants`, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(entrant_object)
+        const response = await fetch(`/api/tournament_entrants/${tournament.id}/${user.id}`, {
+            method: 'PUT',
         });
 
         if (!response.ok) {
@@ -205,12 +201,8 @@ function EntrantDeleteButton({entrant, onDelete}) {
     if (!window.confirm("Are you sure you want to delete this entrant?")) return;
 
     try {
-      const response = await fetch(`/api/tournament_entrants`, {
+      const response = await fetch(`/api/tournament_entrants/${entrant.tournament.id}/${entrant.user.id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(entrant)
       });
 
       if (!response.ok) {
