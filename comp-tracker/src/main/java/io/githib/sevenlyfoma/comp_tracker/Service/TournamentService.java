@@ -2,6 +2,7 @@ package io.githib.sevenlyfoma.comp_tracker.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -324,9 +325,61 @@ public class TournamentService {
         totalTMs.add(grandfinal);
 
         removeByesRecursive(grandfinal);
+        // addMatchNumbers(grandfinal);
+        addMatchNumbersDouble(grandfinal);
         var cleanTMs = removeUnusedMatches(totalTMs);
 
         return cleanTMs;
+    }
+
+    private void addMatchNumbersDouble(TournamentMatch finalMatch){
+        TournamentMatch winnersFinal = finalMatch.getParentMatch1();
+
+        addMatchNumbers(winnersFinal, 1);
+
+        TournamentMatch losersFinal = finalMatch.getParentMatch2();
+
+        addMatchNumbers(losersFinal, winnersFinal.getMatchNumber().intValue());
+
+
+        finalMatch.setMatchNumber(0L);
+
+    }
+
+    private void addMatchNumbers(TournamentMatch finalMatch, int modifier){
+
+        LinkedList<TournamentMatch> queue = new LinkedList<>();
+
+        List<TournamentMatch> traversedMatches = new ArrayList<>();
+
+        queue.add(finalMatch);
+
+        while (!queue.isEmpty()){
+            TournamentMatch current = queue.remove();
+
+            if (current.getParentMatch2() != null && current.getInheritsParentMatch2Winner() == true){
+                queue.add(current.getParentMatch2());
+            }
+            
+            if (current.getParentMatch1() != null && current.getInheritsParentMatch1Winner() == true){
+                queue.add(current.getParentMatch1());
+            }
+            
+            
+
+            traversedMatches.add(current);
+        }
+
+
+        for (int i = 0; i < traversedMatches.size(); i++){
+            TournamentMatch tm = traversedMatches.get(traversedMatches.size()-1-i);
+
+            tm.setMatchNumber((long) (i+modifier));
+        }
+
+
+
+
     }
 
     private Boolean isBye(User u){
