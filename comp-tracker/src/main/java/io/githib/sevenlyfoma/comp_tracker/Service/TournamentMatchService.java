@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
-import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentMatchResult;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
@@ -51,18 +50,18 @@ public class TournamentMatchService {
     }
 
     @Transactional
-    public void processMatchResult(TournamentMatchResult result){
-        TournamentMatch tMatch = tournamentMatchRepository.findById(result.getTournamentMatchID()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament Match not found"));
+    public void processMatchResult(MatchCreationObject mco, Long matchId){
+        TournamentMatch tMatch = tournamentMatchRepository.findById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament Match not found"));
 
         validateAllUsersPresent(tMatch);
         validateNoResult(tMatch);
-        validateParticipants(tMatch, result);
+        validateParticipants(tMatch, mco);
         
 
         User winner = tMatch.getUser2();
         User loser = tMatch.getUser1();
 
-        if (result.getWinnerID().equals(tMatch.getUser1().getId())){
+        if (mco.getWinnerID().equals(tMatch.getUser1().getId())){
             winner = tMatch.getUser1();
             loser = tMatch.getUser2();
         }
@@ -110,7 +109,7 @@ public class TournamentMatchService {
         return tms.get(0);
     }
 
-    private void validateParticipants(TournamentMatch tMatch, TournamentMatchResult result) {
+    private void validateParticipants(TournamentMatch tMatch, MatchCreationObject result) {
         Long u1 = tMatch.getUser1().getId();
         Long u2 = tMatch.getUser2().getId();
         Long winner = result.getWinnerID();

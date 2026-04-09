@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentMatchResult;
+import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
 import io.githib.sevenlyfoma.comp_tracker.Service.TournamentMatchService;
 
@@ -31,9 +31,9 @@ public class TournamentMatchController {
         return tournamentMatchService.getTMatch(mid);
     }
 
-    @PostMapping("/report")
-    public ResponseEntity<String> reportMatch(@RequestBody TournamentMatchResult request) {
-        tournamentMatchService.processMatchResult(request);
+    @PutMapping("/report/{mid}")
+    public ResponseEntity<String> reportMatch(@RequestBody MatchCreationObject mco, Long mid) {
+        tournamentMatchService.processMatchResult(mco, mid);
         return ResponseEntity.ok("Match processed and ELO updated.");
     }
 

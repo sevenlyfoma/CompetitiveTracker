@@ -53,7 +53,7 @@ public class TournamentController {
         return ResponseEntity.ok("Tournament id:" +id + " updated");
     }
 
-    @PostMapping("/close/{tournamentId}")
+    @PutMapping("/close/{tournamentId}")
     public ResponseEntity<String> closeTournament(@PathVariable long tournamentId) {
         tournamentService.closeTournament(tournamentId);
         return ResponseEntity.ok("Tournament Closed, Tournament Matches Created");
