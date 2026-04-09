@@ -1,6 +1,6 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,13 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentMatchResult;
+import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
-import io.githib.sevenlyfoma.comp_tracker.Model.MatchRepository;
+import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
-import io.githib.sevenlyfoma.comp_tracker.Model.UserRepository;
 
 @Service
 public class TournamentMatchService {
@@ -24,56 +23,53 @@ public class TournamentMatchService {
     private static final Logger logger = LoggerFactory.getLogger(TournamentMatchService.class);
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private MatchRepository matchRepository;
-
-    @Autowired
     private TournamentMatchRepository tournamentMatchRepository;
 
+    @Autowired
+    private TournamentService tournamentService;
+
+    @Autowired
+    private MatchService matchService;
+
+    public TournamentMatch getTMatch(Long id){
+        var tournamentMatch = tournamentMatchRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return tournamentMatch;
+    }
+
+    public TournamentMatch getTournamentTopMatch(Long tournamentID){
+        Tournament t = tournamentService.getTournament(tournamentID);
+
+        List<TournamentMatch> tournamentTopMatchList = tournamentMatchRepository.findByTournamentAndMatchNumber(t, Long.valueOf(0));
+
+        TournamentMatch topMatch = validateTopMatchPresent(t, tournamentTopMatchList);
+
+        logger.info(topMatch.toString());
+        
+        return topMatch;
+
+    }
+
     @Transactional
-    public void processMatchResult(TournamentMatchResult result){
-        TournamentMatch tMatch = tournamentMatchRepository.findById(result.getTournamentMatchID()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament Match not found"));
+    public void processMatchResult(MatchCreationObject mco, Long matchId){
+        logger.info(matchId + " " + mco.toString());
+
+
+        TournamentMatch tMatch = tournamentMatchRepository.findById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament Match not found"));
 
         validateAllUsersPresent(tMatch);
         validateNoResult(tMatch);
-        validateParticipants(tMatch, result);
+        validateParticipants(tMatch, mco);
         
 
         User winner = tMatch.getUser2();
         User loser = tMatch.getUser1();
 
-        if (result.getWinnerID().equals(tMatch.getUser1().getId())){
+        if (mco.getWinnerID().equals(tMatch.getUser1().getId())){
             winner = tMatch.getUser1();
             loser = tMatch.getUser2();
         }
 
-        int kFactor = 32;
-        double expectedScore = 1.0 / (1.0 + Math.pow(10, (loser.getRating() - winner.getRating()) / 400.0));
-        int eloChange = (int) Math.round(kFactor * (1 - expectedScore));
-
-        int winnerEloBefore = winner.getRating();
-        int loserEloBefore = loser.getRating();
-
-        winner.setRating(winner.getRating() + eloChange);
-        loser.setRating(loser.getRating() - eloChange);
-
-        userRepository.save(winner);
-        userRepository.save(loser);
-
-        Match match = Match.builder().dateOfMatch(LocalDateTime.now())
-            .user1(winner)
-            .user2(loser)
-            .winner(winner)
-            .user1RatingBefore(winnerEloBefore)
-            .user1RatingAfter(winner.getRating())
-            .user2RatingBefore(loserEloBefore)
-            .user2RatingAfter(loser.getRating())
-            .build();
-
-        
-        matchRepository.save(match);
+        Match match = matchService.createMatch(MatchCreationObject.builder().loserID(loser.getId()).winnerID(winner.getId()).build());
 
         tMatch.setMatchRecord(match);
         tournamentMatchRepository.save(tMatch);
@@ -101,7 +97,22 @@ public class TournamentMatchService {
         }
     }
 
-    private void validateParticipants(TournamentMatch tMatch, TournamentMatchResult result) {
+    private TournamentMatch validateTopMatchPresent(Tournament t, List<TournamentMatch> tms){
+
+        if (tms.isEmpty()){
+            logger.error("Validation failed for Tournament ID {}: No matches found for this tournament", t.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament No Matches");
+        }
+
+        if (tms.size() > 1){
+            logger.error("Validation failed for Tournament ID {}: Tournament Badly Formatted", t.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Badly Formatted");
+        }
+
+        return tms.get(0);
+    }
+
+    private void validateParticipants(TournamentMatch tMatch, MatchCreationObject result) {
         Long u1 = tMatch.getUser1().getId();
         Long u2 = tMatch.getUser2().getId();
         Long winner = result.getWinnerID();

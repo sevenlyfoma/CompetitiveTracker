@@ -6,5 +6,8 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface TournamentEntrantRepository extends CrudRepository<TournamentEntrant, Long> {
     List<TournamentEntrant> findByTournament(Tournament tournament);
+
+    TournamentEntrant findByTournamentAndUser(Tournament tournament, User user);
+
 }
 

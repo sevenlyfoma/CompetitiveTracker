@@ -106,7 +106,7 @@ function FinalisedMatchBody({tMatch}){
 
 function UnfinalisedMatchBody({tMatch, fetchData}){
 
-    const [result, setResult] = useState({tournamentMatchID: tMatch.id, winnerID: tMatch?.user1?.id, loserID:  tMatch?.user2?.id,});
+    const [result, setResult] = useState({winnerID: tMatch?.user1?.id, loserID:  tMatch?.user2?.id,});
 
     useEffect(() => {
     console.log("Updated Result State:", result);
@@ -146,20 +146,23 @@ function UnfinalisedMatchBody({tMatch, fetchData}){
                 <option value="user2">{tMatch?.user2?.name}</option>
             </select>
 
-            <SendResultButton result={result} fetchData={fetchData}/>
+            <SendResultButton tmid={tMatch?.id} result={result} fetchData={fetchData}/>
         
         </>
     )
 }
 
-function SendResultButton({result, fetchData}){
+function SendResultButton({tmid, result, fetchData}){
+
+    console.log("sendresultbutton")
+    console.log(tmid);
 
 
     const handleCreate = async () => {
         if (!window.confirm("Are you sure the winner has been correctly selected")) return;
         try {
-        const response = await fetch(`/api/tournament_matches/report`, {
-            method: 'POST',
+        const response = await fetch(`/api/tournament_matches/report/${tmid}`, {
+            method: 'PUT',
             headers: {
             'Content-Type': 'application/json',
             },

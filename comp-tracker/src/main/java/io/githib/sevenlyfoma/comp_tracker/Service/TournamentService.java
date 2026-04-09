@@ -3,6 +3,7 @@ package io.githib.sevenlyfoma.comp_tracker.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentDTO;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrant;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrantRepository;
@@ -24,7 +26,7 @@ import io.githib.sevenlyfoma.comp_tracker.Model.User;
 @Service
 public class TournamentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TournamentMatchService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     
     @Autowired
     private TournamentRepository tournamentRepository;
@@ -35,6 +37,72 @@ public class TournamentService {
     @Autowired
     private TournamentEntrantRepository tournamentEntrantRepository;
 
+    public Iterable<Tournament> getAllTournaments(){
+        return tournamentRepository.findAll();
+    }
+
+    public Tournament getTournament(long tournamentID){
+        var t = tournamentRepository.findById(tournamentID).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
+        return t;
+    }
+
+    @Transactional
+    public Tournament createTournament(TournamentDTO tdto){
+
+        logger.info(tdto.toString());
+        
+        validateStyleExists(tdto.getStyle());
+
+        validateTournamentNameNotTaken(tdto.getName(), null);
+
+        Tournament t = Tournament.builder()
+            .closed(false)
+            .style(tdto.getStyle())
+            .tournamentName(tdto.getName())
+            .build();
+
+        tournamentRepository.save(t);
+
+        return t;
+    }
+
+    @Transactional
+    public void deleteTournament(Long id){
+        
+        Tournament t = validateTournamentExists(id);
+
+        validateNotAlreadyClosed(t);
+
+        List<TournamentEntrant> tes = tournamentEntrantRepository.findByTournament(t);
+
+        tournamentEntrantRepository.deleteAll(tes);
+
+        tournamentRepository.delete(t);
+        
+
+        
+    }
+
+    @Transactional
+    public Tournament updateTournament(TournamentDTO tdto, Long id){
+        Tournament t = validateTournamentExists(id);
+
+        validateNotAlreadyClosed(t);
+
+        validateStyleExists(tdto.getStyle());
+
+        validateTournamentNameNotTaken(tdto.getName(), t);
+
+        t.setStyle(tdto.getStyle());
+        t.setTournamentName(tdto.getName());
+
+        tournamentRepository.save(t);
+
+        return t;
+
+
+    }
+
     @Transactional
     public void closeTournament(long tournamentID){
         var t = tournamentRepository.findById(tournamentID).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
@@ -42,6 +110,8 @@ public class TournamentService {
         validateNotAlreadyClosed(t);
         
         var entrants = tournamentEntrantRepository.findByTournament(t);
+
+        validateEnoughEntrants(t, entrants);
 
 
         List<User> sortedUsers = entrants.stream()
@@ -51,9 +121,9 @@ public class TournamentService {
 
         var leng = sortedUsers.size();
         var closestPowerOfTwo = Integer.highestOneBit(leng);
-        var difference = leng - closestPowerOfTwo;
+        // var difference = leng - closestPowerOfTwo;
 
-        logger.info(Integer.toString(leng) + " " + Integer.toString(closestPowerOfTwo) + " " + Integer.toString(difference));
+        // logger.info(Integer.toString(leng) + " " + Integer.toString(closestPowerOfTwo) + " " + Integer.toString(difference));
 
         if (leng != closestPowerOfTwo){
             for (int i = 0; i < closestPowerOfTwo*2 - leng; i++){
@@ -63,9 +133,9 @@ public class TournamentService {
         }
         
 
-        for (User u: sortedUsers){
-            logger.info(u.getId() + " " + u.getName() + " " + u.getRating().toString());
-        }
+        // for (User u: sortedUsers){
+        //     logger.info(u.getId() + " " + u.getName() + " " + u.getRating().toString());
+        // }
         
         List<TournamentMatch> tms = new ArrayList<>();
         if (t.getStyle().equals("single")){
@@ -158,7 +228,7 @@ public class TournamentService {
                     loserTMs.add(tmL);
                     totalLoserTMs.add(tmL);
 
-                    logger.info("Creating losers round 1 match " + i);
+                    // logger.info("Creating losers round 1 match " + i);
                 }
 
             }
@@ -167,7 +237,7 @@ public class TournamentService {
                 .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
                 .collect(Collectors.toList());
 
-            logger.info("sltms: " +sortedLoserTMs.size() + ", tms:" + tms.size() );
+            // logger.info("sltms: " +sortedLoserTMs.size() + ", tms:" + tms.size() );
 
             loserTMs = new ArrayList<>();
 
@@ -225,7 +295,7 @@ public class TournamentService {
                 loserTMs = tempLosers;
             }
 
-            if (count == 0){logger.info("ltms: "  + loserTMs.size() );}
+            // if (count == 0){logger.info("ltms: "  + loserTMs.size() );}
 
             
 
@@ -486,7 +556,7 @@ public class TournamentService {
                     .matchNumber( ((long) Integer.numberOfTrailingZeros(sortedTMs.size())) - 1L )
                     .build();
 
-                logger.info(tm.getMatchNumber().toString());
+                // logger.info(tm.getMatchNumber().toString());
 
                 tms.add(tm);
             }
@@ -571,12 +641,50 @@ public class TournamentService {
         return u;
     }
 
+    private Tournament validateTournamentExists(Long id){
+        Optional<Tournament> ot = tournamentRepository.findById(id);
 
+        if (ot.isEmpty()){
+            logger.error("Validation failed in Tournament Service for Tournament id {}: Tournament does not exist", id);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament does not Exist");
+        }
+
+        return ot.get();
+    }
+
+    private void validateTournamentNameNotTaken(String name, Tournament t){
+        long currentID = -1;
+        if (t != null){
+            currentID = t.getId();
+        }
+
+        Tournament nameTournament = tournamentRepository.findByTournamentName(name);
+
+        if (nameTournament != null && nameTournament.getId() != currentID){
+            logger.error("Validation failed in Tournament Service for Tournament name {}: name already taken by another tournament", name);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Name not unique");
+        }
+    }
+
+    private void validateStyleExists(String style){
+        if (!style.equals("single") && !style.equals("double")){
+            logger.error("Validation failed for Tournament Creation: Style '{}' not supported", style);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Style Not Supported");
+        }
+    }
+    
     private void validateNotAlreadyClosed(Tournament t) {
 
         if (t.getClosed()) {
             logger.error("Validation failed for Tournament ID {}: The tournament has already been closed", t.getId());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Already Closed");
+        }
+    }
+
+    private void validateEnoughEntrants(Tournament t, List<TournamentEntrant> entrants){
+        if (entrants.size() < 3){
+            logger.error("Validation failed for Tournament ID {}: The tournament must have at least 3 entrants", t.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Not Enough Entrants");
         }
     }
 

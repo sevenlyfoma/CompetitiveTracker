@@ -44,6 +44,7 @@ function TournamentList() {
             <th>ID</th>
             <th>Name</th>
             <th>Status</th>
+            <th>Style</th>
             <th></th>
             <th></th>
           </tr>
@@ -94,6 +95,7 @@ function StandardItemRow({item, handleEditClick, fetchItems}) {
       <td>{item.id}</td>
       <td>{item.tournamentName}</td>
       <td>{status}</td>
+      <td>{item.style}</td>
       <td><ItemDeleteButton id={item.id} onDelete={fetchItems}/></td>
       <td>{button}</td>
     </tr>
@@ -101,7 +103,7 @@ function StandardItemRow({item, handleEditClick, fetchItems}) {
 }
 
 function CreateItemRow( {onCreate} ) {
-  const [item, setItem] = useState({tournamentName: "", closed: false});
+  const [item, setItem] = useState({name: "", style: "single"});
 
   useEffect(() => {
   console.log("Updated Item State:", item);
@@ -111,11 +113,9 @@ function CreateItemRow( {onCreate} ) {
   function handleChange(e) {
     const { name, value, type } = e.target;
 
-    const finalValue = name === "closed" ? value === "true" : value;
-
     setItem((prevItem) => ({
       ...prevItem,
-      [name]: finalValue,
+      [name]: value,
     }));
   }
   
@@ -128,17 +128,21 @@ function CreateItemRow( {onCreate} ) {
       <td></td>
 
       <td>
-        <input type="text" name="tournamentName" value={item.tournamentName} onChange={handleChange}/> 
+        <input type="text" name="name" value={item.tournamentName} onChange={handleChange}/> 
+      </td>
+
+      <td>
+        open
       </td>
 
       <td>
         <select 
-          name="closed" 
-          value={item.closed.toString()} 
+          name="style" 
+          value={item.style} 
           onChange={handleChange}
         >
-          <option value="false">Open</option>
-          <option value="true">Closed</option>
+          <option value="single">single</option>
+          <option value="double">double</option>
         </select>
       </td>
 
@@ -157,7 +161,7 @@ function CreateItemRow( {onCreate} ) {
 }
 
 function UpdateItemRow( {item_data, onUpdate, handleCancel} ) {
-  const [item, setItem] = useState(item_data);
+  const [item, setItem] = useState({name: item_data.tournamentName, style: item_data.style});
 
   useEffect(() => {
   console.log("Updated Item State:", item);
@@ -167,11 +171,9 @@ function UpdateItemRow( {item_data, onUpdate, handleCancel} ) {
   function handleChange(e) {
     const { name, value, type } = e.target;
 
-    const finalValue = name === "closed" ? value === "true" : value;
-
     setItem((prevItem) => ({
       ...prevItem,
-      [name]: finalValue,
+      [name]: value,
     }));
   }
 
@@ -181,7 +183,10 @@ function UpdateItemRow( {item_data, onUpdate, handleCancel} ) {
   }
   
   
-  
+  let closedText = "open"
+  if (item.closed){
+    closedText = "closed"
+  }
   
   return (
     <tr>
@@ -193,13 +198,17 @@ function UpdateItemRow( {item_data, onUpdate, handleCancel} ) {
       </td>
 
       <td>
+        {closedText}
+      </td>
+
+      <td>
         <select 
-          name="closed" 
-          value={item.closed.toString()} 
+          name="style" 
+          value={item.style}
           onChange={handleChange}
         >
-          <option value="false">Open</option>
-          <option value="true">Closed</option>
+          <option value="single">Single Elimination</option>
+          <option value="double">Double Elimination</option>
         </select>
       </td>
 
@@ -225,9 +234,9 @@ function ItemDeleteButton({id, onDelete}) {
     try {
       const response = await fetch(`/api/tournaments/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
       });
 
       if (!response.ok) {
@@ -289,7 +298,7 @@ function CreateItemButton({ itemData, onCreate, setItem }) {
       }
 
       onCreate();
-      setItem({tournamentName: "", closed: false});
+      setItem({name: "", style: "single"});
       console.log(`Item created successfully`);
     } catch (error) {
       console.error("Error creating item:", error);
