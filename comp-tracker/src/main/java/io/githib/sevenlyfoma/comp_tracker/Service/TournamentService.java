@@ -165,6 +165,8 @@ public class TournamentService {
 
         long matchNumber = 1L;
 
+        int winnersRoundNumber = 1;
+
         for (int i = 0; i < users.size()/2; i++){
             User user1 = users.get(i);
             User user2 = users.get(users.size()-1-i);
@@ -172,7 +174,7 @@ public class TournamentService {
                 .tournament(t)
                 .user1(user1)
                 .user2(user2)
-                .matchTitle("Match in Winners Round of " + users.size())
+                .matchTitle("Winner's Round " + winnersRoundNumber)
                 .matchNumber( matchNumber++ )
                 .build();
 
@@ -180,6 +182,9 @@ public class TournamentService {
         }
 
         long loserMatchNumber = (matchNumber * 2);
+
+        int losersRoundNumber = 1;
+        
 
         List<TournamentMatch> totalTMs = new ArrayList<>();
 
@@ -191,6 +196,7 @@ public class TournamentService {
         int count = 0;
 
         while (tms.size() > 1){
+            winnersRoundNumber++;
             List<TournamentMatch> sortedTMs = tms.stream()
                 .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating(), Comparator.reverseOrder()))
                 .collect(Collectors.toList());
@@ -206,7 +212,7 @@ public class TournamentService {
 
                 TournamentMatch tm = TournamentMatch.builder()
                     .tournament(t)
-                    .matchTitle("Match in Winners Round of " + sortedTMs.size())
+                    .matchTitle("Winner's Round" + winnersRoundNumber)
                     .parentMatch1(tm1)
                     .parentMatch2(tm2)
                     .inheritsParentMatch1Winner(true)
@@ -220,7 +226,7 @@ public class TournamentService {
                 if (count == 0){
                     TournamentMatch tmL = TournamentMatch.builder()
                         .tournament(t)
-                        .matchTitle("Match in Losers Round of " + sortedTMs.size())
+                        .matchTitle("Loser's Round " + losersRoundNumber)
                         .parentMatch1(tm1)
                         .parentMatch2(tm2)
                         .inheritsParentMatch1Winner(false)
@@ -245,13 +251,14 @@ public class TournamentService {
             loserTMs = new ArrayList<>();
 
             if (sortedLoserTMs.size() != tms.size()){
+                losersRoundNumber++;
                 for (int i = 0; i < sortedLoserTMs.size()/2; i++){
                     var tm1 = sortedLoserTMs.get(i);
                     var tm2 = sortedLoserTMs.get(sortedLoserTMs.size()-1-i);
 
                     TournamentMatch tmL = TournamentMatch.builder()
                             .tournament(t)
-                            .matchTitle("Match in Losers Round of " + tms.size()*4)
+                            .matchTitle("Loser's Round " + losersRoundNumber)
                             .parentMatch1(tm1)
                             .parentMatch2(tm2)
                             .inheritsParentMatch1Winner(true)
@@ -275,13 +282,14 @@ public class TournamentService {
                 .collect(Collectors.toList());
                 
             List<TournamentMatch> tempLosers = new ArrayList<>();
+            losersRoundNumber++;
             for (int i = 0; i < sortedTMs.size(); i++){
                 var tm1 = sortedTMs.get(i);
                 var tm2 = sortedLoserTMs.get(i);
 
                 TournamentMatch tmL = TournamentMatch.builder()
                         .tournament(t)
-                        .matchTitle("Match in Losers Round of " + sortedTMs.size()*2)
+                        .matchTitle("Loser's Round " + losersRoundNumber)
                         .parentMatch1(tm1)
                         .parentMatch2(tm2)
                         .inheritsParentMatch1Winner(false)
@@ -311,7 +319,7 @@ public class TournamentService {
 
         TournamentMatch grandfinal = TournamentMatch.builder()
             .tournament(t)
-            .matchTitle("Grand final")
+            .matchTitle("Grand Finals")
             .parentMatch1(tms.get(0))
             .parentMatch2(loserTMs.get(0))
             .inheritsParentMatch1Winner(true)
@@ -329,9 +337,48 @@ public class TournamentService {
         removeByesRecursive(grandfinal);
         // addMatchNumbers(grandfinal);
         addMatchNumbersDouble(grandfinal);
+        addTitleMatchNamesDouble(grandfinal);
         var cleanTMs = removeUnusedMatches(totalTMs);
 
         return cleanTMs;
+    }
+
+    private void addTitleMatchNamesDouble(TournamentMatch match){
+
+        match.setMatchTitle("Grand Finals");
+
+        addTitleMatchNames(match.getParentMatch1(), 1, "Winner's ");
+
+        addTitleMatchNames(match.getParentMatch2(), 1, "Loser's ");
+        
+    }
+
+    private void addTitleMatchNames(TournamentMatch match, int depth, String front){
+        String matchTitle = front;
+
+
+        switch (depth) {
+            case 1 -> matchTitle += " Finals";
+            case 2 -> matchTitle += " Semifinals";
+            case 3 -> matchTitle += " Quaterfinals";
+            default -> {
+            }
+        }
+
+        match.setMatchTitle(matchTitle);
+
+        if (depth < 3){
+            if (match.getParentMatch1() != null && match.getInheritsParentMatch1Winner() == true){
+                addTitleMatchNames(match.getParentMatch1(), depth+1, front);
+            }
+            if (match.getParentMatch2() != null && match.getInheritsParentMatch2Winner() == true){
+                addTitleMatchNames(match.getParentMatch2(), depth+1, front);
+            }
+        }
+
+
+
+
     }
 
     private void addMatchNumbersDouble(TournamentMatch finalMatch){
@@ -534,6 +581,8 @@ public class TournamentService {
 
         List<TournamentMatch> tms = new ArrayList<>();
 
+        int roundNumber = 1;
+
         for (int i = 0; i < users.size()/2; i++){
             User user1 = users.get(i);
             User user2 = users.get(users.size()-1-i);
@@ -541,7 +590,7 @@ public class TournamentService {
                 .tournament(t)
                 .user1(user1)
                 .user2(user2)
-                .matchTitle("Match in Round of " + users.size())
+                .matchTitle("Round " + roundNumber)
                 .matchNumber( ((long) Integer.numberOfTrailingZeros(users.size())) - 1L )
                 .build();
 
@@ -557,6 +606,7 @@ public class TournamentService {
         }
 
         while (tms.size() > 1){
+            roundNumber++;
             List<TournamentMatch> sortedTMs = tms.stream()
                 .sorted(Comparator.comparing(match -> findExpectedWinner(match).getRating()))
                 .collect(Collectors.toList());
@@ -601,7 +651,7 @@ public class TournamentService {
 
                 TournamentMatch tm = TournamentMatch.builder()
                     .tournament(t)
-                    .matchTitle("Match in Round of " + sortedTMs.size())
+                    .matchTitle("Round " + roundNumber)
                     .user1(byeUser1)
                     .user2(byeUser2)
                     .parentMatch1(p1)
@@ -622,6 +672,7 @@ public class TournamentService {
         }
 
         addMatchNumbers(totalTMs.getLast(), 1);
+        addTitleMatchNames(totalTMs.getLast(), 1, "");
 
         totalTMs.getLast().setMatchNumber(0L);
 
