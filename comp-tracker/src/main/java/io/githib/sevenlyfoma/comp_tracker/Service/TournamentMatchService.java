@@ -43,6 +43,8 @@ public class TournamentMatchService {
         List<TournamentMatch> tournamentTopMatchList = tournamentMatchRepository.findByTournamentAndMatchNumber(t, Long.valueOf(0));
 
         TournamentMatch topMatch = validateTopMatchPresent(t, tournamentTopMatchList);
+
+        logger.info(topMatch.toString());
         
         return topMatch;
 

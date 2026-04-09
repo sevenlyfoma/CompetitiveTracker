@@ -3,6 +3,7 @@ package io.githib.sevenlyfoma.comp_tracker.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentDTO;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrant;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrantRepository;
@@ -35,9 +37,68 @@ public class TournamentService {
     @Autowired
     private TournamentEntrantRepository tournamentEntrantRepository;
 
+    public Iterable<Tournament> getAllTournaments(){
+        return tournamentRepository.findAll();
+    }
+
     public Tournament getTournament(long tournamentID){
         var t = tournamentRepository.findById(tournamentID).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
         return t;
+    }
+
+    @Transactional
+    public Tournament createTournament(TournamentDTO tdto){
+        
+        validateStyleExists(tdto.getStyle());
+
+        validateTournamentNameNotTaken(tdto.getName(), null);
+
+        Tournament t = Tournament.builder()
+            .closed(false)
+            .style(tdto.getStyle())
+            .tournamentName(tdto.getName())
+            .build();
+
+        tournamentRepository.save(t);
+
+        return t;
+    }
+
+    @Transactional
+    public void deleteTournament(Long id){
+        
+        Tournament t = validateTournamentExists(id);
+
+        validateNotAlreadyClosed(t);
+
+        List<TournamentEntrant> tes = tournamentEntrantRepository.findByTournament(t);
+
+        tournamentEntrantRepository.deleteAll(tes);
+
+        tournamentRepository.delete(t);
+        
+
+        
+    }
+
+    @Transactional
+    public Tournament updateTournament(TournamentDTO tdto, Long id){
+        Tournament t = validateTournamentExists(id);
+
+        validateNotAlreadyClosed(t);
+
+        validateStyleExists(tdto.getStyle());
+
+        validateTournamentNameNotTaken(tdto.getName(), t);
+
+        t.setStyle(tdto.getStyle());
+        t.setTournamentName(tdto.getName());
+
+        tournamentRepository.save(t);
+
+        return t;
+
+
     }
 
     @Transactional
@@ -58,7 +119,7 @@ public class TournamentService {
 
         var leng = sortedUsers.size();
         var closestPowerOfTwo = Integer.highestOneBit(leng);
-        var difference = leng - closestPowerOfTwo;
+        // var difference = leng - closestPowerOfTwo;
 
         // logger.info(Integer.toString(leng) + " " + Integer.toString(closestPowerOfTwo) + " " + Integer.toString(difference));
 
@@ -578,7 +639,38 @@ public class TournamentService {
         return u;
     }
 
+    private Tournament validateTournamentExists(Long id){
+        Optional<Tournament> ot = tournamentRepository.findById(id);
 
+        if (ot.isEmpty()){
+            logger.error("Validation failed in Tournament Service for Tournament id {}: Tournament does not exist", id);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament does not Exist");
+        }
+
+        return ot.get();
+    }
+
+    private void validateTournamentNameNotTaken(String name, Tournament t){
+        long currentID = -1;
+        if (t != null){
+            currentID = t.getId();
+        }
+
+        Tournament nameTournament = tournamentRepository.findByTournamentName(name);
+
+        if (nameTournament != null && nameTournament.getId() != currentID){
+            logger.error("Validation failed in Tournament Service for Tournament name {}: name already taken by another tournament", name);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Name not unique");
+        }
+    }
+
+    private void validateStyleExists(String style){
+        if (!style.equals("single") && !style.equals("double")){
+            logger.error("Validation failed for Tournament Creation: Style '{}' not supported", style);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Style Not Supported");
+        }
+    }
+    
     private void validateNotAlreadyClosed(Tournament t) {
 
         if (t.getClosed()) {
