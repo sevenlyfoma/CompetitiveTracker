@@ -178,13 +178,18 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
 
     // if (match.id == 46){console.log(nMinY + " " + nMaxY)}
 
-    
+    let topnx = x - 200;
+    let botnx = x - 200
+
+    if(match.matchNumber == 0){
+      topnx -= (match.parentMatch2.depth - match.parentMatch1.depth) * 200
+    }
     
     if (match.inheritsParentMatch1Winner == true) {
-      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, x - 200, style, depth +1)
+      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, topnx, style, depth +1)
     }
     if (match.inheritsParentMatch2Winner == true) {
-      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, x - 200, style, depth +1)
+      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, botnx, style, depth +1)
     }
 
     let lossNodes = []
