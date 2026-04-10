@@ -242,92 +242,59 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
 
 const initialNodes = [];
 
-function find_tourney_height(match){
-  if (match !== undefined && match !== null){
-    if (match.parentMatch1 == null && match.parentMatch2 == null
-      ||match.inheritsParentMatch1Winner == false && match.inheritsParentMatch2Winner == false
-    ){
-      match.height = 1;
-      return match;
-    }
-    else{
-      let p1 = find_tourney_height(match.parentMatch1);
-      let p2 = find_tourney_height(match.parentMatch2);
-
-      let p1HD;
-      let p2HD;
-
-      if (p1 == null){
-        p1HD = 0;
-      }
-      else{
-        p1HD = p1.height;
-      }
-
-      if (p2 == null){
-        p2HD = 0;
-      }
-      else{
-        p2HD = p2.height;
-      }
-
-
-      if (match.inheritsParentMatch1Winner == false){
-        p1HD = 0;
-      }
-      if (match.inheritsParentMatch2Winner == false){
-        p2HD = 0;
-      }
-
-
-
-      match.height = p1HD + p2HD;
-
-      return match
-
-
-    }
+function appened_tourney_dimensions(match){
+  if (match === undefined || match === null){
+    return null;
   }
 
-
-  return null;
-}
-
-function find_tourney_depth(match){
-  //ONLY ONE PARENT = DONT COUNT THE DEPTH???
-
-  if (match !== undefined && match !== null){
-    if (match.parentMatch1 == null && match.parentMatch2 == null){
-      return 1;
-    }
-    else{
-      //Hack to avoid double counting of depth on double elim brackets
-      // if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false){
-      //   return 0
-      // }
-      let p1Depth = find_tourney_depth(match.parentMatch1)
-      let p2Depth = find_tourney_depth(match.parentMatch2)
-      if (match.inheritsParentMatch1Winner == false){
-        p1Depth = 0;
-      }
-      if (match.inheritsParentMatch2Winner == false){
-        p2Depth = 0;
-      }
-
-      if (p1Depth >= p2Depth){
-        return p1Depth + 1;
-      }
-      else {
-        return p2Depth + 1;
-      }
-    }
+  if (match.parentMatch1 == null && match.parentMatch2 == null
+      ||match.inheritsParentMatch1Winner != true && match.inheritsParentMatch2Winner != true
+  ){
+    match.height = 1;
+    match.depth = 1;
+    return match;
   }
-  return 0;
+
+  let p1 = null
+  let p2 = null
+
+  let p1D = 0;
+  let p1H = 0;
+  
+  let p2D = 0;
+  let p2H = 0;
+
+
+  if (match.inheritsParentMatch1Winner == true){
+    p1 = appened_tourney_dimensions(match.parentMatch1);
+    p1D = p1.depth;
+    p1H = p1.height;
+  }
+   
+ if (match.inheritsParentMatch2Winner == true){
+    p2 = appened_tourney_dimensions(match.parentMatch2);
+    p2D = p2.depth;
+    p2H = p2.height;
+  } 
+  
+
+  match.height = p1H + p2H;
+
+  if (p1D > p2D) {
+    match.depth = p1D + 1;
+  }
+  else  {
+    match.depth = p2D + 1;
+  }
+
+  return match;
+
+    
 }
 
 function find_canvas_size(topMatch, setCanvasDimensions, setTopTournamentMatch){
 
-  let depth = find_tourney_depth(topMatch); //Added 2 to see a graph TODO FIX
+  // let depth = find_tourney_depth(topMatch); //Added 2 to see a graph TODO FIX
   // console.log("Find tourney height:")
   // let newTopMatch = find_tourney_height(topMatch);
 
@@ -336,6 +303,7 @@ function find_canvas_size(topMatch, setCanvasDimensions, setTopTournamentMatch){
   // console.log("depth: " + depth)
 
   let height = topMatch?.height;
+  let depth = topMatch?.depth;
 
   let maxBotMatches = 2 ** (depth - 1)
   let dimensions = {height: 100 + 100 * height, width: 100 + 200 * depth};
@@ -406,9 +374,12 @@ function TournamentBracketPageInner() {
           const topMatchJson = await response.json();
           // console.log(matchesJson);
 
-          let newTopMatch = find_tourney_height(topMatchJson);
+          // let newTopMatch = find_tourney_height(topMatchJson);
 
-          // console.log(newTopMatch);
+          let newTopMatch = appened_tourney_dimensions(topMatchJson);
+
+          console.log("New top match")
+          console.log(newTopMatch);
 
 
 
