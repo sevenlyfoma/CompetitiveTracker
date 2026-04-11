@@ -4,8 +4,9 @@ import UserList from './UserList.jsx'
 import UserMatchList from './UserMatchList.jsx'
 import TournamentList from './TournamentList.jsx';
 import TournamentEntrantList from './TournamentEntrantList.jsx';
-import TournamentBracketPage from './TournamentBracketPage.jsx';
 import TournamentMatchPage from './TournamentMatchPage.jsx';
+
+import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
 function App() {
   return (

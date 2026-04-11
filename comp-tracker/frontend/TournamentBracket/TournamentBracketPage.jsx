@@ -1,8 +1,3 @@
-// import { SingleEliminationBracket, DoubleEliminationBracket, Match, SVGViewer } from '@g-loot/react-tournament-brackets';
-
-//https://www.npmjs.com/package/@g-loot/react-tournament-brackets
-
-// import { Bracket, RoundProps } from 'react-brackets';
 import React, {useCallback, useState, useEffect} from 'react';
 import ReactFlow, { Position, useReactFlow, ReactFlowProvider, useStore, Handle } from 'reactflow';
 // import { useViewportHelper } from 'reactflow';
@@ -11,89 +6,24 @@ import 'reactflow/dist/style.css';
 
 import './TournamentBracketPage.css'
 
+import BoundaryNode from './BoundaryNode';
 
-//TODO logic for resolving tournament matches
+import MatchNode from './MatchNode';
+
+import LossNode from './LossNode';
+
+import FirstCornerDefinedDistanceStepEdge from './FirstCornerDefinedDistanceStepEdge';
+
+import RoundTitleNode from './RoundTitleNode';
+
+// import LinkNode from './LinkNode';
+const roundLabelHeight = 100;
  
-const edgeTypes = {};
-
-const BoundaryNode = ({ data }) => {
-
-  const { colorStart = 'red', colorEnd = 'blue', degree = 90, label } = data;
-  
-  return (
-    <div style={{
-      width: '100%', 
-      height: '100%',
-      background: `linear-gradient(${degree}deg, ${colorStart} 0%, ${colorEnd} 100%)`,}}>
-    </div>
-  );
-};
-
-const MatchUserNode = ({ data }) => {
-  const navigate = useNavigate();
-
-  const {match, showLeftHandle, showRightHandle} = data;
-
-  let label1 = "n/a";
-  let label2 = "n/a";
-  if (match.user1 !== null){label1 = match.user1.name}
-  if (match.user2 !== null){label2 = match.user2.name}
-
-  let user1BgColor = null;
-  let user2BgColor = null;
-
-  if (match?.matchRecord != null){
-    if (match?.matchRecord?.winner?.id == match?.user1?.id){
-      user1BgColor = "lightgreen";
-      user2BgColor = "red";
-    }
-    else {
-      user1BgColor = "red";
-      user2BgColor = "lightgreen";
-    }
-  }
 
 
-  return (
-    <div className="matchUserNodeOuter" style={{width: '100%', height: '100%',}}>
-      <button 
-        style={{width: '20%', height: '100%',}} 
-        onClick={() => navigate(`/tournaments/matches/${match.tournament.id}/${match.id}`)}>
+const nodeTypes = {boundary: BoundaryNode, matchUser: MatchNode, loss: LossNode, roundTitle: RoundTitleNode};
 
-      </button>
-      
-      <div className="matchUserNodeDiv" style={{width: '80%', height: '100%',}}>
-        
-        {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Left} />)}
-        
-        <div className="matchUserNodeInner" style={{width: '100%', height: '50%', backgroundColor: user1BgColor}}>
-          <p>{label1}</p>
-        </div>
-
-        <div className="matchUserNodeInner" style={{width: '100%', height: '50%', backgroundColor: user2BgColor}}>
-          <p>{label2}</p>
-        </div>
-        
-        {showRightHandle && (<Handle className='matchUserNodeHandle' type="source" position={Position.Right} />)}
-      </div>
-    </div>
-  );
-};
-
-const LossNode = ({data}) =>{
-  const {label, showLeftHandle=false, showRightHandle=false} = data;
-  // console.log("lossnode: " + label)
-  return (
-  <div className="lossNode" style={{width: '100%', height: '100%',}}>
-    {showLeftHandle && (<Handle className='matchUserNodeHandle' type="target" position={Position.Left} />)}
-
-    <p>{label}</p>
-
-    {showRightHandle && (<Handle className='matchUserNodeHandle' type="source" position={Position.Right} />)}
-  </div>)
-}
-
-const nodeTypes = {boundary: BoundaryNode, matchUser: MatchUserNode, loss: LossNode};
+const edgeTypes = {fcddse: FirstCornerDefinedDistanceStepEdge};
 
 function makeNodes(topMatch, canvasDimensions){
 
@@ -104,7 +34,41 @@ function makeNodes(topMatch, canvasDimensions){
 
   // console.log("height " + height)
 
-  let {nodes, edges, lossLinkMarks} = makeNodesRecursive(topMatch, 0, height, width-200, topMatch?.tournament?.style, 0)
+  let nHeight = height;
+  // if (topMatch?.tournament?.style === "double") {nHeight -= roundLabelHeight}
+
+  let {nodes, edges, lossLinkMarks, roundTitlesAndPositions} = makeNodesRecursive(topMatch, roundLabelHeight, nHeight, width-200, topMatch?.tournament?.style, 0, 0)
+
+  // console.log(roundTitlesAndPositions.filter(function(value, index, array) {return array.indexOf(value) == index;}));
+  // let uniqueTitles = roundTitlesAndPositions.map(x => x.title).filter(function(value, index, array) {return array.indexOf(value) == index;});
+
+  // let uniqueTitlesAndPositions = uniqueTitles.map(t => {return ({title: t, position: roundTitlesAndPositions.findIndex(item => item.title === t).position})} )
+
+  const seen = new Set();
+
+  const uniqueTitlesAndPositions = roundTitlesAndPositions.filter(item => {
+  // Create a unique key for the pair
+  const key = `${item.title}|${item.positionX}`;
+  
+    if (seen.has(key)) {
+      return false;
+    } else {
+      seen.add(key); 
+      return true; 
+  }
+  });
+
+  console.log(uniqueTitlesAndPositions); 
+
+  for (let i = 0; i < uniqueTitlesAndPositions.length; i++){
+    let item  = uniqueTitlesAndPositions[i];
+
+    nodes.push({id: "title_"+item.title, type: 'roundTitle', position: { x: item.positionX, y: item.positionY}, style: { width: 100, height: 100}, data: { roundTitle: item.title }})
+
+
+
+  }
+
 
   let lossNodes = [];
 
@@ -118,14 +82,14 @@ function makeNodes(topMatch, canvasDimensions){
 
     let lossNodeId = "sendLoss"+node.id;
     let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+160, y: node.position.y+12.5}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
-    edges.push({id: "e-"+lossNodeId+"-"+node.id, source: node.id, target: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
+    edges.push({id: "e-"+lossNodeId+"-"+node.id, target: node.id, source: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
     lossNodes.push(lossNode);
   }
 
   return {nodes: nodes.concat(lossNodes), edges: edges}
 }
 
-function makeNodesRecursive(match, minY, maxY, x, style, depth){
+function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
 
   // console.log(match)
 
@@ -135,6 +99,10 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
     let nodes =[]
     let edges = []
     let lossLinkMarks = []
+    let roundTitlesAndPositions = []
+
+    roundTitlesAndPositions.push({title: match.matchTitle, positionX: x, positionY: titleY})
+    
   
     let height = 25
     let width = 100
@@ -160,9 +128,8 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
     nodes.push({id: node_id, type: 'matchUser', position: { x: nx, y: y-25}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
     
     
-    
-    let topNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: []};
-    let botNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: []};
+    let topNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: [], roundTitlesAndPositions : []};
+    let botNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: [], roundTitlesAndPositions : []};
 
 
     //Makes it so if only one parent is a winner, then we dont brach, we draw in a straight line
@@ -178,27 +145,48 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
 
     // if (match.id == 46){console.log(nMinY + " " + nMaxY)}
 
-    
+    let topnx = x - 200;
+    let botnx = x - 200
+
+    let nTitleY = titleY;
+
+    if(match.matchNumber == 0 && style === "double"){
+      let p1Depth = match.parentMatch1.depth;
+      let p2Depth = match.parentMatch2.depth;
+      if (p2Depth > p1Depth)  {
+           topnx -= (p2Depth - p1Depth) * 200
+      } 
+      if (p1Depth > p2Depth) {
+        botnx -= (p1Depth - p2Depth) * 200
+      }
+
+      nMinY += roundLabelHeight * (1-splitpoint)
+      nMaxY -= roundLabelHeight * splitpoint
+
+      nTitleY = nMaxY
+     
+    }
     
     if (match.inheritsParentMatch1Winner == true) {
-      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, x - 200, style, depth +1)
+      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, topnx, style, depth +1, titleY)
     }
     if (match.inheritsParentMatch2Winner == true) {
-      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, x - 200, style, depth +1)
+      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, botnx, style, depth +1, nTitleY)
     }
 
     let lossNodes = []
 
+    
     if (match.parentMatch1 !== null){
       let parent1_node_id = "match_"+match.parentMatch1.id
       let col = match.inheritsParentMatch1Winner == true ? 'green' : 'red';
       if (match.inheritsParentMatch1Winner == true) {
-        edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id, source: parent1_node_id, target: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
+        edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id,  data: {dist:50}, target: parent1_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
       }
       else if (match.inheritsParentMatch1Winner == false){
         let lossNodeId = "receiveLoss1"+node_id;
         let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y-40}, style: { width: 25, height: 25}, data: { label: match.parentMatch1.matchNumber, showRightHandle: true }}
-        edges.push({id: "e-"+lossNodeId+"-"+match.id, source: lossNodeId, target: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
+        edges.push({id: "e-"+lossNodeId+"-"+match.id, target: lossNodeId, source: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
         lossNodes.push(receiveLossNode);
 
         lossLinkMarks.push({id: match.parentMatch1.id, match: match.parentMatch1});
@@ -208,17 +196,18 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
       let parent2_node_id = "match_"+match.parentMatch2.id
       let col = match.inheritsParentMatch2Winner == true ? 'green' : 'red';
       if (match.inheritsParentMatch2Winner == true) {
-        edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, source:parent2_node_id, target: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
+        edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, data: {dist:50} , target:parent2_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
       }
       else if (match.inheritsParentMatch2Winner == false){
         let lossNodeId = "receiveLoss2"+node_id;
         let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y+15}, style: { width: 25, height: 25}, data: { label: match.parentMatch2.matchNumber, showRightHandle: true }}
-        edges.push({id: "e-"+lossNodeId+"-"+match.id, source: lossNodeId, target: node_id, type: "smoothstep", style : {stroke: col, strokeWidth: 3,},})
+        edges.push({id: "e-"+lossNodeId+"-"+match.id, target: lossNodeId, source: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
         lossNodes.push(receiveLossNode);
 
         lossLinkMarks.push({id: match.parentMatch2.id, match: match.parentMatch2});
       }
     } 
+
       
   
     // console.log(lossLinkMarks)
@@ -228,8 +217,8 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
     return {
       nodes: nodes.concat(topNodesAndEdges.nodes).concat(botNodesAndEdges.nodes).concat(lossNodes), 
       edges: edges.concat(topNodesAndEdges.edges).concat(botNodesAndEdges.edges),
-      lossLinkMarks: lossLinkMarks.concat(topNodesAndEdges.lossLinkMarks).concat(botNodesAndEdges.lossLinkMarks)
-    
+      lossLinkMarks: lossLinkMarks.concat(topNodesAndEdges.lossLinkMarks).concat(botNodesAndEdges.lossLinkMarks),
+      roundTitlesAndPositions: roundTitlesAndPositions.concat(topNodesAndEdges.roundTitlesAndPositions).concat(botNodesAndEdges.roundTitlesAndPositions)
     }
   }
 
@@ -237,97 +226,70 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth){
  
 
 
-  return {nodes: [], edges: [], lossLinkMarks: []};
+  return {nodes: [], edges: [], lossLinkMarks: [], roundTitlesAndPositions: []};
 }
 
 const initialNodes = [];
 
-function find_tourney_height(match){
-  if (match !== undefined && match !== null){
-    if (match.parentMatch1 == null && match.parentMatch2 == null
-      ||match.inheritsParentMatch1Winner == false && match.inheritsParentMatch2Winner == false
-    ){
-      match.height = 1;
-      return match;
-    }
-    else{
-      let p1 = find_tourney_height(match.parentMatch1);
-      let p2 = find_tourney_height(match.parentMatch2);
-
-      let p1HD;
-      let p2HD;
-
-      if (p1 == null){
-        p1HD = 0;
-      }
-      else{
-        p1HD = p1.height;
-      }
-
-      if (p2 == null){
-        p2HD = 0;
-      }
-      else{
-        p2HD = p2.height;
-      }
-
-
-      if (match.inheritsParentMatch1Winner == false){
-        p1HD = 0;
-      }
-      if (match.inheritsParentMatch2Winner == false){
-        p2HD = 0;
-      }
-
-
-
-      match.height = p1HD + p2HD;
-
-      return match
-
-
-    }
+function appened_tourney_dimensions(match){
+  if (match === undefined || match === null){
+    return null;
   }
 
-
-  return null;
-}
-
-function find_tourney_depth(match){
-  //ONLY ONE PARENT = DONT COUNT THE DEPTH???
-
-  if (match !== undefined && match !== null){
-    if (match.parentMatch1 == null && match.parentMatch2 == null){
-      return 1;
-    }
-    else{
-      //Hack to avoid double counting of depth on double elim brackets
-      // if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false){
-      //   return 0
-      // }
-      let p1Depth = find_tourney_depth(match.parentMatch1)
-      let p2Depth = find_tourney_depth(match.parentMatch2)
-      if (match.inheritsParentMatch1Winner == false){
-        p1Depth = 0;
-      }
-      if (match.inheritsParentMatch2Winner == false){
-        p2Depth = 0;
-      }
-
-      if (p1Depth >= p2Depth){
-        return p1Depth + 1;
-      }
-      else {
-        return p2Depth + 1;
-      }
-    }
+  if (match.parentMatch1 == null && match.parentMatch2 == null
+      ||match.inheritsParentMatch1Winner != true && match.inheritsParentMatch2Winner != true
+  ){
+    match.height = 1;
+    match.depth = 1;
+    return match;
   }
-  return 0;
+
+  let p1 = null
+  let p2 = null
+
+  let p1D = 0;
+  let p1H = 0;
+  
+  let p2D = 0;
+  let p2H = 0;
+
+
+  if (match.inheritsParentMatch1Winner == true){
+    p1 = appened_tourney_dimensions(match.parentMatch1);
+    if (p1 != null){
+        p1D = p1.depth;
+      p1H = p1.height;
+    }
+    
+  }
+   
+ if (match.inheritsParentMatch2Winner == true){
+    p2 = appened_tourney_dimensions(match.parentMatch2);
+    if (p2 != null){
+      p2D = p2.depth;
+      p2H = p2.height;
+    }
+   
+  } 
+  
+
+  match.height = p1H + p2H;
+
+  if (p1D > p2D) {
+    match.depth = p1D + 1;
+  }
+  else  {
+    match.depth = p2D + 1;
+  }
+
+  return match;
+
+    
 }
 
 function find_canvas_size(topMatch, setCanvasDimensions, setTopTournamentMatch){
 
-  let depth = find_tourney_depth(topMatch); //Added 2 to see a graph TODO FIX
+  // let depth = find_tourney_depth(topMatch); //Added 2 to see a graph TODO FIX
   // console.log("Find tourney height:")
   // let newTopMatch = find_tourney_height(topMatch);
 
@@ -336,9 +298,12 @@ function find_canvas_size(topMatch, setCanvasDimensions, setTopTournamentMatch){
   // console.log("depth: " + depth)
 
   let height = topMatch?.height;
+  let depth = topMatch?.depth;
 
-  let maxBotMatches = 2 ** (depth - 1)
-  let dimensions = {height: 100 + 100 * height, width: 100 + 200 * depth};
+  let bracketNo = 1;
+  if (topMatch?.tournament?.style === "double") {console.log("yes"); bracketNo = 2;}
+
+  let dimensions = {height: 100 + (100 * height) + (bracketNo * roundLabelHeight), width: 100 + 200 * depth};
 
   // let dimensions = {height: 100 + 100 * maxBotMatches, width: 100 + 400 * depth};
 
@@ -386,7 +351,6 @@ function create_boundary_boxes(canvasDimensions){
 
 function TournamentBracketPageInner() {
 
-
   const navigate = useNavigate();
   const { tournamentID } = useParams();
       
@@ -406,9 +370,12 @@ function TournamentBracketPageInner() {
           const topMatchJson = await response.json();
           // console.log(matchesJson);
 
-          let newTopMatch = find_tourney_height(topMatchJson);
+          // let newTopMatch = find_tourney_height(topMatchJson);
 
-          // console.log(newTopMatch);
+          let newTopMatch = appened_tourney_dimensions(topMatchJson);
+
+          console.log("New top match")
+          console.log(newTopMatch);
 
 
 
