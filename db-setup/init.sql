@@ -108,6 +108,8 @@ INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 6',
 
 INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 7', false, 'double');
 
+INSERT INTO tournaments (tournament_name, closed, style) VALUES ('ex tourney 8', false, 'single');
+
 
 
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 1);
@@ -176,6 +178,17 @@ INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (5, 7);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (6, 7);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (7, 7);
 INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (8, 7);
+
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (1, 8);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (2, 8);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (3, 8);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (4, 8);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (5, 8);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (6, 8);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (7, 8);
+INSERT INTO tournament_entrants (user_id, tournament_id) VALUES (8, 8);
+
+
 
 INSERT INTO matches 
 (date_of_match, user1_id, user2_id, winner_id, user1_rating_before, user1_rating_after, user2_rating_before, user2_rating_after) 
