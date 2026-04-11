@@ -14,6 +14,3 @@ Application for storing and acessing data on players in competive games
 
 - Overhaul UI
 
-- Add Regiona Area Labels to the different rounds in the bracket canvas
-
-
