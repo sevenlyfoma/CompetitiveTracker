@@ -17,6 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentDTO;
 import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentAlreadyClosedException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentNameNotUniqueException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentNotEnoughEntrantsException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentNotFoundException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentStyleNotValidException;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrant;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrantRepository;
@@ -757,7 +761,7 @@ public class TournamentService {
 
         if (ot.isEmpty()){
             logger.error("Validation failed in Tournament Service for Tournament id {}: Tournament does not exist", id);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament does not Exist");
+            throw new TournamentNotFoundException("Tournament does not exist");
         }
 
         return ot.get();
@@ -773,14 +777,15 @@ public class TournamentService {
 
         if (nameTournament != null && nameTournament.getId() != currentID){
             logger.error("Validation failed in Tournament Service for Tournament name {}: name already taken by another tournament", name);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Name not unique");
+            throw new TournamentNameNotUniqueException("Tournament Name Already Taken By Another Tournament");
         }
     }
 
     private void validateStyleExists(String style){
         if (!style.equals("single") && !style.equals("double")){
             logger.error("Validation failed for Tournament Creation: Style '{}' not supported", style);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Style Not Supported");
+
+            throw new TournamentStyleNotValidException("Entered Tournament Style Not Supported");
         }
     }
     
@@ -789,14 +794,13 @@ public class TournamentService {
         if (t.getClosed()) {
             logger.error("Validation failed for Tournament ID {}: The tournament has already been closed", t.getId());
             throw new TournamentAlreadyClosedException("Cannot close Tournament, Tournament Already Closed");
-            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Already Closed");
         }
     }
 
     private void validateEnoughEntrants(Tournament t, List<TournamentEntrant> entrants){
         if (entrants.size() < 3){
             logger.error("Validation failed for Tournament ID {}: The tournament must have at least 3 entrants", t.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Not Enough Entrants");
+            throw new TournamentNotEnoughEntrantsException("A tournament must have at least 3 entrants");
         }
     }
 

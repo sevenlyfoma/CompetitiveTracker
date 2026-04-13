@@ -13,8 +13,6 @@ import io.githib.sevenlyfoma.comp_tracker.DTO.ErrorDTO;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
-
     private ResponseEntity<ErrorDTO> buildErrorResponse(HttpStatus status, String errorCode, String message) {
         ErrorDTO error = new ErrorDTO(LocalDateTime.now(), status.value(), errorCode, message);
         return new ResponseEntity<>(error, status);
@@ -85,5 +83,23 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
     }
 
+    @ExceptionHandler(TournamentNotFoundException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentNotFound(TournamentNotFoundException ex, WebRequest request){
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
+    }
 
+    @ExceptionHandler(TournamentNameNotUniqueException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentNameNotUnique(TournamentNameNotUniqueException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(TournamentStyleNotValidException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentStyleNotValid(TournamentStyleNotValidException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(TournamentNotEnoughEntrantsException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentNotEnoughEntrants(TournamentNotEnoughEntrantsException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
 }
