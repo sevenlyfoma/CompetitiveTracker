@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
+import { Toaster } from 'react-hot-toast';
+
 import UserList from './UserList.jsx'
 import UserMatchList from './UserMatchList.jsx'
 import TournamentList from './TournamentList.jsx';
@@ -11,6 +13,7 @@ import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.js
 function App() {
   return (
     <>
+    <Toaster />
     <BrowserRouter>
       <Routes>
          <Route path="/" element={< UserList />} />

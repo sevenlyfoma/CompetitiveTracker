@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import './UserList.css'
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
+
+import toast from 'react-hot-toast';
 
 function TournamentList() {
   const [dataList, setDataList] = useState([]);
@@ -14,14 +16,16 @@ function TournamentList() {
   const fetchTournaments = async () => {
     try {
       const response = await fetch("/api/tournaments/all");
+      const data = await response.json();
       if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+        throw new Error(data.message);
       }
-      const dataListJson = await response.json();
+      const dataListJson = data;
       console.log(dataListJson);
       setDataList(dataListJson);
 
     } catch (error) {
+      toast.error('Error fetching data:' + error.message)
       console.error('Error fetching data:', error);
       setDataList([]); 
     }
@@ -239,14 +243,17 @@ function ItemDeleteButton({id, onDelete}) {
         // },
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to delete item');
+        throw new Error(data.message);
       }
 
       console.log(`Item ${id} deleted successfully`);
       // Trigger update for fetched user list
       onDelete();
     } catch (error) {
+      toast.error("Error deleting tournament: " + error.message)
       console.error("Error deleting user:", error);
     }
   };
@@ -293,14 +300,17 @@ function CreateItemButton({ itemData, onCreate, setItem }) {
         body: JSON.stringify(itemData)
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create item');
+        throw new Error(data.message);
       }
 
       onCreate();
       setItem({name: "", style: "single"});
       console.log(`Item created successfully`);
     } catch (error) {
+      toast.error("Error creating item: " + error.message)
       console.error("Error creating item:", error);
     }
   };
@@ -327,13 +337,16 @@ function UpdateItemButton({ id, itemData, onUpdate }) {
         body: JSON.stringify(itemData)
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to update item');
+        throw new Error(data.message);
       }
 
       onUpdate();
       console.log(`Item updated successfully`);
     } catch (error) {
+      toast.error("Error updating item: " + error.message )
       console.error("Error updating item:", error);
     }
   };

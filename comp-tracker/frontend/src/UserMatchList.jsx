@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import RatingGraph from './RatingGraph';
 
+import toast from 'react-hot-toast';
+
 function UserMatchList(){
 
     const navigate = useNavigate();
@@ -18,16 +20,18 @@ function UserMatchList(){
     const fetchUser = async () => {
         try {
             const response = await fetch(`/api/users/${userID}`);
+            const data = await response.json();
             if (!response.ok){
-                throw new Error(`Server responded with status: ${response.status}`)
+                throw new Error(data.message)
             }
-            const userJson = await response.json();
+            const userJson = data;
             console.log("fetchUser")
             console.log(userJson);
             setUser(userJson);
 
 
         } catch (error) {
+            toast.error('Error fetching data:' + error.message)
             console.error('Error fetching data:', error);
             setUser({}) ;
         }
@@ -40,15 +44,17 @@ function UserMatchList(){
     const fetchUserMatches = async () => {
         try {
             const response = await fetch(`/api/matches/all/${userID}`);
+            const data = await response.json();
             if (!response.ok){
-                throw new Error(`Server responded with status: ${response.status}`)
+                throw new Error(data.message)
             }
-            const matchListJson = await response.json();
+            const matchListJson = data;
             console.log(matchListJson);
             setUserMatchList(matchListJson);
 
 
         } catch (error) {
+            toast.error('Error fetching data:' + error.message)
             console.error('Error fetching data:', error);
             setUserMatchList([]); 
         }

@@ -5,10 +5,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import io.githib.sevenlyfoma.comp_tracker.Exception.DuplicateTournamentEntrantException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.MissingTournamentEntrantException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentEntrantChangeAfterCloseException;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrant;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrantRepository;
@@ -73,7 +74,7 @@ public class TournamentEntrantService {
     private void validateIsNotClosed(Tournament t){
         if (t.getClosed()){
             logger.error("Validation failed for Tournament ID {}: Entrants cant be changed when Tournament is already closed", t.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Already Closed");
+            throw new TournamentEntrantChangeAfterCloseException("Entrants cannot be changed when tournament is already closed");
         }
     }
 
@@ -83,7 +84,7 @@ public class TournamentEntrantService {
 
         if (tes != null){
             logger.error("Validation failed for Tournament ID {} and User ID {}: A user cannot be entered into the same tournament multiple times", t.getId(), u.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duplicate Tournament Entrant");
+            throw new DuplicateTournamentEntrantException("A user cannot be entered into the same tournament twice");
         }
 
        
@@ -95,7 +96,7 @@ public class TournamentEntrantService {
 
         if (tes == null){
             logger.error("Validation failed for Tournament ID {} and User ID {}: A user cannot be deleted from a tournament it is not enrolled in", t.getId(), u.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing Tournament Entrant");
+            throw new MissingTournamentEntrantException("User cannot be deleted from a tournament it is not in");
         }
 
         return tes;
