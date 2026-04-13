@@ -7,12 +7,12 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
 import io.githib.sevenlyfoma.comp_tracker.DTO.RatingPair;
+import io.githib.sevenlyfoma.comp_tracker.Exception.DuplicateUserException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.UserNotFoundException;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
 import io.githib.sevenlyfoma.comp_tracker.Model.MatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
@@ -82,14 +82,14 @@ public class MatchService {
         Optional<User> u = userRepository.findById(userId);
         if (u.isEmpty()){
             logger.error("Validation failed in Match Service for User ID {}: user does not exist", userId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Does Not Exist");
+            throw new UserNotFoundException("Participant in Match (User ID: " + userId + ") does not exist");
         }
     }
 
     private void validateUsersUnique(Long uid1, Long uid2){
         if (uid1.equals(uid2)){
             logger.error("Validation failed in Match Service for User ID {}: user can not be matched up against self", uid1);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Match Users the Same");
+            throw new DuplicateUserException("User cannot be part of a match against themselves");
         }
     }
 }
