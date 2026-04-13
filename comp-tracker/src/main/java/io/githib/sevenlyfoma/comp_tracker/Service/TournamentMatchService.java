@@ -11,6 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
+import io.githib.sevenlyfoma.comp_tracker.Exception.NoTournamentMatchesFoundException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentBadlyFormattedException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchAlreadyDecidedException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchMissingParticipantsException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchResultAgainstSelfException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchResultParticipantNotValidException;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
@@ -101,12 +107,12 @@ public class TournamentMatchService {
 
         if (tms.isEmpty()){
             logger.error("Validation failed for Tournament ID {}: No matches found for this tournament", t.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament No Matches");
+            throw new NoTournamentMatchesFoundException("No matches found for tournament id" + t.getId());
         }
 
         if (tms.size() > 1){
             logger.error("Validation failed for Tournament ID {}: Tournament Badly Formatted", t.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Badly Formatted");
+            throw new TournamentBadlyFormattedException("Tournament is badly formatted in database");
         }
 
         return tms.get(0);
@@ -122,23 +128,34 @@ public class TournamentMatchService {
         boolean loserIsValid = loser.equals(u1) || loser.equals(u2);
         boolean notPlayingThemselves = !winner.equals(loser);
 
-        if (!winnerIsValid || !loserIsValid || !notPlayingThemselves) {
-            logger.error("Validation failed for Match ID {}: One or More of the participants in result were not valid for the given Tournament Match", tMatch.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Participant mismatch");
+        if (!winnerIsValid){
+            logger.error("Validation failed for TMatch ID {}: Result participant (user id {}) is not a participant in tournament match id {}", tMatch.getId(), winner, tMatch.getId());
+            throw new TournamentMatchResultParticipantNotValidException("Result participant (user id " + winner + ") is not a participant in tournament match id " + tMatch.getId());
         }
+
+        if (!loserIsValid){
+            logger.error("Validation failed for TMatch ID {}: Result participant (user id {}) is not a participant in tournament match id {}", tMatch.getId(), loser, tMatch.getId());
+            throw new TournamentMatchResultParticipantNotValidException("Result participant (user id " + loser + ") is not a participant in tournament match id " + tMatch.getId());
+        }
+
+        if (!notPlayingThemselves){
+            logger.error("Validation failed for Match ID {}: User cannot be matched up against themselves in a tournament match", tMatch.getId());
+            throw new TournamentMatchResultAgainstSelfException("Tournament Match Result cannot have the winner and loser be the same user");
+        }   
     }
 
     private void validateNoResult(TournamentMatch tMatch){
         if (tMatch.getMatchRecord() != null){
             logger.error("Validation failed for Match ID {}: match result has already been decided", tMatch.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Record Already Exists");
+            throw new TournamentMatchAlreadyDecidedException("Tournament Match Result has already been decided");
         }
     }
 
     private void validateAllUsersPresent(TournamentMatch tMatch){
         if (tMatch.getUser1() == null || tMatch.getUser2() == null){
             logger.error("Validation failed for Match ID {}: match does not have all required participants registered", tMatch.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing Participant");
+            
+            throw new TournamentMatchMissingParticipantsException("Match Cannot Be resolved, not all participants have been decided");
         }
     }
 }

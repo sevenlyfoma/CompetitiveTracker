@@ -55,5 +55,35 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
     }
 
+    @ExceptionHandler(NoTournamentMatchesFoundException.class)
+    public ResponseEntity<ErrorDTO> handleNoTournamentMatchesFound(NoTournamentMatchesFoundException ex, WebRequest request){
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
+    }
+
+    @ExceptionHandler(TournamentBadlyFormattedException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentBadlyFormatted(TournamentBadlyFormattedException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", ex.getMessage());
+    }
+
+    @ExceptionHandler(TournamentMatchResultParticipantNotValidException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentMatchResultParticipantNotValid(TournamentMatchResultParticipantNotValidException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(TournamentMatchResultAgainstSelfException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentMatchResultAgainstSelf(TournamentMatchResultAgainstSelfException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(TournamentMatchAlreadyDecidedException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentMatchAlreadyDecided(TournamentMatchAlreadyDecidedException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(TournamentMatchMissingParticipantsException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentMatchMissingParticipants(TournamentMatchMissingParticipantsException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
 
 }
