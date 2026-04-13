@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.TournamentDTO;
+import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentAlreadyClosedException;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrant;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrantRepository;
@@ -787,7 +788,8 @@ public class TournamentService {
 
         if (t.getClosed()) {
             logger.error("Validation failed for Tournament ID {}: The tournament has already been closed", t.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Already Closed");
+            throw new TournamentAlreadyClosedException("Cannot close Tournament, Tournament Already Closed");
+            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament Already Closed");
         }
     }
 

@@ -110,21 +110,24 @@ function TournamentEntrantList(){
 
 function CloseTournamentButton({tournament, onClose}){
     const handleClose = async () => {
-        if (!window.confirm("Are you want to close the tournament")) return;
+        if (!window.confirm("Are you sure you want to close the tournament")) return;
 
         try {
-        const response = await fetch(`/api/tournaments/close/${tournament.id}`, {
-            method: 'PUT',
-        });
+            const response = await fetch(`/api/tournaments/close/${tournament.id}`, {
+                method: 'PUT',
+            });
 
-        if (!response.ok) {
-            throw new Error('Failed to close tournament');
-        }
+            const data = await response.json();
 
-        onClose();
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+
+            onClose();
 
         } catch (error) {
-        console.error("Error closing tournament:", error);
+            console.error("Error closing tournament:", error.message);
+            alert(`Error: ${error.message}`); // TODO Replace with a nicer conditional graphic, have a Error SetError useState
         }
     };
 
