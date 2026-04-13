@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
 import io.githib.sevenlyfoma.comp_tracker.DTO.RatingPair;
-import io.githib.sevenlyfoma.comp_tracker.Exception.DuplicateUserException;
-import io.githib.sevenlyfoma.comp_tracker.Exception.UserNotFoundException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.MatchAgainstSelfException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.MatchParticipantNotFoundException;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
 import io.githib.sevenlyfoma.comp_tracker.Model.MatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
@@ -82,14 +82,14 @@ public class MatchService {
         Optional<User> u = userRepository.findById(userId);
         if (u.isEmpty()){
             logger.error("Validation failed in Match Service for User ID {}: user does not exist", userId);
-            throw new UserNotFoundException("Participant in Match (User ID: " + userId + ") does not exist");
+            throw new MatchParticipantNotFoundException("Participant in Match (User ID: " + userId + ") does not exist");
         }
     }
 
     private void validateUsersUnique(Long uid1, Long uid2){
         if (uid1.equals(uid2)){
             logger.error("Validation failed in Match Service for User ID {}: user can not be matched up against self", uid1);
-            throw new DuplicateUserException("User cannot be part of a match against themselves");
+            throw new MatchAgainstSelfException("User cannot be part of a match against themselves");
         }
     }
 }

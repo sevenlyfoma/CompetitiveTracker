@@ -30,13 +30,30 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorDTO> handleUserNotFound(UserNotFoundException ex, WebRequest request) {
+    @ExceptionHandler(MatchParticipantNotFoundException.class)
+    public ResponseEntity<ErrorDTO> handleMatchParticipantNotFound(MatchParticipantNotFoundException ex, WebRequest request) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
     }
 
-    @ExceptionHandler(DuplicateUserException.class)
-    public ResponseEntity<ErrorDTO> handleDuplicateUser(DuplicateUserException ex, WebRequest request) {
+    @ExceptionHandler(MatchAgainstSelfException.class)
+    public ResponseEntity<ErrorDTO> handleMatchAgainstSelf(MatchAgainstSelfException ex, WebRequest request) {
         return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
     }
+
+    @ExceptionHandler(TournamentEntrantChangeAfterCloseException.class)
+    public ResponseEntity<ErrorDTO> handleTournamentEntrantChangeAfterClose(TournamentEntrantChangeAfterCloseException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateTournamentEntrantException.class)
+    public ResponseEntity<ErrorDTO> handleDuplicateTournamentEntrant(DuplicateTournamentEntrantException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(MissingTournamentEntrantException.class)
+    public ResponseEntity<ErrorDTO> handleMissingTournamentEntrant(MissingTournamentEntrantException ex, WebRequest request){
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
+    }
+
+
 }
