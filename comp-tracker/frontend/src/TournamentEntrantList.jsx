@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, data } from 'react-router-dom';
 
 import Select from 'react-select'
+
+import toast from 'react-hot-toast';
 
 
 //TODO look at warnings closely like this  2026-03-14T15:44:15.333Z  WARN 22351 --- [comp-tracker] [nio-8080-exec-5] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "{"id":2,"tournamentName":"extourney2","closed":true}"]
@@ -21,24 +23,27 @@ function TournamentEntrantList(){
     const fetchEntrants = async () => {
         try {
             const response = await fetch(`/api/tournament_entrants/${tournamentID}`);
+            const data = await response.json();
             if (!response.ok){
-                throw new Error(`Server responded with status: ${response.status}`)
+                throw new Error(data.message);
             }
-            const entrantsJson = await response.json();
+            const entrantsJson = data;
             console.log(entrantsJson);
             setTournamentEntrantList(entrantsJson);
 
             const response2 = await fetch(`/api/tournaments/${tournamentID}`);
+            const data2 = await response2.json();
             if (!response2.ok){
-                throw new Error(`Server responded with status: ${response2.status}`)
+                throw new Error(data2.message)
             }
-            const tournamentJson = await response2.json();
+            const tournamentJson = data2;
             console.log(tournamentJson);
             setTournament(tournamentJson);
 
 
         } catch (error) {
             console.error('Error fetching data:', error);
+            toast.error('Error fetching data: ' + error.message);
             setUser({}) ;
         }
     }
@@ -52,14 +57,16 @@ function TournamentEntrantList(){
     const fetchUsers = async () => {
         try {
         const response = await fetch("/api/users/all");
+        const data = await response.json();
         if (!response.ok) {
-            throw new Error(`Server responded with status: ${response.status}`);
+            throw new Error(data.message);
         }
-        const userListJson = await response.json();
+        const userListJson = data;
         console.log(userListJson);
         setUserList(userListJson);
 
         } catch (error) {
+        toast.error('Error fetching data: ', error.message);
         console.error('Error fetching data:', error);
         setUserList([]); 
         }
@@ -127,7 +134,7 @@ function CloseTournamentButton({tournament, onClose}){
 
         } catch (error) {
             console.error("Error closing tournament:", error.message);
-            alert(`Error: ${error.message}`); // TODO Replace with a nicer conditional graphic, have a Error SetError useState
+            toast.error("Error closing tournament: " + error.message)
         }
     };
 
@@ -153,13 +160,16 @@ function AddUserButton({user, tournament, onCreate}){
             method: 'PUT',
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            throw new Error('Failed to add entrant');
+            throw new Error(data.message);
         }
 
         onCreate();
         console.log(`Entrant added successfully`);
         } catch (error) {
+            toast.error("Error adding entrant:", error.message)
         console.error("Error adding entrant:", error);
         }
     };
@@ -208,13 +218,16 @@ function EntrantDeleteButton({entrant, onDelete}) {
         method: 'DELETE',
       });
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error('Failed to delete entrant');
+        throw new Error(data.message);
       }
 
       console.log(`Entrant deleted successfully`);
       onDelete();
     } catch (error) {
+        toast.error("Error deleting entrant: " + data.message);
       console.error("Error deleting user:", error);
     }
   };

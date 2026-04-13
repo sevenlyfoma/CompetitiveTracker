@@ -4,6 +4,7 @@ import ReactFlow, { Position, useReactFlow, ReactFlowProvider, useStore, Handle 
 import { useParams, useNavigate, redirect } from 'react-router-dom';
 import 'reactflow/dist/style.css';
 
+
 import './TournamentBracketPage.css'
 
 import BoundaryNode from './BoundaryNode';
@@ -15,6 +16,7 @@ import LossNode from './LossNode';
 import FirstCornerDefinedDistanceStepEdge from './FirstCornerDefinedDistanceStepEdge';
 
 import RoundTitleNode from './RoundTitleNode';
+import toast from 'react-hot-toast';
 
 // import LinkNode from './LinkNode';
 const roundLabelHeight = 100;
@@ -364,10 +366,11 @@ function TournamentBracketPageInner() {
       try {
           // console.log("fetch Matches")
           const response = await fetch(`/api/tournament_matches/top/${tournamentID}`);
+          const data = await response.json()
           if (!response.ok){
-              throw new Error(`Server responded with status: ${response.status}`)
+              throw new Error(data.message)
           }
-          const topMatchJson = await response.json();
+          const topMatchJson = data;
           // console.log(matchesJson);
 
           // let newTopMatch = find_tourney_height(topMatchJson);
@@ -382,15 +385,17 @@ function TournamentBracketPageInner() {
           setTopTournamentMatch(newTopMatch);
 
           const response2 = await fetch(`/api/tournaments/${tournamentID}`);
+          const data2 = await response2.json()
           if (!response2.ok){
-              throw new Error(`Server responded with status: ${response2.status}`)
+              throw new Error(data2.message)
           }
-          const tournamentJson = await response2.json();
+          const tournamentJson = data2;
           // console.log(tournamentJson);
           setTournament(tournamentJson);
 
 
       } catch (error) {
+        toast.error('Error fetching data:' + error.message)
           console.error('Error fetching data:', error);
           setUser({}) ;
       }

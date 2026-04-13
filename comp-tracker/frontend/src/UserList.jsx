@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import './UserList.css'
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
+
+import toast from 'react-hot-toast';
 
 function UserList() {
   const [userList, setUserList] = useState([]);
@@ -22,15 +24,19 @@ function UserList() {
   const fetchUsers = async () => {
     try {
       const response = await fetch("/api/users/all");
+
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+        throw new Error(data.message);
       }
-      const userListJson = await response.json();
+      const userListJson = data;
       console.log(userListJson);
       setUserList(userListJson);
 
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error.message);
+      toast.error('Error fetching data:' + error.message);
       setUserList([]); 
     }
   
@@ -241,15 +247,19 @@ function CreateUserButton({ userData, onCreate, setUser }) {
         body: JSON.stringify(userData)
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create user');
+        throw new Error(data.message);
       }
 
       onCreate();
       setUser({name: "", email: "", pronouns: "", rating: ""});
-      console.log(`User created uccessfully`);
+      console.log(`User created successfully`);
+
     } catch (error) {
-      console.error("Error creating user:", error);
+      toast.error("Error creating user:" + error.message);
+      console.error("Error creating user:", error.message);
     }
   };
 
@@ -328,14 +338,17 @@ function UpdateUserButton({ userID, userData, onUpdate }) {
         body: JSON.stringify(userData)
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to update user');
+        throw new Error(data.message);
       }
 
       onUpdate();
       console.log(`User updated successfully`);
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Error updating user:", error.message);
+      toast.error("Error updating user: " + error.message)
     }
   };
 

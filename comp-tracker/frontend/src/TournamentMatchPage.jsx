@@ -1,4 +1,5 @@
 import React, {useCallback, useState, useEffect} from 'react';
+import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function TournamentMatchPage() {
@@ -15,23 +16,26 @@ function TournamentMatchPage() {
     const fetchData= async () => {
         try {
             const response = await fetch(`/api/tournament_matches/${tournamentMatchID}`);
+            const data = await response.json();
             if (!response.ok){
-                throw new Error(`Server responded with status: ${response.status}`)
+                throw new Error(data.message)
             }
-            const tMatchJson = await response.json();
+            const tMatchJson = data;
             console.log(tMatchJson);
             setTMatch(tMatchJson);
 
             const response2 = await fetch(`/api/tournaments/${tournamentID}`);
+            const data2 = await response2.json();
             if (!response2.ok){
-                throw new Error(`Server responded with status: ${response2.status}`)
+                throw new Error(data2.message)
             }
-            const tournamentJson = await response2.json();
+            const tournamentJson = data2;
             console.log(tournamentJson);
             setTournament(tournamentJson);
 
 
         } catch (error) {
+            toast.error("Error fetching data: " + error.message)
             console.error('Error fetching data:', error);
             setTMatch({}) ;
             setTournament({});
@@ -168,15 +172,17 @@ function SendResultButton({tmid, result, fetchData}){
             },
             body: JSON.stringify(result)
         });
+        const data = await response.json();
 
         if (!response.ok) {
-            throw new Error('Failed to Send Match results');
+            throw new Error(data.message);
         }
 
         fetchData();
 
 
         } catch (error) {
+            toast.error("Error Sending Match results:" + error.message)
         console.error("Error Sending Match results:", error);
         }
     };
