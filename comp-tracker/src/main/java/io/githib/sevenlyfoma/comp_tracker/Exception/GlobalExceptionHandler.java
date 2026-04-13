@@ -102,4 +102,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDTO> handleTournamentNotEnoughEntrants(TournamentNotEnoughEntrantsException ex, WebRequest request) {
         return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorDTO> handleUserNotFound(UserNotFoundException ex, WebRequest request){
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
+    }
+
+    @ExceptionHandler(UserNameNotUnqiueException.class)
+    public ResponseEntity<ErrorDTO> handleUserNameNotUnqiue(UserNameNotUnqiueException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
+
+    @ExceptionHandler(UserEmailNotUniqueException.class)
+    public ResponseEntity<ErrorDTO> handleUserEmailNotUnqiue(UserEmailNotUniqueException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, "UNPROCESSABLE_CONTENT", ex.getMessage());
+    }
+
 }

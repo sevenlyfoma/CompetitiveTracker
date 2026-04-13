@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.githib.sevenlyfoma.comp_tracker.DTO.UserDTO;
+import io.githib.sevenlyfoma.comp_tracker.Exception.UserEmailNotUniqueException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.UserNameNotUnqiueException;
+import io.githib.sevenlyfoma.comp_tracker.Exception.UserNotFoundException;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
 import io.githib.sevenlyfoma.comp_tracker.Model.UserRepository;
 import jakarta.transaction.Transactional;
@@ -75,7 +78,7 @@ public class UserService {
         Optional<User> u = userRepository.findById(userId);
         if (u.isEmpty()){
             logger.error("Validation failed in Match Service for User ID {}: user does not exist", userId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Does Not Exist");
+            throw new UserNotFoundException("User does not exist");
         }
         return u.get();
     }
@@ -90,14 +93,14 @@ public class UserService {
 
         if (nameUser != null && nameUser.getId() != currentID){
             logger.error("Validation failed in User Service for User name {}: name already taken by another user", udto.getName());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Name not unique");
+            throw new UserNameNotUnqiueException("Entered name for user is already taken by another user.");
         }
 
         User emailUser = userRepository.findByEmail(udto.getEmail());
 
         if (emailUser != null && emailUser.getId() != currentID){
             logger.error("Validation failed in User Service for User email {}: email already taken by another user", udto.getEmail());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Email not unique");
+            throw new UserEmailNotUniqueException("Entered email for user is already taken by another user.");
         }
 
     }
