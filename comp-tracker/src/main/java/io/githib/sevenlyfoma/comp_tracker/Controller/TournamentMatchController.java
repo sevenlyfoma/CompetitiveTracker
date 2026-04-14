@@ -33,6 +33,7 @@ public class TournamentMatchController {
         return tournamentMatchService.getTMatch(mid);
     }
 
+    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/report/{mid}")
     public ResponseEntity<SuccessDTO> reportMatch(@RequestBody MatchCreationObject mco, @PathVariable Long mid) {
         tournamentMatchService.processMatchResult(mco, mid);
