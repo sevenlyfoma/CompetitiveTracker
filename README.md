@@ -5,6 +5,7 @@ Application for storing and acessing data on players in competive games
 # TODO
 
 - Admin login (with spring security?)
+    - jjwt for auth tokens
 
 - Refactor react to be tidier
     - The codde in the fetch statements needs to be deduplicated across the code base
