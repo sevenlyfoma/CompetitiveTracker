@@ -36,28 +36,24 @@ public class TournamentController {
         return tournamentService.getTournament(id);
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<SuccessDTO> createTournament(@RequestBody TournamentDTO tdto) throws URISyntaxException {
         Tournament savedTournament = tournamentService.createTournament(tdto);
         return new ResponseEntity<>(new SuccessDTO(HttpStatus.OK.value(), ("Tournament id:" + savedTournament.getId() + " Created")), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<SuccessDTO> deleteTournament(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
         return new ResponseEntity<>(new SuccessDTO(HttpStatus.OK.value(), ("Tournament id:" +id + " deleted")), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<SuccessDTO> updateTournament(@PathVariable Long id, @RequestBody TournamentDTO tdto) {
         tournamentService.updateTournament(tdto, id);
         return new ResponseEntity<>(new SuccessDTO(HttpStatus.OK.value(), ("Tournament id:" +id + " updated")), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/close/{tournamentId}")
     public ResponseEntity<SuccessDTO> closeTournament(@PathVariable long tournamentId) {
         tournamentService.closeTournament(tournamentId);

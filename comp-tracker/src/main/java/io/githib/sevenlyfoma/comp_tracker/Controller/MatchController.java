@@ -29,7 +29,6 @@ public class MatchController {
         return matchService.getMatchesByUser(userId);
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/report")
     public ResponseEntity<SuccessDTO> createMatch(@RequestBody MatchCreationObject mco) {
         Match match = matchService.createMatch(mco);

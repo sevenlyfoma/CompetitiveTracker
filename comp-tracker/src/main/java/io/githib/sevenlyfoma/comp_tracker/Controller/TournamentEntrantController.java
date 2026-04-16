@@ -26,7 +26,6 @@ public class TournamentEntrantController {
         return tournamentEntrantService.getEntrantsByTournamentId(id);
     }
     
-    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{tid}/{uid}")
     public ResponseEntity<SuccessDTO> createTournamentEntrant(@PathVariable Long tid, @PathVariable Long uid){
         tournamentEntrantService.addEntrant(tid, uid);
@@ -34,7 +33,6 @@ public class TournamentEntrantController {
 
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{tid}/{uid}")
     public ResponseEntity<SuccessDTO> deleteEntrant(@PathVariable Long tid, @PathVariable Long uid) {
         tournamentEntrantService.deleteEntrant(tid, uid);

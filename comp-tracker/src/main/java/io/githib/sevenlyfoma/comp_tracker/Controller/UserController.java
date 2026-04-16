@@ -33,14 +33,12 @@ public class UserController {
         return userService.getUser(id);
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<SuccessDTO> createUser(@RequestBody UserDTO udto) {
         User u = userService.createUser(udto);
         return new ResponseEntity<>(new SuccessDTO(HttpStatus.OK.value(), ("User id:" +  u.getId() + " created")), HttpStatus.OK);
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<SuccessDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO udto) {
         userService.updateUser(id, udto);
