@@ -1,9 +1,11 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,7 @@ import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
+import io.githib.sevenlyfoma.comp_tracker.Refactor.TournamentMatchParent;
 
 @Service
 public class TournamentService {
@@ -150,7 +153,13 @@ public class TournamentService {
             tms =  generateSingleElimBracket(sortedUsers, t);
         }
         else if (t.getStyle().equals("double")){
-            tms =  generateDoubleElimBracket(sortedUsers, t);
+            tms =  generateDoubleElimBracketNew(sortedUsers, t);
+
+            // var ntms = generateDoubleElimBracketNew(sortedUsers, t);
+            // logger.info(ntms.get(0).toString()); 
+            // for (var ntm: ntms){
+            //     logger.info(ntm.toString());
+            // }
         }
 
          
@@ -165,6 +174,325 @@ public class TournamentService {
 
     }
 
+    
+    private User findExpectedWinnerOrLoser(TournamentMatch tm, Boolean winner){
+        User u;
+
+        List<User> usersForComparison = new ArrayList<>();
+
+        for (TournamentMatchParent tmp: tm.getParents()){
+            User tmpu = tmp.getUser();
+            if (tmpu == null){
+                tmpu = findExpectedWinnerOrLoser(tmp.getParentMatch(), tmp.getInheritsParentMatchWinner());
+            }
+            usersForComparison.add(tmpu);
+        }
+
+        if (winner){
+            u = usersForComparison.stream()
+                    .max(Comparator.comparingInt(User::getRating))
+                    .orElse(null);
+        }
+        else{
+            u = usersForComparison.stream()
+                    .min(Comparator.comparingInt(User::getRating))
+                    .orElse(null);
+        }
+
+    
+        return u;
+    }
+
+    private TournamentMatch generateTM(Tournament t, List<User> users, List<TournamentMatch> parents, List<Boolean> inheritStatuses){
+
+        if (users.size() != parents.size() || users.size() != inheritStatuses.size()){
+            logger.error("Error: Creation of tournament Match given unequal list input sizes");
+            return null;
+        }
+        
+        TournamentMatch tm = TournamentMatch.builder().tournament(t).build();
+
+        List<TournamentMatchParent> tmps = new ArrayList<>();
+
+        for (int i = 0; i < users.size(); i++){
+            TournamentMatchParent tmp = TournamentMatchParent.builder()
+            .user(users.get(i))
+            .parentMatch(parents.get(i))
+            .inheritsParentMatchWinner(inheritStatuses.get(i))
+            .build();
+
+            tmps.add(tmp);
+        }
+
+        tm.setParents(tmps);
+
+        
+
+
+        return tm;
+    }
+
+    private List<TournamentMatch> sortByExpectedWinner(List<TournamentMatch> tms){
+        return tms.stream()
+        .sorted(Comparator.comparing(match -> findExpectedWinnerOrLoser(match, true).getRating(), Comparator.reverseOrder()))
+        .collect(Collectors.toList());
+    }
+    
+    
+    private List<TournamentMatch> generateDoubleElimBracketNew(List<User> users, Tournament t){
+
+        List<TournamentMatch> totalWinnerTms = new ArrayList<>();
+
+        List<TournamentMatch> winnerTms = new ArrayList<>();
+
+        List<TournamentMatch> totalLoserTms = new ArrayList<>();
+
+        List<TournamentMatch> loserTms = new ArrayList<>();
+
+
+        //Generate first set of matches
+        //We will append missing fields later
+        for (int i = 0; i < users.size()/2; i++){
+
+            User u1 = users.get(i);
+            User u2 = users.get(users.size()-1-i);
+
+            TournamentMatch tm = generateTM(t, Arrays.asList(u1, u2), Arrays.asList(null, null), Arrays.asList(null, null));
+
+            winnerTms.add(tm);
+        }
+
+        totalWinnerTms.addAll(winnerTms);
+
+        List<TournamentMatch> sortedWinnerTms = sortByExpectedWinner(winnerTms);
+        
+        //Generate first set of losers Matches
+        for (int i = 0; i < sortedWinnerTms.size()/2; i++){
+            var tm1 = sortedWinnerTms.get(i);
+            var tm2 = sortedWinnerTms.get(sortedWinnerTms.size()-1-i);
+
+            TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(false, false));
+
+            loserTms.add(tm);
+                
+        }
+
+        totalLoserTms.addAll(loserTms);
+
+        while (sortedWinnerTms.size() > 1){
+            winnerTms = new ArrayList<>();
+
+            for (int i = 0; i < sortedWinnerTms.size()/2; i++){
+                var tm1 = sortedWinnerTms.get(i);
+                var tm2 = sortedWinnerTms.get(sortedWinnerTms.size()-1-i);
+
+                TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(true, true));
+
+                winnerTms.add(tm);
+                
+            }
+
+            List<TournamentMatch> sortedLoserTms = sortByExpectedWinner(loserTms);
+            loserTms = new ArrayList<>();
+
+            //Match losers winners against each other until there are low enough to pair against winners losers
+            if (sortedLoserTms.size() != winnerTms.size()){
+
+                for (int i = 0; i < sortedLoserTms.size()/2; i++){
+                    var tm1 = sortedLoserTms.get(i);
+                    var tm2 = sortedLoserTms.get(sortedLoserTms.size()-1-i);
+
+                    TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(true, true));
+
+                    loserTms.add(tm);
+                    totalLoserTms.add(tm);
+                }
+
+                sortedLoserTms = sortByExpectedWinner(loserTms);
+                loserTms = new ArrayList<>();
+            }
+
+            sortedWinnerTms =  sortByExpectedWinner(winnerTms);
+                
+            List<TournamentMatch> tempLosers = new ArrayList<>();
+            for (int i = 0; i < sortedWinnerTms.size(); i++){
+                var tm1 = sortedWinnerTms.get(i);
+                var tm2 = sortedLoserTms.get(i);
+
+                TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(false, true));
+                
+                tempLosers.add(tm);
+                totalLoserTms.add(tm);
+            }
+            
+            if (!tempLosers.isEmpty()){
+                loserTms = tempLosers;
+            }
+
+
+            totalWinnerTms.addAll(winnerTms);
+
+            sortedWinnerTms =  sortByExpectedWinner(winnerTms);
+            
+        }
+
+
+        var winnerFinal = winnerTms.get(0);
+        var loserFinal = loserTms.get(0);
+
+        TournamentMatch grandfinal = generateTM(t, Arrays.asList(null, null), Arrays.asList(winnerFinal, loserFinal), Arrays.asList(true, true));
+
+        List<TournamentMatch> totalTms = new ArrayList<>();
+        totalTms.addAll(totalWinnerTms);
+        totalTms.addAll(totalLoserTms);
+        totalTms.add(grandfinal);
+
+        removeByesRecursiveNew(grandfinal);
+        addMatchNumbersDoubleNew(grandfinal);
+        addTitleMatchNamesDoubleNew(grandfinal);
+        var cleanTMs = removeUnusedMatchesNew(totalTms);
+
+        return cleanTMs;
+
+        // return totalTms;
+    }
+
+    private void addMatchNumbersDoubleNew(TournamentMatch finalMatch){
+        TournamentMatch winnersFinal = finalMatch.getParents().get(0).getParentMatch();
+
+        addMatchNumbersNew(winnersFinal, 1);
+
+        TournamentMatch losersFinal = finalMatch.getParents().get(1).getParentMatch();
+
+        addMatchNumbersNew(losersFinal, winnersFinal.getMatchNumber().intValue());
+
+
+        finalMatch.setMatchNumber(0L);
+
+    }
+
+    private void addMatchNumbersNew(TournamentMatch finalMatch, int modifier){
+
+        LinkedList<TournamentMatch> queue = new LinkedList<>();
+
+        List<TournamentMatch> traversedMatches = new ArrayList<>();
+
+        queue.add(finalMatch);
+
+        while (!queue.isEmpty()){
+            TournamentMatch current = queue.remove();
+
+            if (current != null){
+                 for (int i = 0; i < current.getParents().size(); i++){
+                    queue.add(current.getParents().get(current.getParents().size() - i - 1).getParentMatch());
+                }
+
+                traversedMatches.add(current);
+            }
+
+           
+        }
+
+
+        for (int i = 0; i < traversedMatches.size(); i++){
+            TournamentMatch tm = traversedMatches.get(traversedMatches.size()-1-i);
+
+            tm.setMatchNumber((long) (i+modifier));
+        }
+
+
+
+
+    }
+
+    private List<TournamentMatch> removeUnusedMatchesNew(List<TournamentMatch> tms){
+        List<TournamentMatch> cleanTMs = new ArrayList<>();
+
+        for (TournamentMatch tm: tms){
+            var tmps = tm.getParents();
+
+            boolean allValid = tmps.stream().noneMatch(t -> isBye(t.getUser()));
+
+            if (allValid){
+                cleanTMs.add(tm);
+            }
+        }
+
+
+        return cleanTMs;
+    }
+
+    private void addTitleMatchNamesDoubleNew(TournamentMatch match){
+        match.setMatchTitle("Grand Finals");
+
+        addTitleMatchNamesNew(match.getParents().get(0).getParentMatch(), 1, "Winner's ");
+
+        addTitleMatchNamesNew(match.getParents().get(0).getParentMatch(), 1, "Loser's ");
+    }
+
+    private int addTitleMatchNamesNew(TournamentMatch match, int depth, String front){
+        if (match == null){
+            return depth;
+        }
+
+        String matchTitle = front;
+
+        List<Integer> depths = new ArrayList<>();
+
+        for (var tmps: match.getParents()){
+            depths.add(addTitleMatchNamesNew(tmps.getParentMatch(), depth+1, front));
+        }   
+
+        int greatestDepth = depths.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new);
+
+        switch (depth) {
+            case 1 -> matchTitle += " Finals";
+            case 2 -> matchTitle += " Semifinals";
+            case 3 -> matchTitle += " Quaterfinals";
+            default -> matchTitle += " Round " + (greatestDepth - depth + 1);
+        }
+
+        match.setMatchTitle(matchTitle);
+
+        return greatestDepth;
+
+    }
+
+    private void removeByesRecursiveNew(TournamentMatch tm){
+
+        if (tm == null){
+            return;
+        }
+
+        // for (var tmp: tm.getParents()){
+        //     removeByesRecursive(tmp.getParentMatch());
+        // }
+
+        for (var tmp: tm.getParents()){
+            removeByesRecursive(tmp.getParentMatch());
+
+            var innerParents = tmp.getParentMatch().getParents();
+
+            for (int i = 0; i < innerParents.size(); i++){
+
+                var ip = innerParents.get(i);
+
+                if (isBye(ip.getUser())){
+                    if (!ip.getInheritsParentMatchWinner()){
+                        tmp.setUser(ip.getUser());
+                    }
+                    else {
+                        var index = (i == 0) ? 1 : 0;
+                        tmp.setUser(innerParents.get(index).getUser());
+                    }
+                    tmp.setInheritsParentMatchWinner(null);
+                    tmp.setParentMatch(null);
+                }
+            }
+        }
+
+    }
+    
     private List<TournamentMatch> generateDoubleElimBracket(List<User> users, Tournament t){
         List<TournamentMatch> tms = new ArrayList<>();
 
@@ -358,31 +686,31 @@ public class TournamentService {
         
     }
 
-    private void addTitleMatchNames(TournamentMatch match, int depth, String front){
+    private int addTitleMatchNames(TournamentMatch match, int depth, String front){
         String matchTitle = front;
 
+        int d1 = 0;
+        int d2 = 0;
+
+        if (match.getParentMatch1() != null && match.getInheritsParentMatch1Winner() == true){
+            d1 = addTitleMatchNames(match.getParentMatch1(), depth+1, front);
+        }
+        if (match.getParentMatch2() != null && match.getInheritsParentMatch2Winner() == true){
+            d2 = addTitleMatchNames(match.getParentMatch2(), depth+1, front);
+        }
+
+        int greatestDepth = (d1 > d2) ? d1 : d2;
 
         switch (depth) {
             case 1 -> matchTitle += " Finals";
             case 2 -> matchTitle += " Semifinals";
             case 3 -> matchTitle += " Quaterfinals";
-            default -> {
-            }
+            default -> matchTitle += " Round " + (greatestDepth - depth + 1);
         }
 
         match.setMatchTitle(matchTitle);
 
-        if (depth < 3){
-            if (match.getParentMatch1() != null && match.getInheritsParentMatch1Winner() == true){
-                addTitleMatchNames(match.getParentMatch1(), depth+1, front);
-            }
-            if (match.getParentMatch2() != null && match.getInheritsParentMatch2Winner() == true){
-                addTitleMatchNames(match.getParentMatch2(), depth+1, front);
-            }
-        }
-
-
-
+        return greatestDepth;
 
     }
 
