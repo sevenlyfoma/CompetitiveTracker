@@ -80,6 +80,11 @@ public class TournamentMatch {
 
     @Override
     public String toString() {
-        return "TournamentMatch [id=" + id + ", parents= + " + parents.toString() + "]";
+        return "TournamentMatch [id=" + id + ", matchNumber=" + matchNumber + ", matchTitle=" + matchTitle
+                + ", tournament=" + tournament + "]";
     }
+
+    
+
+    
 }

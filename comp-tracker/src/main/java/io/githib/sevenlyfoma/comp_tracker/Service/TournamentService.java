@@ -31,6 +31,7 @@ import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
 import io.githib.sevenlyfoma.comp_tracker.Refactor.TournamentMatchParent;
+import io.githib.sevenlyfoma.comp_tracker.Refactor.TournamentMatchParentRepository;
 
 @Service
 public class TournamentService {
@@ -45,6 +46,9 @@ public class TournamentService {
 
     @Autowired
     private TournamentEntrantRepository tournamentEntrantRepository;
+
+    @Autowired
+    private TournamentMatchParentRepository tournamentMatchParentRepository;
 
     public Iterable<Tournament> getAllTournaments(){
         return tournamentRepository.findAll();
@@ -153,25 +157,109 @@ public class TournamentService {
             tms =  generateSingleElimBracket(sortedUsers, t);
         }
         else if (t.getStyle().equals("double")){
-            tms =  generateDoubleElimBracketNew(sortedUsers, t);
+            // tms =  generateDoubleElimBracketNew(sortedUsers, t);
 
             // var ntms = generateDoubleElimBracketNew(sortedUsers, t);
             // logger.info(ntms.get(0).toString()); 
             // for (var ntm: ntms){
             //     logger.info(ntm.toString());
             // }
+
+            var gf = generateDoubleElimBracketNew(sortedUsers, t);
+            saveRecursive(gf);
         }
 
          
 
-        for (TournamentMatch tm: tms){
-            tournamentMatchRepository.save(tm);
-        }
+        // for (TournamentMatch tm: tms){
+
+        //     // logger.info(tm.toString());
+
+        //     var tmps = tm.getParents();
+        //     tm.setParents(null);
+
+        //     // tmps = tm.tmps
+        //     // tm.settmps(null)
+        //     //save(tm)
+        //     //for tmp: tmps: save(tmp) //gotta make a new repo for tmp
+            
+        //     var ntm = tournamentMatchRepository.save(tm);
+        //     tm.setId(ntm.getId());
+
+
+        //     for (var tmp: tmps){
+        //         tmp.setTournamentMatch(ntm);
+        //         tournamentMatchParentRepository.save(tmp);
+        //     }
+
+
+        //     // logger.info(tm.toString());
+        // }
 
         t.setClosed(true);
 
         tournamentRepository.save(t);
 
+    }
+
+    private void saveRecursive(TournamentMatch m){
+
+        if (m == null){
+            // logger.info("null");
+            return;
+            
+        }
+
+        var count = 0;
+        if (m.getParents() != null){
+            for (var tmp: m.getParents()){
+                // logger.info(""+count);count++;
+                saveRecursive(tmp.getParentMatch());
+            }
+        }
+
+        // logger.info("start");
+        
+
+        var tmps = m.getParents();
+        m.setParents(null);
+
+        var nm = tournamentMatchRepository.save(m);
+        m.setId(nm.getId());
+
+        if (tmps != null){
+            for (var tmp: tmps){
+                
+
+
+
+                tmp.setTournamentMatch(nm);
+
+                // logger.info("");
+                // logger.info("tmatchid:" + tmp.getTournamentMatch().getId());
+                if (isBye(tmp.getUser())){
+                    // logger.info("Is bye");
+                }
+
+                if (tmp.getParentMatch() != null){
+                    if (tmp.getParentMatch().getId() == null){
+                        // logger.info("parentmatch id is null");
+                    }
+                    else{
+                        // logger.info("pmatch id: " + tmp.getParentMatch().getId());
+                    }
+                }
+
+
+                // logger.info("");
+
+
+                tournamentMatchParentRepository.save(tmp);
+            }
+        }
+
+
+        
     }
 
     
@@ -239,7 +327,7 @@ public class TournamentService {
     }
     
     
-    private List<TournamentMatch> generateDoubleElimBracketNew(List<User> users, Tournament t){
+    private TournamentMatch generateDoubleElimBracketNew(List<User> users, Tournament t){
 
         List<TournamentMatch> totalWinnerTms = new ArrayList<>();
 
@@ -336,7 +424,8 @@ public class TournamentService {
             
         }
 
-
+        // logger.info("" + winnerTms.size());
+        // logger.info("" + loserTms.size());
         var winnerFinal = winnerTms.get(0);
         var loserFinal = loserTms.get(0);
 
@@ -352,7 +441,9 @@ public class TournamentService {
         addTitleMatchNamesDoubleNew(grandfinal);
         var cleanTMs = removeUnusedMatchesNew(totalTms);
 
-        return cleanTMs;
+        // return cleanTMs;
+
+        return grandfinal;
 
         // return totalTms;
     }
@@ -405,8 +496,9 @@ public class TournamentService {
 
     }
 
-    private List<TournamentMatch> removeUnusedMatchesNew(List<TournamentMatch> tms){
-        List<TournamentMatch> cleanTMs = new ArrayList<>();
+
+     private List<TournamentMatch> removeUnusedMatchesNew(List<TournamentMatch> tms){
+       List<TournamentMatch> cleanTMs = new ArrayList<>();
 
         for (TournamentMatch tm: tms){
             var tmps = tm.getParents();
@@ -422,12 +514,13 @@ public class TournamentService {
         return cleanTMs;
     }
 
+
     private void addTitleMatchNamesDoubleNew(TournamentMatch match){
         match.setMatchTitle("Grand Finals");
 
         addTitleMatchNamesNew(match.getParents().get(0).getParentMatch(), 1, "Winner's ");
 
-        addTitleMatchNamesNew(match.getParents().get(0).getParentMatch(), 1, "Loser's ");
+        addTitleMatchNamesNew(match.getParents().get(1).getParentMatch(), 1, "Loser's ");
     }
 
     private int addTitleMatchNamesNew(TournamentMatch match, int depth, String front){
@@ -440,7 +533,10 @@ public class TournamentService {
         List<Integer> depths = new ArrayList<>();
 
         for (var tmps: match.getParents()){
-            depths.add(addTitleMatchNamesNew(tmps.getParentMatch(), depth+1, front));
+            if (tmps != null && tmps.getInheritsParentMatchWinner() != null && tmps.getInheritsParentMatchWinner()){
+                depths.add(addTitleMatchNamesNew(tmps.getParentMatch(), depth+1, front));
+            }
+            else {depths.add(depth +1);}
         }   
 
         int greatestDepth = depths.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new);
@@ -452,6 +548,8 @@ public class TournamentService {
             default -> matchTitle += " Round " + (greatestDepth - depth + 1);
         }
 
+        // logger.info(matchTitle + " n:" +match.getMatchNumber());
+
         match.setMatchTitle(matchTitle);
 
         return greatestDepth;
@@ -460,33 +558,34 @@ public class TournamentService {
 
     private void removeByesRecursiveNew(TournamentMatch tm){
 
+        logger.info("remove byes recursive");
+
         if (tm == null){
             return;
         }
 
-        // for (var tmp: tm.getParents()){
-        //     removeByesRecursive(tmp.getParentMatch());
-        // }
-
         for (var tmp: tm.getParents()){
-            removeByesRecursive(tmp.getParentMatch());
+            removeByesRecursiveNew(tmp.getParentMatch());
 
-            var innerParents = tmp.getParentMatch().getParents();
+            if (tmp.getParentMatch() != null){
+                var innerParents = tmp.getParentMatch().getParents();
 
-            for (int i = 0; i < innerParents.size(); i++){
+                for (int i = 0; i < innerParents.size(); i++){
 
-                var ip = innerParents.get(i);
+                    var ip = innerParents.get(i);
 
-                if (isBye(ip.getUser())){
-                    if (!ip.getInheritsParentMatchWinner()){
-                        tmp.setUser(ip.getUser());
+                    if (isBye(ip.getUser())){
+                        logger.info("Is bye");
+                        if (!tmp.getInheritsParentMatchWinner()){
+                            tmp.setUser(ip.getUser());
+                        }
+                        else {
+                            var index = (i == 0) ? 1 : 0;
+                            tmp.setUser(innerParents.get(index).getUser());
+                        }
+                        tmp.setInheritsParentMatchWinner(null);
+                        tmp.setParentMatch(null);
                     }
-                    else {
-                        var index = (i == 0) ? 1 : 0;
-                        tmp.setUser(innerParents.get(index).getUser());
-                    }
-                    tmp.setInheritsParentMatchWinner(null);
-                    tmp.setParentMatch(null);
                 }
             }
         }

@@ -37,11 +37,11 @@ public class TournamentMatchParent {
     private TournamentMatch tournamentMatch;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "parent_match_id", nullable = false)
+    @JoinColumn(name = "parent_match_id")
     private TournamentMatch parentMatch;
 
     @Column(name = "inherits_parent_match_winner")
@@ -49,7 +49,7 @@ public class TournamentMatchParent {
 
     @Override
     public String toString() {
-        return "TournamentMatchParent [user=" + user + ", parentMatch=" + parentMatch + ", inheritsParentMatchWinner="
+        return "TournamentMatchParent [user=" + user + ", parentMatch=" + (parentMatch==null ? "Null" : parentMatch.getId()) + ", inheritsParentMatchWinner="
                 + inheritsParentMatchWinner + "]";
     }
 
