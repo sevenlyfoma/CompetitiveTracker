@@ -475,7 +475,12 @@ public class TournamentService {
 
             if (current != null){
                  for (int i = 0; i < current.getParents().size(); i++){
-                    queue.add(current.getParents().get(current.getParents().size() - i - 1).getParentMatch());
+
+                    var x = current.getParents().get(current.getParents().size() - i - 1);
+                    if (x.getInheritsParentMatchWinner() != null && x.getInheritsParentMatchWinner() == true){
+                        queue.add(x.getParentMatch());
+                    }
+                    
                 }
 
                 traversedMatches.add(current);

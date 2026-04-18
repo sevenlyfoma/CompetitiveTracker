@@ -95,8 +95,17 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
 
   // console.log(match)
 
+  
+
 
   if (match !== undefined && match !== null){
+
+    // let sorted = match.parents.sort((a, b) => {
+    //   return a.parentMatch.matchNumber - b.parentMatch.matchNumber;
+    // });#
+
+    
+
 
     let nodes =[]
     let edges = []
@@ -237,6 +246,19 @@ function appened_tourney_dimensions(match){
   if (match === undefined || match === null){
     return null;
   }
+
+  let sorted = match.parents.toReversed();
+
+
+  //HACK TODO remove the need for this!
+  match.inheritsParentMatch1Winner = sorted[0].inheritsParentMatchWinner;
+  match.inheritsParentMatch2Winner = sorted[1].inheritsParentMatchWinner;
+
+  match.parentMatch1 = sorted[0].parentMatch;
+  match.parentMatch2 = sorted[1].parentMatch;
+
+  match.user1 = sorted[0].user;
+  match.user2 = sorted[1].user;
 
   if (match.parentMatch1 == null && match.parentMatch2 == null
       ||match.inheritsParentMatch1Winner != true && match.inheritsParentMatch2Winner != true
