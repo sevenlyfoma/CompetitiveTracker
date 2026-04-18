@@ -545,7 +545,7 @@ public class TournamentService {
             case 1 -> matchTitle += " Finals";
             case 2 -> matchTitle += " Semifinals";
             case 3 -> matchTitle += " Quaterfinals";
-            default -> matchTitle += " Round " + (greatestDepth - depth + 1);
+            default -> matchTitle += " Round " + (greatestDepth - depth);
         }
 
         // logger.info(matchTitle + " n:" +match.getMatchNumber());
@@ -556,9 +556,29 @@ public class TournamentService {
 
     }
 
+    private void resolveSingleBye(TournamentMatchParent tmp, TournamentMatchParent byeParent, TournamentMatchParent regParent){
+        var byeUser = byeParent.getUser();
+        var regUser = regParent.getUser();
+        
+        if (regUser != null){
+            if (!tmp.getInheritsParentMatchWinner()){
+                tmp.setUser(byeUser);
+            }
+            else {
+                tmp.setUser(regUser);
+            }
+            tmp.setInheritsParentMatchWinner(null);
+            tmp.setParentMatch(null);
+        }
+        else {
+            tmp.setParentMatch(regParent.getParentMatch());
+            tmp.setInheritsParentMatchWinner(regParent.getInheritsParentMatchWinner());
+        }
+    }
+
     private void removeByesRecursiveNew(TournamentMatch tm){
 
-        logger.info("remove byes recursive");
+        // logger.info("remove byes recursive");
 
         if (tm == null){
             return;
@@ -570,22 +590,24 @@ public class TournamentService {
             if (tmp.getParentMatch() != null){
                 var innerParents = tmp.getParentMatch().getParents();
 
-                for (int i = 0; i < innerParents.size(); i++){
+                var ip1 = innerParents.get(0);
+                var ip2 = innerParents.get(1);
 
-                    var ip = innerParents.get(i);
+                var user1 = ip1.getUser();
+                var user2 = ip2.getUser();
 
-                    if (isBye(ip.getUser())){
-                        logger.info("Is bye");
-                        if (!tmp.getInheritsParentMatchWinner()){
-                            tmp.setUser(ip.getUser());
-                        }
-                        else {
-                            var index = (i == 0) ? 1 : 0;
-                            tmp.setUser(innerParents.get(index).getUser());
-                        }
-                        tmp.setInheritsParentMatchWinner(null);
-                        tmp.setParentMatch(null);
-                    }
+                if (isBye(user1) && isBye(user2)){
+                    tmp.setUser(user1);
+                    tmp.setInheritsParentMatchWinner(null);
+                    tmp.setParentMatch(null);
+                }
+
+                else if (isBye(user1)){
+                    resolveSingleBye(tmp, ip1, ip2);
+                }
+
+                else if (isBye(user2)){
+                    resolveSingleBye(tmp, ip2, ip1);
                 }
             }
         }
