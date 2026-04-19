@@ -169,37 +169,114 @@ public class TournamentService {
             saveRecursive(gf);
         }
 
-         
-
-        // for (TournamentMatch tm: tms){
-
-        //     // logger.info(tm.toString());
-
-        //     var tmps = tm.getParents();
-        //     tm.setParents(null);
-
-        //     // tmps = tm.tmps
-        //     // tm.settmps(null)
-        //     //save(tm)
-        //     //for tmp: tmps: save(tmp) //gotta make a new repo for tmp
-            
-        //     var ntm = tournamentMatchRepository.save(tm);
-        //     tm.setId(ntm.getId());
-
-
-        //     for (var tmp: tmps){
-        //         tmp.setTournamentMatch(ntm);
-        //         tournamentMatchParentRepository.save(tmp);
-        //     }
-
-
-        //     // logger.info(tm.toString());
-        // }
 
         t.setClosed(true);
 
         tournamentRepository.save(t);
 
+    }
+
+    private TournamentMatch generateDoubleElimBracketNew(List<User> users, Tournament t){
+
+        List<TournamentMatch> winnerTms = new ArrayList<>();
+
+        List<TournamentMatch> loserTms = new ArrayList<>();
+
+
+        //Generate first set of matches
+        //We will append missing fields later
+        for (int i = 0; i < users.size()/2; i++){
+
+            User u1 = users.get(i);
+            User u2 = users.get(users.size()-1-i);
+
+            TournamentMatch tm = generateTM(t, Arrays.asList(u1, u2), Arrays.asList(null, null), Arrays.asList(null, null));
+
+            winnerTms.add(tm);
+        }
+
+        List<TournamentMatch> sortedWinnerTms = sortByExpectedWinner(winnerTms);
+        
+        //Generate first set of losers Matches
+        for (int i = 0; i < sortedWinnerTms.size()/2; i++){
+            var tm1 = sortedWinnerTms.get(i);
+            var tm2 = sortedWinnerTms.get(sortedWinnerTms.size()-1-i);
+
+            TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(false, false));
+
+            loserTms.add(tm);
+                
+        }
+
+        while (sortedWinnerTms.size() > 1){
+            winnerTms = new ArrayList<>();
+
+            for (int i = 0; i < sortedWinnerTms.size()/2; i++){
+                var tm1 = sortedWinnerTms.get(i);
+                var tm2 = sortedWinnerTms.get(sortedWinnerTms.size()-1-i);
+
+                TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(true, true));
+
+                winnerTms.add(tm);
+                
+            }
+
+            List<TournamentMatch> sortedLoserTms = sortByExpectedWinner(loserTms);
+            loserTms = new ArrayList<>();
+
+            //Match losers winners against each other until there are low enough to pair against winners losers
+            if (sortedLoserTms.size() != winnerTms.size()){
+
+                for (int i = 0; i < sortedLoserTms.size()/2; i++){
+                    var tm1 = sortedLoserTms.get(i);
+                    var tm2 = sortedLoserTms.get(sortedLoserTms.size()-1-i);
+
+                    TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(true, true));
+
+                    loserTms.add(tm);
+                }
+
+                sortedLoserTms = sortByExpectedWinner(loserTms);
+                loserTms = new ArrayList<>();
+            }
+
+            sortedWinnerTms =  sortByExpectedWinner(winnerTms);
+                
+            List<TournamentMatch> tempLosers = new ArrayList<>();
+            for (int i = 0; i < sortedWinnerTms.size(); i++){
+                var tm1 = sortedWinnerTms.get(i);
+                var tm2 = sortedLoserTms.get(i);
+
+                TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(false, true));
+                
+                tempLosers.add(tm);
+            }
+            
+            if (!tempLosers.isEmpty()){
+                loserTms = tempLosers;
+            }
+
+            sortedWinnerTms =  sortByExpectedWinner(winnerTms);
+            
+        }
+
+        // logger.info("" + winnerTms.size());
+        // logger.info("" + loserTms.size());
+        var winnerFinal = winnerTms.get(0);
+        var loserFinal = loserTms.get(0);
+
+        TournamentMatch grandfinal = generateTM(t, Arrays.asList(null, null), Arrays.asList(winnerFinal, loserFinal), Arrays.asList(true, true));
+
+
+        removeByesRecursiveNew(grandfinal);
+        addMatchNumbersDoubleNew(grandfinal);
+        addTitleMatchNamesDoubleNew(grandfinal);
+
+        // return cleanTMs;
+
+        return grandfinal;
+
+        // return totalTms;
     }
 
     private void saveRecursive(TournamentMatch m){
@@ -327,126 +404,7 @@ public class TournamentService {
     }
     
     
-    private TournamentMatch generateDoubleElimBracketNew(List<User> users, Tournament t){
-
-        List<TournamentMatch> totalWinnerTms = new ArrayList<>();
-
-        List<TournamentMatch> winnerTms = new ArrayList<>();
-
-        List<TournamentMatch> totalLoserTms = new ArrayList<>();
-
-        List<TournamentMatch> loserTms = new ArrayList<>();
-
-
-        //Generate first set of matches
-        //We will append missing fields later
-        for (int i = 0; i < users.size()/2; i++){
-
-            User u1 = users.get(i);
-            User u2 = users.get(users.size()-1-i);
-
-            TournamentMatch tm = generateTM(t, Arrays.asList(u1, u2), Arrays.asList(null, null), Arrays.asList(null, null));
-
-            winnerTms.add(tm);
-        }
-
-        totalWinnerTms.addAll(winnerTms);
-
-        List<TournamentMatch> sortedWinnerTms = sortByExpectedWinner(winnerTms);
-        
-        //Generate first set of losers Matches
-        for (int i = 0; i < sortedWinnerTms.size()/2; i++){
-            var tm1 = sortedWinnerTms.get(i);
-            var tm2 = sortedWinnerTms.get(sortedWinnerTms.size()-1-i);
-
-            TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(false, false));
-
-            loserTms.add(tm);
-                
-        }
-
-        totalLoserTms.addAll(loserTms);
-
-        while (sortedWinnerTms.size() > 1){
-            winnerTms = new ArrayList<>();
-
-            for (int i = 0; i < sortedWinnerTms.size()/2; i++){
-                var tm1 = sortedWinnerTms.get(i);
-                var tm2 = sortedWinnerTms.get(sortedWinnerTms.size()-1-i);
-
-                TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(true, true));
-
-                winnerTms.add(tm);
-                
-            }
-
-            List<TournamentMatch> sortedLoserTms = sortByExpectedWinner(loserTms);
-            loserTms = new ArrayList<>();
-
-            //Match losers winners against each other until there are low enough to pair against winners losers
-            if (sortedLoserTms.size() != winnerTms.size()){
-
-                for (int i = 0; i < sortedLoserTms.size()/2; i++){
-                    var tm1 = sortedLoserTms.get(i);
-                    var tm2 = sortedLoserTms.get(sortedLoserTms.size()-1-i);
-
-                    TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(true, true));
-
-                    loserTms.add(tm);
-                    totalLoserTms.add(tm);
-                }
-
-                sortedLoserTms = sortByExpectedWinner(loserTms);
-                loserTms = new ArrayList<>();
-            }
-
-            sortedWinnerTms =  sortByExpectedWinner(winnerTms);
-                
-            List<TournamentMatch> tempLosers = new ArrayList<>();
-            for (int i = 0; i < sortedWinnerTms.size(); i++){
-                var tm1 = sortedWinnerTms.get(i);
-                var tm2 = sortedLoserTms.get(i);
-
-                TournamentMatch tm = generateTM(t, Arrays.asList(null, null), Arrays.asList(tm1, tm2), Arrays.asList(false, true));
-                
-                tempLosers.add(tm);
-                totalLoserTms.add(tm);
-            }
-            
-            if (!tempLosers.isEmpty()){
-                loserTms = tempLosers;
-            }
-
-
-            totalWinnerTms.addAll(winnerTms);
-
-            sortedWinnerTms =  sortByExpectedWinner(winnerTms);
-            
-        }
-
-        // logger.info("" + winnerTms.size());
-        // logger.info("" + loserTms.size());
-        var winnerFinal = winnerTms.get(0);
-        var loserFinal = loserTms.get(0);
-
-        TournamentMatch grandfinal = generateTM(t, Arrays.asList(null, null), Arrays.asList(winnerFinal, loserFinal), Arrays.asList(true, true));
-
-        List<TournamentMatch> totalTms = new ArrayList<>();
-        totalTms.addAll(totalWinnerTms);
-        totalTms.addAll(totalLoserTms);
-        totalTms.add(grandfinal);
-
-        removeByesRecursiveNew(grandfinal);
-        addMatchNumbersDoubleNew(grandfinal);
-        addTitleMatchNamesDoubleNew(grandfinal);
-        var cleanTMs = removeUnusedMatchesNew(totalTms);
-
-        // return cleanTMs;
-
-        return grandfinal;
-
-        // return totalTms;
-    }
+    
 
     private void addMatchNumbersDoubleNew(TournamentMatch finalMatch){
         TournamentMatch winnersFinal = finalMatch.getParents().get(0).getParentMatch();

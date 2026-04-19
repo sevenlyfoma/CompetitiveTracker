@@ -247,7 +247,13 @@ function appened_tourney_dimensions(match){
     return null;
   }
 
-  let sorted = match.parents.toReversed();
+  // let sorted = match.parents.toReversed();
+
+  let sorted = match.parents.sort((a, b) => {
+    const numA = a.parentMatch?.matchNumber ?? 0;
+    const numB = b.parentMatch?.matchNumber ?? 0;
+    return numA - numB;
+  });
 
 
   //HACK TODO remove the need for this!
