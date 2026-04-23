@@ -1,9 +1,9 @@
 package io.githib.sevenlyfoma.comp_tracker.Strategy;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.RatingPair;
+import java.util.List;
 
 public interface RatingStrategy {
     Integer getInitialRating();
-    RatingPair getRatingChange(RatingPair beforePair);
     String getSystemName();
+    List<Integer> getRatingChange(List<Integer> ratingsBefore, List<Integer> points);
 }

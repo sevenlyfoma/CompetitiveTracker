@@ -2,6 +2,52 @@ import React, {useCallback, useState, useEffect} from 'react';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 
+function hackFields(match){
+    if (match === undefined || match === null){
+        return null;
+    }
+    let sorted = match.parents;
+    sorted = match.parents.sort((a, b) => {
+        const numA = a.parentMatch?.matchNumber ?? 0;
+        const numB = b.parentMatch?.matchNumber ?? 0;
+        return numA - numB;
+    });
+
+    match.inheritsParentMatch1Winner = sorted[0].inheritsParentMatchWinner;
+    match.inheritsParentMatch2Winner = sorted[1].inheritsParentMatchWinner;
+
+    match.parentMatch1 = sorted[0].parentMatch;
+    match.parentMatch2 = sorted[1].parentMatch;
+
+    match.user1 = sorted[0].user;
+    match.user2 = sorted[1].user;
+
+    if (match.matchRecord != null && match.matchRecord != undefined){
+        let participants = match.matchRecord.participants;
+
+        match.matchRecord.user1 = participants[0].user;
+        match.matchRecord.user1RatingBefore = participants[0].ratingBefore;
+        match.matchRecord.user1RatingAfter = participants[0].ratingAfter;
+
+
+        match.matchRecord.user2 = participants[1].user;
+        match.matchRecord.user2RatingBefore = participants[1].ratingBefore;
+        match.matchRecord.user2RatingAfter = participants[1].ratingAfter;
+
+        if (participants[0].points == 1){
+            match.matchRecord.winner = participants[0].user;
+        }
+        else {
+            match.matchRecord.winner = participants[1].user;
+        }
+
+
+
+    }
+
+    return match;
+}
+
 function TournamentMatchPage() {
 
     const { tournamentID = -1, tournamentMatchID = -1 } = useParams();
@@ -21,8 +67,9 @@ function TournamentMatchPage() {
                 throw new Error(data.message)
             }
             const tMatchJson = data;
-            console.log(tMatchJson);
-            setTMatch(tMatchJson);
+            const hacked = hackFields(tMatchJson);
+            console.log(hacked);
+            setTMatch(hacked);
 
             const response2 = await fetch(`/api/tournaments/${tournamentID}`);
             const data2 = await response2.json();
@@ -161,6 +208,10 @@ function SendResultButton({tmid, result, fetchData}){
     console.log("sendresultbutton")
     console.log(tmid);
 
+    let hackedDTO = {userIds: [result.winnerID, result.loserID], points: [1,0]}
+
+    console.log(hackedDTO);
+
 
     const handleCreate = async () => {
         if (!window.confirm("Are you sure the winner has been correctly selected")) return;
@@ -170,7 +221,7 @@ function SendResultButton({tmid, result, fetchData}){
             headers: {
             'Content-Type': 'application/json',
             },
-            body: JSON.stringify(result)
+            body: JSON.stringify(hackedDTO)
         });
         const data = await response.json();
 

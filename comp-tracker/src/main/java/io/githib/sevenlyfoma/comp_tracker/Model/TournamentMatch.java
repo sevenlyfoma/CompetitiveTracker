@@ -1,12 +1,17 @@
 package io.githib.sevenlyfoma.comp_tracker.Model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -15,7 +20,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 
 
@@ -27,13 +31,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(onlyExplicitlyIncluded = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class TournamentMatch {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     @EqualsAndHashCode.Include
     private Long id;
 
@@ -61,13 +62,6 @@ public class TournamentMatch {
     @JoinColumn(name = "parent_match_2_id")
     private TournamentMatch parentMatch2;
 
-    
-    // @Column(name = "parent_match_1_id")
-    // private Long parentMatch1Id;
-
-    // @Column(name = "parent_match_2_id")
-    // private Long parentMatch2Id;
-
     @ManyToOne
     @JoinColumn(name = "user1_id")
     private User user1;
@@ -79,4 +73,22 @@ public class TournamentMatch {
     @OneToOne
     @JoinColumn(name = "match_record_id")
     private Match matchRecord;
+
+    @OneToMany(mappedBy = "tournamentMatch", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TournamentMatchParent> parents;
+
+    @Column(name = "number_of_participants")
+    @Builder.Default
+    private Long numberOfParticipants = 2L;
+
+
+    @Override
+    public String toString() {
+        return "TournamentMatch [id=" + id + ", matchNumber=" + matchNumber + ", matchTitle=" + matchTitle
+                + ", tournament=" + tournament + "]";
+    }
+
+    
+
+    
 }

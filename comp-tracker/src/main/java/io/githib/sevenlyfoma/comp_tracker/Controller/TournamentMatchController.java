@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
+import io.githib.sevenlyfoma.comp_tracker.DTO.MatchResultDTO;
 import io.githib.sevenlyfoma.comp_tracker.DTO.SuccessDTO;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
 import io.githib.sevenlyfoma.comp_tracker.Service.TournamentMatchService;
@@ -34,8 +34,8 @@ public class TournamentMatchController {
     }
 
     @PutMapping("/report/{mid}")
-    public ResponseEntity<SuccessDTO> reportMatch(@RequestBody MatchCreationObject mco, @PathVariable Long mid) {
-        tournamentMatchService.processMatchResult(mco, mid);
+    public ResponseEntity<SuccessDTO> reportMatch(@RequestBody MatchResultDTO mrdto, @PathVariable Long mid) {
+        tournamentMatchService.processMatchResult(mrdto, mid);
         return new ResponseEntity<>(new SuccessDTO(HttpStatus.OK.value(), "Match processed and ELO updated."), HttpStatus.OK);
     }
 

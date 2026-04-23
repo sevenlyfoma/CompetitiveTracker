@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
+import io.githib.sevenlyfoma.comp_tracker.DTO.MatchResultDTO;
 import io.githib.sevenlyfoma.comp_tracker.DTO.SuccessDTO;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
 import io.githib.sevenlyfoma.comp_tracker.Service.MatchService;
@@ -30,8 +30,8 @@ public class MatchController {
     }
 
     @PostMapping("/report")
-    public ResponseEntity<SuccessDTO> createMatch(@RequestBody MatchCreationObject mco) {
-        Match match = matchService.createMatch(mco);
+    public ResponseEntity<SuccessDTO> createMatch(@RequestBody MatchResultDTO mrdto) {
+        Match match = matchService.createMatch(mrdto);
         return new ResponseEntity<>(new SuccessDTO(HttpStatus.OK.value(), ("Match id:" +  match.getId() + " created and ELO updated.")), HttpStatus.OK);
     }
     

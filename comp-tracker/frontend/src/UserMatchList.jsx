@@ -6,6 +6,38 @@ import RatingGraph from './RatingGraph';
 
 import toast from 'react-hot-toast';
 
+function hackFields(match){
+    if (match === undefined || match === null){
+        return null;
+    }
+    
+    let participants = match.participants;
+
+    if (participants.length != 0){
+        match.user1 = participants[0].user;
+        match.user1RatingBefore = participants[0].ratingBefore;
+        match.user1RatingAfter = participants[0].ratingAfter;
+
+
+        match.user2 = participants[1].user;
+        match.user2RatingBefore = participants[1].ratingBefore;
+        match.user2RatingAfter = participants[1].ratingAfter;
+
+        if (participants[0].points == 1){
+            match.winner = participants[0].user;
+        }
+        else {
+            match.winner = participants[1].user;
+        }
+
+        
+    }
+
+    return match;
+
+    
+}
+
 function UserMatchList(){
 
     const navigate = useNavigate();
@@ -49,8 +81,13 @@ function UserMatchList(){
                 throw new Error(data.message)
             }
             const matchListJson = data;
+
+            console.log("Match list json")
             console.log(matchListJson);
-            setUserMatchList(matchListJson);
+
+            const hackedMatchList = matchListJson.map(hackFields);
+            console.log(hackedMatchList);
+            setUserMatchList(hackedMatchList);
 
 
         } catch (error) {

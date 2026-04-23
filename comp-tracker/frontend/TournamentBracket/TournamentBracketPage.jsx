@@ -20,6 +20,52 @@ import toast from 'react-hot-toast';
 
 // import LinkNode from './LinkNode';
 const roundLabelHeight = 100;
+
+function hackFields(match){
+    if (match === undefined || match === null){
+        return null;
+    }
+    let sorted = match.parents;
+    sorted = match.parents.sort((a, b) => {
+        const numA = a.parentMatch?.matchNumber ?? 0;
+        const numB = b.parentMatch?.matchNumber ?? 0;
+        return numA - numB;
+    });
+
+    match.inheritsParentMatch1Winner = sorted[0].inheritsParentMatchWinner;
+    match.inheritsParentMatch2Winner = sorted[1].inheritsParentMatchWinner;
+
+    match.parentMatch1 = sorted[0].parentMatch;
+    match.parentMatch2 = sorted[1].parentMatch;
+
+    match.user1 = sorted[0].user;
+    match.user2 = sorted[1].user;
+
+    if (match.matchRecord != null && match.matchRecord != undefined){
+        let participants = match.matchRecord.participants;
+
+        match.matchRecord.user1 = participants[0].user;
+        match.matchRecord.user1RatingBefore = participants[0].ratingBefore;
+        match.matchRecord.user1RatingAfter = participants[0].ratingAfter;
+
+
+        match.matchRecord.user2 = participants[1].user;
+        match.matchRecord.user2RatingBefore = participants[1].ratingBefore;
+        match.matchRecord.user2RatingAfter = participants[1].ratingAfter;
+
+        if (participants[0].points == 1){
+            match.matchRecord.winner = participants[0].user;
+        }
+        else {
+            match.matchRecord.winner = participants[1].user;
+        }
+
+
+
+    }
+
+    return match;
+}
  
 
 
@@ -95,8 +141,17 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
 
   // console.log(match)
 
+  
+
 
   if (match !== undefined && match !== null){
+
+    // let sorted = match.parents.sort((a, b) => {
+    //   return a.parentMatch.matchNumber - b.parentMatch.matchNumber;
+    // });#
+
+    
+
 
     let nodes =[]
     let edges = []
@@ -237,6 +292,8 @@ function appened_tourney_dimensions(match){
   if (match === undefined || match === null){
     return null;
   }
+
+  match = hackFields(match);
 
   if (match.parentMatch1 == null && match.parentMatch2 == null
       ||match.inheritsParentMatch1Winner != true && match.inheritsParentMatch2Winner != true

@@ -1,12 +1,17 @@
 package io.githib.sevenlyfoma.comp_tracker.Model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,26 +42,29 @@ public class Match {
     private java.time.LocalDateTime dateOfMatch;
 
     @ManyToOne
-    @JoinColumn(name = "user1_id", nullable = false)
+    @JoinColumn(name = "user1_id")
     private User user1;
 
     @ManyToOne
-    @JoinColumn(name = "user2_id", nullable = false)
+    @JoinColumn(name = "user2_id")
     private User user2;
 
     @ManyToOne
-    @JoinColumn(name = "winner_id", nullable = false)
+    @JoinColumn(name = "winner_id")
     private User winner;
 
-    @Column(name = "user1_rating_before", nullable = false)
+    @Column(name = "user1_rating_before")
     private Integer user1RatingBefore; 
 
-    @Column(name = "user1_rating_after", nullable = false)
+    @Column(name = "user1_rating_after")
     private Integer user1RatingAfter;
 
-    @Column(name = "user2_rating_before", nullable = false)
+    @Column(name = "user2_rating_before")
     private Integer user2RatingBefore;
 
-    @Column(name = "user2_rating_after", nullable = false)
+    @Column(name = "user2_rating_after")
     private Integer user2RatingAfter;
+
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MatchParticipant> participants;
 }
