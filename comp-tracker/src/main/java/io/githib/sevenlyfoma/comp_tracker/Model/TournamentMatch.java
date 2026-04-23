@@ -2,7 +2,6 @@ package io.githib.sevenlyfoma.comp_tracker.Model;
 
 import java.util.List;
 
-import io.githib.sevenlyfoma.comp_tracker.Refactor.TournamentMatchParent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -77,6 +76,11 @@ public class TournamentMatch {
 
     @OneToMany(mappedBy = "tournamentMatch", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TournamentMatchParent> parents;
+
+    @Column(name = "number_of_participants")
+    @Builder.Default
+    private Long numberOfParticipants = 2L;
+
 
     @Override
     public String toString() {

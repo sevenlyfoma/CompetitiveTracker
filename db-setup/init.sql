@@ -22,13 +22,13 @@ CREATE TABLE tournament_entrants (
 CREATE TABLE matches (
     id SERIAL PRIMARY KEY,
     date_of_match TIMESTAMP NOT NULL,
-    user1_id INTEGER NOT NULL REFERENCES users(id),
-    user2_id INTEGER NOT NULL REFERENCES users(id),
+    user1_id INTEGER REFERENCES users(id),
+    user2_id INTEGER REFERENCES users(id),
     winner_id INTEGER REFERENCES users(id),
-    user1_rating_before integer NOT NULL,
-    user1_rating_after integer NOT NULL,
-    user2_rating_before integer NOT NULL,
-    user2_rating_after integer NOT NULL
+    user1_rating_before integer,
+    user1_rating_after integer,
+    user2_rating_before integer,
+    user2_rating_after integer
 );
 
 CREATE TABLE match_participants (
@@ -45,6 +45,8 @@ CREATE TABLE match_participants (
 
 CREATE TABLE tournament_matches (
     id SERIAL PRIMARY KEY,
+
+    number_of_participants INTEGER,
 
     match_number INTEGER,
     match_title VARCHAR(100) NOT NULL,

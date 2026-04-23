@@ -1,11 +1,11 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.RatingPair;
 import io.githib.sevenlyfoma.comp_tracker.Strategy.RatingStrategy;
 
 @Service
@@ -26,7 +26,7 @@ public class RatingService {
         return activeStrategy.getInitialRating();
     }
 
-    public RatingPair getRatingChange(RatingPair beforePair) {
-        return activeStrategy.getRatingChange(beforePair);
+    public List<Integer> getRatingChange(List<Integer> ratingsBefore, List<Integer> points){
+        return activeStrategy.getRatingChange(ratingsBefore, points);
     }
 }

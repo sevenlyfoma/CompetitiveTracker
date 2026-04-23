@@ -1,6 +1,7 @@
 package io.githib.sevenlyfoma.comp_tracker.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,18 +11,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.githib.sevenlyfoma.comp_tracker.DTO.MatchCreationObject;
+import io.githib.sevenlyfoma.comp_tracker.DTO.MatchResultDTO;
 import io.githib.sevenlyfoma.comp_tracker.Exception.NoTournamentMatchesFoundException;
 import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentBadlyFormattedException;
 import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchAlreadyDecidedException;
 import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchMissingParticipantsException;
-import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchResultAgainstSelfException;
 import io.githib.sevenlyfoma.comp_tracker.Exception.TournamentMatchResultParticipantNotValidException;
 import io.githib.sevenlyfoma.comp_tracker.Model.Match;
+import io.githib.sevenlyfoma.comp_tracker.Model.MatchParticipant;
 import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
+import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchParent;
+import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchParentRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchRepository;
-import io.githib.sevenlyfoma.comp_tracker.Model.User;
 
 @Service
 public class TournamentMatchService {
@@ -36,6 +38,9 @@ public class TournamentMatchService {
 
     @Autowired
     private MatchService matchService;
+
+    @Autowired
+    private TournamentMatchParentRepository tournamentMatchParentRepository;
 
     public TournamentMatch getTMatch(Long id){
         var tournamentMatch = tournamentMatchRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -56,50 +61,32 @@ public class TournamentMatchService {
     }
 
     @Transactional
-    public void processMatchResult(MatchCreationObject mco, Long matchId){
-        logger.info(matchId + " " + mco.toString());
-
+    public void processMatchResult(MatchResultDTO mrdto, Long matchId){
 
         TournamentMatch tMatch = tournamentMatchRepository.findById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament Match not found"));
 
         validateAllUsersPresent(tMatch);
         validateNoResult(tMatch);
-        validateParticipants(tMatch, mco);
-        
+        validateParticipants(tMatch, mrdto);
+    
 
-        User winner = tMatch.getUser2();
-        User loser = tMatch.getUser1();
-
-        if (mco.getWinnerID().equals(tMatch.getUser1().getId())){
-            winner = tMatch.getUser1();
-            loser = tMatch.getUser2();
-        }
-
-        Match match = matchService.createMatch(MatchCreationObject.builder().loserID(loser.getId()).winnerID(winner.getId()).build());
+        Match match = matchService.createMatch(mrdto);
 
         tMatch.setMatchRecord(match);
         tournamentMatchRepository.save(tMatch);
 
-        var childMatches = tournamentMatchRepository.findByParentMatch1OrParentMatch2(tMatch, tMatch);
+        var childMatches = tournamentMatchParentRepository.findByParentMatch(tMatch);
 
-        for (TournamentMatch c: childMatches){
-            if (c.getParentMatch1() != null && c.getParentMatch1().getId().equals(tMatch.getId())){
-                if (c.getInheritsParentMatch1Winner()){
-                    c.setUser1(winner);
+        for (TournamentMatchParent c: childMatches){
+            for (MatchParticipant mp: match.getParticipants()){
+                if (c.getInheritsParentMatchWinner() && mp.getPoints() == 1){
+                    c.setUser(mp.getUser());
                 }
-                else {
-                    c.setUser1(loser);
-                }
-            }
-            else {
-                if (c.getInheritsParentMatch2Winner()){
-                    c.setUser2(winner);
-                }
-                else {
-                    c.setUser2(loser);
+                else if (!c.getInheritsParentMatchWinner() && mp.getPoints() == 0){
+                    c.setUser(mp.getUser());
                 }
             }
-            tournamentMatchRepository.save(c);
+            tournamentMatchParentRepository.save(c);
         }
     }
 
@@ -118,32 +105,26 @@ public class TournamentMatchService {
         return tms.get(0);
     }
 
-    private void validateParticipants(TournamentMatch tMatch, MatchCreationObject result) {
-        Long u1 = tMatch.getUser1().getId();
-        Long u2 = tMatch.getUser2().getId();
-        Long winner = result.getWinnerID();
-        Long loser = result.getLoserID();
+    //TODO validate total points in MatchResultObject add up to one, maybe do this in match service
 
-        boolean winnerIsValid = winner.equals(u1) || winner.equals(u2);
-        boolean loserIsValid = loser.equals(u1) || loser.equals(u2);
-        boolean notPlayingThemselves = !winner.equals(loser);
+    private void validateParticipants(TournamentMatch tMatch, MatchResultDTO mrdto) {
 
-        if (!winnerIsValid){
-            logger.error("Validation failed for TMatch ID {}: Result participant (user id {}) is not a participant in tournament match id {}", tMatch.getId(), winner, tMatch.getId());
-            throw new TournamentMatchResultParticipantNotValidException("Result participant (user id " + winner + ") is not a participant in tournament match id " + tMatch.getId());
-        }
+        List<Long> tMatchUsers = tMatch.getParents().stream()
+            .map(x -> x.getUser().getId())
+            .sorted()
+            .collect(Collectors.toList());
 
-        if (!loserIsValid){
-            logger.error("Validation failed for TMatch ID {}: Result participant (user id {}) is not a participant in tournament match id {}", tMatch.getId(), loser, tMatch.getId());
-            throw new TournamentMatchResultParticipantNotValidException("Result participant (user id " + loser + ") is not a participant in tournament match id " + tMatch.getId());
-        }
+        List<Long> resultIds = mrdto.getUserIds().stream()
+            .sorted()
+            .collect(Collectors.toList());
 
-        if (!notPlayingThemselves){
-            logger.error("Validation failed for Match ID {}: User cannot be matched up against themselves in a tournament match", tMatch.getId());
-            throw new TournamentMatchResultAgainstSelfException("Tournament Match Result cannot have the winner and loser be the same user");
-        }   
+        for (int i = 0; i < tMatchUsers.size(); i++){
+            if (!tMatchUsers.get(i).equals(resultIds.get(i))){
+                logger.error("Validation failed for TMatch ID {}: Result participants did not match assinged participants", tMatch.getId());
+                throw new TournamentMatchResultParticipantNotValidException("RResult participants did not match assinged participants");
+            }
+        }  
     }
-
     private void validateNoResult(TournamentMatch tMatch){
         if (tMatch.getMatchRecord() != null){
             logger.error("Validation failed for Match ID {}: match result has already been decided", tMatch.getId());
@@ -152,9 +133,8 @@ public class TournamentMatchService {
     }
 
     private void validateAllUsersPresent(TournamentMatch tMatch){
-        if (tMatch.getUser1() == null || tMatch.getUser2() == null){
+        if (tMatch.getParents().size() != tMatch.getNumberOfParticipants()){
             logger.error("Validation failed for Match ID {}: match does not have all required participants registered", tMatch.getId());
-            
             throw new TournamentMatchMissingParticipantsException("Match Cannot Be resolved, not all participants have been decided");
         }
     }

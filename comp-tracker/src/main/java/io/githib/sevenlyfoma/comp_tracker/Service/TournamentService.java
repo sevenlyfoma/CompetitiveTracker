@@ -27,11 +27,11 @@ import io.githib.sevenlyfoma.comp_tracker.Model.Tournament;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrant;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentEntrantRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatch;
+import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchParent;
+import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchParentRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentMatchRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.TournamentRepository;
 import io.githib.sevenlyfoma.comp_tracker.Model.User;
-import io.githib.sevenlyfoma.comp_tracker.Refactor.TournamentMatchParent;
-import io.githib.sevenlyfoma.comp_tracker.Refactor.TournamentMatchParentRepository;
 
 @Service
 public class TournamentService {
@@ -144,8 +144,6 @@ public class TournamentService {
             }
         }
         
-        
-        List<TournamentMatch> tms = new ArrayList<>();
         if (t.getStyle().equals("single")){
             var gf = generateSingleElimBracket(sortedUsers, t);
             saveRecursive(gf);
@@ -317,20 +315,14 @@ public class TournamentService {
     private void saveRecursive(TournamentMatch m){
 
         if (m == null){
-            // logger.info("null");
             return;
             
         }
-
-        var count = 0;
         if (m.getParents() != null){
             for (var tmp: m.getParents()){
-                // logger.info(""+count);count++;
                 saveRecursive(tmp.getParentMatch());
             }
         }
-
-        // logger.info("start");
         
 
         var tmps = m.getParents();

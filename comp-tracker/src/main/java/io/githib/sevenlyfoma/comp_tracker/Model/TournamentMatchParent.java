@@ -1,9 +1,7 @@
-package io.githib.sevenlyfoma.comp_tracker.Refactor;
+package io.githib.sevenlyfoma.comp_tracker.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.githib.sevenlyfoma.comp_tracker.Model.Match;
-import io.githib.sevenlyfoma.comp_tracker.Model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,35 +18,39 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "match_participants")
+@Table(name = "tournament_match_parents")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MatchParticipant {
+public class TournamentMatchParent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "match_id", nullable = false)
+    @JoinColumn(name = "tournament_match_id", nullable = false)
     @JsonIgnore
-    private Match match;
-
-    // @Column(name = "user_id", nullable = false)
-    // private Integer userId;
+    private TournamentMatch tournamentMatch;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "points")
-    private Integer points;
+    @ManyToOne
+    @JoinColumn(name = "parent_match_id")
+    private TournamentMatch parentMatch;
 
-    @Column(name = "rating_before")
-    private Integer ratingBefore;
+    @Column(name = "inherits_parent_match_winner")
+    private Boolean inheritsParentMatchWinner;
 
-    @Column(name = "rating_after")
-    private Integer ratingAfter;
+    @Override
+    public String toString() {
+        return "TournamentMatchParent [user=" + user + ", parentMatch=" + (parentMatch==null ? "Null" : parentMatch.getId()) + ", inheritsParentMatchWinner="
+                + inheritsParentMatchWinner + "]";
+    }
+
+    
 }
+
