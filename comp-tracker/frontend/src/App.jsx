@@ -7,6 +7,7 @@ import UserMatchList from './UserMatchList.jsx'
 import TournamentList from './TournamentList.jsx';
 import TournamentEntrantList from './TournamentEntrantList.jsx';
 import TournamentMatchPage from './TournamentMatchPage.jsx';
+import HomePage from './HomePage.jsx';
 
 import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
@@ -17,6 +18,7 @@ function App() {
     <BrowserRouter>
       <Routes>
          <Route path="/" element={< UserList />} />
+         <Route path="/home" element={< HomePage />} />
          <Route path="/userpages/:userID" element={<UserMatchList />} />
          <Route path="/tournaments" element={<TournamentList />} />
          <Route path="/tournaments/open/:tournamentID" element={<TournamentEntrantList/>} />
