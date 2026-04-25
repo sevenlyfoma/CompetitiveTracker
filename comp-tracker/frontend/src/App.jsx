@@ -18,7 +18,6 @@ function App() {
     <BrowserRouter>
       <Routes>
          <Route path="/" element={< UserList />} />
-         <Route path="/home" element={< HomePage />} />
          <Route path="/userpages/:userID" element={<UserMatchList />} />
          <Route path="/tournaments" element={<TournamentList />} />
          <Route path="/tournaments/open/:tournamentID" element={<TournamentEntrantList/>} />
