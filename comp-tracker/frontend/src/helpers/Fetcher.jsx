@@ -13,7 +13,8 @@ async function fetchData(pathname, setData){
             throw new Error(errorMessage);
         }
 
-        setData(data);
+        console.log(data);
+        setData(data); 
 
     } catch (error) {
         toast.error('Error fetching data: ' + error.message)
@@ -21,4 +22,4 @@ async function fetchData(pathname, setData){
     }   
 }
 
-export default fetchTournaments
+export default fetchData
