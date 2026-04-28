@@ -22,4 +22,35 @@ async function fetchData(pathname, setData){
     }   
 }
 
+async function fetchDatas(pathnames, setData){
+    try {
+
+        const entries = Object.entries(pathnames);
+        const urls = entries.map(([key, url]) => url);
+
+        const results = await Promise.allSettled(urls.map(url => fetch(url)));
+
+        const successfulData = {};
+
+        for (let i = 0; i < results.length; i++) {
+            const [key] = entries[i];
+            const result = results[i];
+
+            if (result.status === 'fulfilled' && result.value.ok) {
+                const data = await result.value.json();
+                successfulData[key] = data;
+            } else {
+                console.error(`Error fetching ${key}:`, result.reason || result.value?.statusText);
+            }
+        }
+
+        setData(successfulData);
+
+    } catch (error) {
+        toast.error('Error fetching data: ' + error.message)
+        console.error('Error fetching data: ', error.message); 
+    }   
+}
+
+
 export default fetchData
