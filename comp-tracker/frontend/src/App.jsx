@@ -7,7 +7,7 @@ import UserMatchList from './UserMatchList.jsx'
 import TournamentList from './TournamentList.jsx';
 import TournamentEntrantList from './TournamentEntrantList.jsx';
 import TournamentMatchPage from './TournamentMatchPage.jsx';
-import HomePage from './HomePage.jsx';
+import Layout from './Layout.jsx';
 
 import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
@@ -17,13 +17,14 @@ function App() {
     <Toaster />
     <BrowserRouter>
       <Routes>
-         <Route path="/" element={< UserList />} />
-         <Route path="/home" element={< HomePage />} />
-         <Route path="/userpages/:userID" element={<UserMatchList />} />
-         <Route path="/tournaments" element={<TournamentList />} />
-         <Route path="/tournaments/open/:tournamentID" element={<TournamentEntrantList/>} />
-         <Route path="/tournaments/closed/:tournamentID" element={<TournamentBracketPage/>} />
-         <Route path="/tournaments/matches/:tournamentID/:tournamentMatchID" element={<TournamentMatchPage />} />
+         <Route path="/" element={< Layout />}>
+          <Route path="" element={< UserList />} />
+          <Route path="userpages/:userID" element={<UserMatchList />} />
+          <Route path="tournaments" element={<TournamentList />} />
+          <Route path="tournaments/open/:tournamentID" element={<TournamentEntrantList/>} />
+          <Route path="tournaments/closed/:tournamentID" element={<TournamentBracketPage/>} />
+          <Route path="tournaments/matches/:tournamentID/:tournamentMatchID" element={<TournamentMatchPage />} />
+         </Route>
       </Routes>
     </BrowserRouter>
 

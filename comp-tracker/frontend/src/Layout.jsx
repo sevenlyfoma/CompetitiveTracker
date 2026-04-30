@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom';
+
+import { Outlet } from "react-router";
 
 import fetchData from './helpers/Fetcher';
 
@@ -10,7 +13,7 @@ import fetchData from './helpers/Fetcher';
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 
 
-function HomePage() {
+function Layout() {
   const [userList, setUserList] = useState([]);
 
   useEffect(() => {fetchData("/api/users/all", setUserList); }, []);
@@ -20,16 +23,14 @@ function HomePage() {
     <>
     <Sidebar>
       <Menu>
-        <SubMenu label="Charts">
-          <MenuItem> Pie charts </MenuItem>
-          <MenuItem> Line charts </MenuItem>
-        </SubMenu>
-        <MenuItem> Documentation </MenuItem>
-        <MenuItem> Calendar </MenuItem>
+        <MenuItem> Create User </MenuItem>
+        <MenuItem component={<Link to="/tournaments"/>}>   View Tournaments </MenuItem>
       </Menu>
     </Sidebar>
+
+    <Outlet/>
     </>
   );
 }
 
-export default HomePage
+export default Layout
