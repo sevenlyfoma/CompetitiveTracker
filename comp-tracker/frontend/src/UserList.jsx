@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import './UserList.css'
+// import './UserList.css'
 import { data, useNavigate } from 'react-router-dom';
 
 import toast from 'react-hot-toast';

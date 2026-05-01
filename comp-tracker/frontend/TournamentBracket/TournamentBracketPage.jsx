@@ -5,7 +5,7 @@ import { useParams, useNavigate, redirect } from 'react-router-dom';
 import 'reactflow/dist/style.css';
 
 
-import './TournamentBracketPage.css'
+// import './TournamentBracketPage.css'
 
 import BoundaryNode from './BoundaryNode';
 

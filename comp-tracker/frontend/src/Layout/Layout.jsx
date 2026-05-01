@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom';
 
 import { Outlet } from "react-router";
 
-import fetchData from './helpers/Fetcher';
+import fetchData from '../helpers/Fetcher';
 
-
-//Look into outlet with react router dom to make the sidebare render the same every time
+import './Layout.css';
 
 //https://www.npmjs.com/package/react-pro-sidebar
 
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import { Sidebar, Menu, MenuItem, SubMenu, sidebarClasses} from 'react-pro-sidebar';
 
 
 function Layout() {
@@ -20,8 +19,17 @@ function Layout() {
 
 
   return (
-    <>
-    <Sidebar>
+    <div className='layoutDiv'>
+    <Sidebar
+      rootStyles={{
+        [`.${sidebarClasses.container}`]: {
+          backgroundColor: 'transparent',
+          height: '100vh',
+          position: 'sticky',
+          top: 0,
+        },
+      }}
+    >
       <Menu>
         <MenuItem> Create User </MenuItem>
         <MenuItem component={<Link to="/tournaments"/>}>   View Tournaments </MenuItem>
@@ -29,7 +37,7 @@ function Layout() {
     </Sidebar>
 
     <Outlet/>
-    </>
+    </div>
   );
 }
 
