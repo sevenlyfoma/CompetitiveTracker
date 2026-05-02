@@ -11,6 +11,12 @@ import './Layout.css';
 
 import { Sidebar, Menu, MenuItem, SubMenu, sidebarClasses} from 'react-pro-sidebar';
 
+import Button from '@mui/material/Button';
+
+function ButtonUsage() {
+  return <Button variant="contained">Hello world</Button>;
+}
+
 
 function Layout() {
   const [userList, setUserList] = useState([]);
@@ -35,6 +41,8 @@ function Layout() {
         <MenuItem component={<Link to="/tournaments"/>}>   View Tournaments </MenuItem>
       </Menu>
     </Sidebar>
+
+    <ButtonUsage />
 
     <Outlet/>
     </div>
