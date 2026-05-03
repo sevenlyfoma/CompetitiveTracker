@@ -27,6 +27,11 @@ public class UserController {
     public Iterable<User> getAllUsers(){
         return userService.getAllUsers();
     }
+
+    @GetMapping("/group/{pagesize}/{pageno}")
+    public Iterable<User> getPageOfUsers(@PathVariable int pagesize, @PathVariable int pageno){
+        return userService.getUsersByPage(pagesize, pageno);
+    }
     
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id){

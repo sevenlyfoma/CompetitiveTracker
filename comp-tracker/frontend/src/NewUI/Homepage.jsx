@@ -7,7 +7,7 @@ function HomePage(){
 
     const [userList, setUserList] = useState([]);
 
-    useEffect(() => {fetchData("/api/users/all", setUserList); }, []);
+    useEffect(() => {fetchData("/api/users/group/4/0", setUserList); }, []);
 
     return (
         <h1>Hello New World</h1>
