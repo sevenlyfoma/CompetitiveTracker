@@ -37,7 +37,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public List<User> getUsersByPage(int pageSize, int pageNumber){
+    public Page<User> getUsersByPage(int pageSize, int pageNumber){
 
         PageRequest pageRequest = PageRequest.of(
             pageNumber, 
@@ -49,7 +49,7 @@ public class UserService {
         Page<User> userPage = userRepository.findAll(pageRequest);
         List<User> users = userPage.getContent();
 
-        return users;
+        return userPage;
     }
 
     public User getUser(Long id){

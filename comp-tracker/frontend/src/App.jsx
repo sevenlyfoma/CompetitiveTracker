@@ -12,9 +12,12 @@ import HomePage from './NewUI/Homepage.jsx';
 
 // import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
+import CssBaseline from '@mui/material/CssBaseline';
+
 function App() {
   return (
     <>
+    <CssBaseline />
     <Toaster />
     <BrowserRouter>
       <Routes>

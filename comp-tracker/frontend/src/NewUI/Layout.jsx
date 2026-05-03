@@ -75,14 +75,14 @@ function Layout() {
   const toggleDrawer = () => {setOpen(!open);};
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'white' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', height: '100vh', bgcolor: 'white' }}>
 
-      <Box compoent="nav" sx={{ width: '100%', maxWidth: open ? 240 : 60, transition: '0.3s', height:'100vh', bgcolor: 'lightgrey' }}>
+      <Box compoent="nav" sx={{ width: '100%', maxWidth: open ? 240 : 60, transition: '0.3s', height:'100%', bgcolor: 'lightgrey' }}>
         <NavList toggleDrawer={toggleDrawer} open={open}/>
       </Box>
       
 
-      <Box component="main"  sx={{ flexGrow: 1, p: 3, width: '100%',}} >
+      <Box component="main"  sx={{ flexGrow: 1, p:3, width: '100%', height: '100%', boxSizing: 'border-box'}} >
         <Outlet />
       </Box>
 
