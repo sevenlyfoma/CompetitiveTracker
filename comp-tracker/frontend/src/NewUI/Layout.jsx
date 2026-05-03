@@ -15,79 +15,69 @@ import DataArrayIcon from '@mui/icons-material/DataArray';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 
+import { AppBar, Toolbar, Button, Stack, Typography} from '@mui/material';
 
 import fetchData from '../helpers/Fetcher';
 
-function NavList({toggleDrawer , open}) {
+function HorizontalNav() {
   return (
-      <nav aria-label="Page Navigation Options">
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton onClick={toggleDrawer}>
-              <ListItemIcon>
-                <MenuIcon />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
+    <AppBar position="static" color="default" elevation={1}>
+      <Toolbar sx={{bgcolor: "lightgrey"}}>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Typography 
+            variant="h6" 
+            component="div" 
+            sx={{ flexGrow: 1, fontWeight: 'bold' }}
+          >
+            Competitive Tracker
+          </Typography>
 
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/home">
-              <ListItemIcon>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Home" 
-                sx={{ display: open ? 'block' : 'none', whiteSpace: 'nowrap' }}
-              />
-            </ListItemButton>
-          </ListItem>
+          <Button 
+            component={Link} 
+            to="/home" 
+            startIcon={<HomeIcon />}
+            color="inherit"
+          >
+            Home
+          </Button>
 
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/create-user">
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Create New User" 
-                sx={{ display: open ? 'block' : 'none', whiteSpace: 'nowrap' }}
-              />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/tournaments">
-              <ListItemIcon>
-                <DataArrayIcon />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Tournaments" 
-                sx={{ display: open ? 'block' : 'none', whiteSpace: 'nowrap' }}
-              />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </nav>
+          <Button 
+            component={Link} 
+            to="/create-user" 
+            startIcon={<AddIcon />}
+            color="inherit"
+          >
+            Create New User
+          </Button>
+
+          <Button 
+            component={Link} 
+            to="/tournaments" 
+            startIcon={<DataArrayIcon />}
+            color="inherit"
+          >
+            Tournaments
+          </Button>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
 
 
 function Layout() {
-  const [open, setOpen] = useState(true);
-  const toggleDrawer = () => {setOpen(!open);};
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', height: '100vh', bgcolor: 'white' }}>
+    <Stack sx={{ display: 'flex', minHeight: '100vh', height: '100vh', bgcolor: 'white' }}>
 
-      <Box compoent="nav" sx={{ width: '100%', maxWidth: open ? 240 : 60, transition: '0.3s', height:'100%', bgcolor: 'lightgrey' }}>
-        <NavList toggleDrawer={toggleDrawer} open={open}/>
-      </Box>
-      
+      <HorizontalNav />
 
       <Box component="main"  sx={{ flexGrow: 1, p:3, width: '100%', height: '100%', boxSizing: 'border-box'}} >
         <Outlet />
       </Box>
 
 
-    </Box>
+    </Stack>
   );
 }
 

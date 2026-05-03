@@ -30,7 +30,7 @@ function HomePage(){
     const [selectedUser, setSelectedUser] = useState(-1);
 
     return (
-      <Box sx={{ gap: 2, display: 'flex', bgcolor: 'red', height:'100%'}} >
+      <Box sx={{ gap: 2, display: 'flex', bgcolor: 'white', height:'100%'}} >
         <Box sx={{height:'100%'}} >
             <UserTableArea selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
         </Box>
