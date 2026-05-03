@@ -7,7 +7,8 @@ import { Toaster } from 'react-hot-toast';
 // import TournamentList from './TournamentList.jsx';
 // import TournamentEntrantList from './TournamentEntrantList.jsx';
 // import TournamentMatchPage from './TournamentMatchPage.jsx';
-import Layout from './Layout/Layout.jsx';
+import Layout from './NewUI/Layout.jsx';
+import HomePage from './NewUI/Homepage.jsx';
 
 // import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
@@ -18,7 +19,7 @@ function App() {
     <BrowserRouter>
       <Routes>
          <Route path="/" element={< Layout />}>
-          <Route path='home' element={<h1>Hello World</h1>} />
+          <Route path='home' element={<HomePage />} />
           {/* <Route path="" element={< UserList />} />
           <Route path="userpages/:userID" element={<UserMatchList />} />
           <Route path="tournaments" element={<TournamentList />} />
