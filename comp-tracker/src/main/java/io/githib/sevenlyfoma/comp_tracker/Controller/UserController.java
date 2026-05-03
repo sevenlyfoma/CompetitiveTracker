@@ -1,5 +1,7 @@
 package io.githib.sevenlyfoma.comp_tracker.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,11 @@ public class UserController {
     @GetMapping("/group/{pagesize}/{pageno}")
     public Page<User> getPageOfUsers(@PathVariable int pagesize, @PathVariable int pageno){
         return userService.getUsersByPage(pagesize, pageno);
+    }
+
+    @GetMapping("/search/{section}")
+    public List<User> getSearchUsers(@PathVariable String section){
+        return userService.getUsersByName(section);
     }
     
     @GetMapping("/{id}")

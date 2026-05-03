@@ -47,9 +47,11 @@ public class UserService {
         );
 
         Page<User> userPage = userRepository.findAll(pageRequest);
-        List<User> users = userPage.getContent();
-
         return userPage;
+    }
+
+    public List<User> getUsersByName(String section){
+        return userRepository.findByNameStartingWithIgnoreCase(section);
     }
 
     public User getUser(Long id){
