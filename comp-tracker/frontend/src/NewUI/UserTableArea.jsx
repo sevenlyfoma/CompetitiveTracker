@@ -27,7 +27,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import fetchData from '../helpers/Fetcher';
 
 
-const pageSize = 4;
+const pageSize = 7;
 
 function UserTable({users, selectedUser, setSelectedUser, pageNumber}){
     return (
@@ -44,9 +44,9 @@ function UserTable({users, selectedUser, setSelectedUser, pageNumber}){
             {users.map((user, index) => (
                 <TableRow
                 key={user.id}
-                onClick={() => setSelectedUser(user.id)}
+                onClick={() => setSelectedUser(user)}
                 hover
-                selected={selectedUser === user.id}
+                selected={selectedUser.id === user.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                 <TableCell>
@@ -115,7 +115,7 @@ function UserTableArea({selectedUser, setSelectedUser}){
                 )}
                 onChange={(event, user) => {
                     if (user) {
-                        setSelectedUser(user.id)
+                        setSelectedUser(user)
                     }
                 }}
                 onInputChange={(event, newInputValue) => {

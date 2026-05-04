@@ -24,10 +24,11 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import fetchData from '../helpers/Fetcher';
 
 import UserTableArea from './UserTableArea';
+import UserDetailsArea from './UserDetailsArea';
 
 function HomePage(){
 
-    const [selectedUser, setSelectedUser] = useState(-1);
+    const [selectedUser, setSelectedUser] = useState({});
 
     return (
       <Box sx={{ gap: 2, display: 'flex', bgcolor: 'white', height:'100%'}} >
@@ -35,7 +36,9 @@ function HomePage(){
             <UserTableArea selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
         </Box>
 
-        <Box sx={{ display: 'flex', bgcolor: 'green', flexGrow: 1, height:'100%'}} ><h1>future content</h1></Box>
+        <Box sx={{ display: 'flex', bgcolor: 'green', flexGrow: 1, height:'100%'}} >
+          <UserDetailsArea selectedUser={selectedUser} />
+        </Box>
         
     
       </Box>
