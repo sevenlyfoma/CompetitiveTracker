@@ -56,6 +56,7 @@ function UserMatchRow({selectedUser, match}){
 
     let dateObj = new Date(match.dateOfMatch);
     let dateStr = dateObj.toLocaleString()
+    
 
     return (
         <TableRow
@@ -102,8 +103,7 @@ function UserMatchTable({selectedUser, matches, pageNumber}){
 
 const pageSize = 8
 
-function UserDetailsArea({selectedUser}){
-
+function UserDetailsAreaPresent({selectedUser}){
     const [data, setData] = useState([]);
 
     useEffect(() => {if (selectedUser?.id != null) {fetchData(`/api/matches/all/${selectedUser.id}`, setData);}}, [selectedUser]);
@@ -114,35 +114,66 @@ function UserDetailsArea({selectedUser}){
     useEffect(() => {setTotalPageNumber(Math.ceil(data.length / pageSize))}, [data]);
 
     return (
-        <Box sx={{ gap: 2, display: 'flex', bgcolor: 'white', width: '100%', height:'100%'}} >
-            <Stack  spacing={2} sx={{ bgcolor: 'white', height:'100%'}}>
-            <h2>{selectedUser.name} ({selectedUser.pronouns})</h2>
-            <h3>{selectedUser.rating} elo</h3>
+        <>
+        {data.length != 0 ? (
+            <Box sx={{ gap: 2, display: 'flex', bgcolor: 'white', width: '100%', height:'100%'}} >
+                <Stack  spacing={2} sx={{ bgcolor: 'white', height:'100%'}}>
+                <h2>{selectedUser.name} ({selectedUser.pronouns})</h2>
+                <h3>{selectedUser.rating} elo</h3>
 
-            <Box sx={{ display: 'flex', flexGrow: 1}} >
-                <UserMatchTable matches={data} selectedUser={selectedUser} pageNumber={pageNumber}/>
-            </Box>
+                <Box sx={{ display: 'flex', flexGrow: 1}} >
+                    <UserMatchTable matches={data} selectedUser={selectedUser} pageNumber={pageNumber}/>
+                </Box>
 
-            <Pagination 
-                count={totalPageNumber} 
-                page={pageNumber + 1} 
-                onChange={(event, value) => setPageNumber(value - 1)} 
-                color="primary" 
-            />
+                <Pagination 
+                    count={totalPageNumber} 
+                    page={pageNumber + 1} 
+                    onChange={(event, value) => setPageNumber(value - 1)} 
+                    color="primary" 
+                />
+                
+
+
+
+                </Stack>
+
+                <Box sx={{ display: 'flex', flexGrow: 1}} >
+
+                    <MatchHistoryGraph user={selectedUser} matches={data} />
+                </Box>
             
 
-
-
-            </Stack>
-
-            <Box sx={{ display: 'flex', flexGrow: 1}} >
-
-                <MatchHistoryGraph user={selectedUser} matches={data} />
             </Box>
-        
+        ) : (
+            <UserDetailsAreaAbsent message={"User has no matches on record"}/>
+        )}
+        </>
+    );
+}
 
+function UserDetailsAreaAbsent({message}){
+    return (
+        <Box sx={{ display: 'flex', bgcolor: 'white', width: '100%', height:'100%',justifyContent: 'center', alignItems: 'center'}} >
+            <Typography variant="h6" color="text.secondary">
+                {message}
+            </Typography>
         </Box>
     );
+}
+
+function UserDetailsArea({selectedUser}){
+
+    return (
+        <>
+        {selectedUser?.id != null ? (
+            <UserDetailsAreaPresent selectedUser={selectedUser}/>
+        ) : (
+            <UserDetailsAreaAbsent message={"Select or search for a player to see their match history"}/>
+        )}
+        
+        </>
+    )
+    
 }
 
 export default UserDetailsArea;

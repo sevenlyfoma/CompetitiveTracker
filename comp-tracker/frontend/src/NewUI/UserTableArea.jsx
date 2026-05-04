@@ -26,6 +26,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import fetchData from '../helpers/Fetcher';
 
+import { Link } from 'react-router-dom';
+
 
 const pageSize = 7;
 
@@ -44,6 +46,12 @@ function UserTable({users, selectedUser, setSelectedUser, pageNumber}){
             {users.map((user, index) => (
                 <TableRow
                 key={user.id}
+
+                // component={Link}
+                        
+                // to={`#${user.id}`}
+
+
                 onClick={() => setSelectedUser(user)}
                 hover
                 selected={selectedUser.id === user.id}
