@@ -17,7 +17,7 @@ import HomeIcon from '@mui/icons-material/Home';
 
 import { AppBar, Toolbar, Button, Stack, Typography} from '@mui/material';
 
-import fetchData from '../helpers/Fetcher';
+import {fetchData} from '../helpers/Fetcher';
 
 function HorizontalNav() {
   return (
@@ -43,7 +43,7 @@ function HorizontalNav() {
 
           <Button 
             component={Link} 
-            to="/create-user" 
+            to="/create/user" 
             startIcon={<AddIcon />}
             color="inherit"
           >

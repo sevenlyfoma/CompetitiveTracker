@@ -24,7 +24,7 @@ import TextField from '@mui/material/TextField';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-import fetchData from '../helpers/Fetcher';
+import {fetchData} from '../helpers/Fetcher';
 
 import { Link } from 'react-router-dom';
 

@@ -21,7 +21,7 @@ import Pagination from '@mui/material/Pagination';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-import fetchData from '../helpers/Fetcher';
+import {fetchData} from '../helpers/Fetcher';
 
 import UserTableArea from './UserTableArea';
 import UserDetailsArea from './UserDetailsArea';

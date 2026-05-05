@@ -10,6 +10,8 @@ import { Toaster } from 'react-hot-toast';
 import Layout from './NewUI/Layout.jsx';
 import HomePage from './NewUI/Homepage.jsx';
 
+import UserCreatePage from './NewUI/UserCreatePage.jsx';
+
 // import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
 import CssBaseline from '@mui/material/CssBaseline';
@@ -23,6 +25,7 @@ function App() {
       <Routes>
          <Route path="/" element={< Layout />}>
           <Route path='home' element={<HomePage />} />
+          <Route path='create/user' element={<UserCreatePage />} />
           {/* <Route path="" element={< UserList />} />
           <Route path="userpages/:userID" element={<UserMatchList />} />
           <Route path="tournaments" element={<TournamentList />} />
