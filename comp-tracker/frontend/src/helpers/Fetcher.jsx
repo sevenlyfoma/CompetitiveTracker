@@ -22,12 +22,13 @@ export async function fetchData(pathname, setData){
     }   
 }
 
-export async function postData(pathname, sendData, onPost){
+export async function sendData(method, pathname, sendData, onPost){
+    if (method !== 'POST' && method !== 'PUT') return;
     try {
         if (!window.confirm("Are you sure the entered data is correct")) return;
 
         const response = await fetch(pathname, {
-            method: 'POST',
+            method: method,
             headers: {
             'Content-Type': 'application/json',
             },

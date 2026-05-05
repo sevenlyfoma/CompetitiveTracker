@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 
 import { useState, useEffect } from 'react'
 
-import { postData } from '../helpers/Fetcher';
+import { sendData } from '../helpers/Fetcher';
 
 import toast from 'react-hot-toast';
 
@@ -35,14 +35,14 @@ function UserCreatePage(){
             <h1>Enter New User Details</h1>
 
             <TextField id="name-entry-field" label="Name" variant="outlined" 
-                sx={{ width: '20%',}}
+                sx={{maxWidth: 360 }}
                 name='name'
                 value={user.name}
                 onChange={(event) => {handleChange(event)}}
             />
 
             <TextField id="email-entry-field" label="Email" variant="outlined" 
-                sx={{ width: '20%',}}
+                sx={{maxWidth: 360 }}
                 name='email'
                 value={user.email}
                 onChange={(event) => {handleChange(event)}}
@@ -50,16 +50,16 @@ function UserCreatePage(){
 
 
             <TextField id="pronoun-entry-field" label="Pronouns" variant="outlined" 
-                sx={{ width: '20%',}}
+                sx={{ maxWidth: 360}}
                 name='pronouns'
                 value={user.pronouns}
                 onChange={(event) => {handleChange(event)}}
             />
 
             <Button variant="contained"
-                sx={{ width: '20%',}}
+                sx={{maxWidth: 360}}
                 onClick={() => {
-                    postData(`/api/users`, user, onPost)
+                    sendData('POST', `/api/users`, user, onPost)
                 }}
             >Submit</Button>
 
