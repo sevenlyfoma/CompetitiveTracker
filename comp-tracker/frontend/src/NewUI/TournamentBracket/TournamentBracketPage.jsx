@@ -19,14 +19,18 @@ import Stack from '@mui/material/Stack';
 
 import Typography from '@mui/material/Typography';
 
-import BoundaryNode from './BoundaryNode';
-import MatchNode from './MatchNode';
-import LossNode from './LossNode';
-import RoundTitleNode from './RoundTitleNode';
-import FirstCornerDefinedDistanceStepEdge from './FirstCornerDefinedDistanceStepEdge';
+import BoundaryNode from './CustomNodesEdges/BoundaryNode';
+import MatchNode from './CustomNodesEdges/MatchNode';
+import LossNode from './CustomNodesEdges/LossNode';
+import RoundTitleNode from './CustomNodesEdges/RoundTitleNode';
+import FirstCornerDefinedDistanceStepEdge from './CustomNodesEdges/FirstCornerDefinedDistanceStepEdge';
+
+import {fetchData, sendData} from '../../helpers/Fetcher';
 
 const nodeTypes = {boundary: BoundaryNode, matchUser: MatchNode, loss: LossNode, roundTitle: RoundTitleNode};
 const edgeTypes = {fcddse: FirstCornerDefinedDistanceStepEdge};
+
+const roundLabelHeight = 100;
 
 function create_boundary_boxes(canvasDimensions){
 
@@ -62,8 +66,18 @@ function create_boundary_boxes(canvasDimensions){
     return boundaryBoxes
 }
 
+function find_canvas_size(setCanvasDimensions, topTournamentMatch){
+    setCanvasDimensions({width: 400, height: 400})
+}
+
 function TournamentBracketPageInner({selectedTournament}) {
-    const [canvasDimensions, setCanvasDimensions] = useState({width: 400, height: 400})
+    const [canvasDimensions, setCanvasDimensions] = useState({width: 4000, height: 4000})
+
+    const [topTournamentMatch, setTopTournamentMatch] = useState(null);
+
+    useEffect(() => {fetchData(`/api/tournament_matches/top/${selectedTournament.id}`, setTopTournamentMatch);}, []);
+
+    useEffect(() => {find_canvas_size(setCanvasDimensions, topTournamentMatch)}, [topTournamentMatch]);
 
     const boundaryBoxes = create_boundary_boxes(canvasDimensions);
 
@@ -71,6 +85,27 @@ function TournamentBracketPageInner({selectedTournament}) {
 
     const totalNodes = initialNodes.concat(boundaryBoxes)
 
+    const translateLimit = [
+        [-1000, -1000],
+        [canvasDimensions.width, canvasDimensions.height],
+    ];
+
+    const { setViewport, getViewport } = useReactFlow();
+      
+    const handleMove = useCallback((event, viewport) => {
+        if (viewport.y > 0) {
+            setViewport(
+            { ...viewport, y: 0 }, 
+            { duration: 0 }
+            );
+        }
+        if (viewport.x > 0) {
+            setViewport(
+            { ...viewport, x: 0 }, 
+            { duration: 0 }
+            );
+        }
+    }, [setViewport]);
 
 
     return (
@@ -83,6 +118,8 @@ function TournamentBracketPageInner({selectedTournament}) {
             nodes={totalNodes}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
+            translateExtent={translateLimit}
+            onMove={handleMove}
         ></ReactFlow>
         
         </Stack>
