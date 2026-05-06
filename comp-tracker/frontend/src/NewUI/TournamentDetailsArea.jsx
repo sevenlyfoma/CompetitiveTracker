@@ -30,6 +30,7 @@ import {TextField} from '@mui/material';
 
 import toast from 'react-hot-toast';
 
+import TournamentBracketPage from './TournamentBracket/TournamentBracketPage';
 
 
 function TournamentNotSelectedArea({message}){
@@ -224,7 +225,7 @@ function TournamentDetailsArea({selectedTournament, setSelectedTournament, tourn
                 ( <>
                 
                 {selectedTournament?.closed ? 
-                    (<h1>Closed</h1>) 
+                    (<TournamentBracketPage selectedTournament={selectedTournament} />) 
                 :
                     (<OpenTournamentArea tournamentList={tournamentList} setTournamentList={setTournamentList} entrants={entrants} selectedTournament={selectedTournament} setSelectedTournament={setSelectedTournament} fetchEntrants={fetchEntrants}/>)}
                 </>
