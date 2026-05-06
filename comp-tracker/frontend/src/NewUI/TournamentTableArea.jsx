@@ -68,17 +68,15 @@ function TournamentTable({tournaments, selectedTournament, setSelectedTournament
 }
 
 
-function TournamentTableArea({selectedTournament, setSelectedTournament}){
+function TournamentTableArea({selectedTournament, setSelectedTournament, tournamentList, setTournamentList}){
 
     const [pageNumber, setPageNumber] = useState(0);
 
-    const [data, setData] = useState([]);
-
     const [totalPageNumber, setTotalPageNumber] = useState(0);
 
-    useEffect(() => {setTotalPageNumber(Math.ceil(data.length / pageSize))}, [data]);
+    useEffect(() => {setTotalPageNumber(Math.ceil(tournamentList.length / pageSize))}, [tournamentList]);
 
-    useEffect(() => {fetchData(`/api/tournaments/all`, setData);}, []);
+    useEffect(() => {fetchData(`/api/tournaments/all`, setTournamentList);}, []);
 
     return (
         <Stack  spacing={2} sx={{ bgcolor: 'white', height:'100%'}}>
@@ -89,7 +87,7 @@ function TournamentTableArea({selectedTournament, setSelectedTournament}){
             </Box>
 
             <Box sx={{flexGrow: 1, minHeight: 0}} >
-                <TournamentTable tournaments={data} selectedTournament={selectedTournament} setSelectedTournament={setSelectedTournament} pageNumber={pageNumber}/>
+                <TournamentTable tournaments={tournamentList} selectedTournament={selectedTournament} setSelectedTournament={setSelectedTournament} pageNumber={pageNumber}/>
             </Box>
 
             <Pagination 

@@ -23,7 +23,7 @@ export async function fetchData(pathname, setData){
 }
 
 export async function sendData(method, pathname, sendData, onPost){
-    if (method !== 'POST' && method !== 'PUT') return;
+    if (method !== 'POST' && method !== 'PUT' && method !== 'DELETE') return;
     try {
         if (!window.confirm("Are you sure the entered data is correct")) return;
 

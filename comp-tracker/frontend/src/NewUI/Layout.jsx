@@ -72,7 +72,7 @@ function Layout() {
 
       <HorizontalNav />
 
-      <Box component="main"  sx={{ flexGrow: 1, p:3, width: '100%', height: '100%', boxSizing: 'border-box'}} >
+      <Box component="main"  sx={{ flexGrow: 1, p:3, width: '100%', height: '100%', boxSizing: 'border-box', minHeight:0}} >
         <Outlet />
       </Box>
 
