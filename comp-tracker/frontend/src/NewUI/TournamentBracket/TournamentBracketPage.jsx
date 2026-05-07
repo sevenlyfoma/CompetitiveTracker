@@ -66,16 +66,80 @@ function create_boundary_boxes(canvasDimensions){
     return boundaryBoxes
 }
 
+
 function find_canvas_size(setCanvasDimensions, topTournamentMatch){
     setCanvasDimensions({width: 400, height: 400})
+}
+
+function appendDimensions(match){
+    if (match === undefined || match === null){
+    return null;
+  }
+
+  if (match.parents[0]?.parentMatch == null && match.parents[1].parentMatch == null
+      ||match.parents[0]?.inheritsParentMatchWinner != true && match.parents[1]?.inheritsParentMatchWinner != true
+  ){
+    match.height = 1;
+    match.depth = 1;
+    return match;
+  }
+
+  let p1 = null
+  let p2 = null
+
+  let p1D = 0;
+  let p1H = 0;
+  
+  let p2D = 0;
+  let p2H = 0;
+
+
+  if (match.parents[0]?.inheritsParentMatchWinner == true){
+    p1 = appendDimensions(match.parents[0]?.parentMatch);
+    if (p1 != null){
+        p1D = p1.depth;
+      p1H = p1.height;
+    }
+    
+  }
+   
+ if (match.parents[1]?.inheritsParentMatchWinner == true){
+    p2 = appendDimensions(match.parents[1]?.parentMatch);
+    if (p2 != null){
+      p2D = p2.depth;
+      p2H = p2.height;
+    }
+   
+  } 
+  
+
+  match.height = p1H + p2H;
+
+  if (p1D > p2D) {
+    match.depth = p1D + 1;
+  }
+  else  {
+    match.depth = p2D + 1;
+  }
+
+  return match;
 }
 
 function TournamentBracketPageInner({selectedTournament}) {
     const [canvasDimensions, setCanvasDimensions] = useState({width: 4000, height: 4000})
 
+    const [topTournamentMatchRaw, setTopTournamentMatchRaw] = useState(null);
+
     const [topTournamentMatch, setTopTournamentMatch] = useState(null);
 
-    useEffect(() => {fetchData(`/api/tournament_matches/top/${selectedTournament.id}`, setTopTournamentMatch);}, []);
+    useEffect(() => {fetchData(`/api/tournament_matches/top/${selectedTournament.id}`, setTopTournamentMatchRaw);}, []);
+
+    useEffect(() => {
+        let appended = appendDimensions(topTournamentMatchRaw);
+        console.log(appended)
+        setTopTournamentMatch(appended)
+    
+    }, [topTournamentMatchRaw]);
 
     useEffect(() => {find_canvas_size(setCanvasDimensions, topTournamentMatch)}, [topTournamentMatch]);
 
