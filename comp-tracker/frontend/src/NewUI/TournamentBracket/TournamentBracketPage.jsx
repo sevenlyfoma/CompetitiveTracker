@@ -66,6 +66,204 @@ function create_boundary_boxes(canvasDimensions){
     return boundaryBoxes
 }
 
+function makeNodes(topMatch, canvasDimensions){
+
+    const {width, height} = canvasDimensions;
+
+    let nHeight = height;
+
+    let {nodes, edges, lossLinkMarks, roundTitlesAndPositions} = makeNodesRecursive(topMatch, roundLabelHeight, nHeight, width-200, topMatch?.tournament?.style, 0, 0)
+
+    // const seen = new Set();
+
+    // const uniqueTitlesAndPositions = roundTitlesAndPositions.filter(item => {
+    // // Create a unique key for the pair
+    // const key = `${item.title}|${item.positionX}`;
+    
+    //     if (seen.has(key)) {
+    //     return false;
+    //     } else {
+    //     seen.add(key); 
+    //     return true; 
+    // }
+    // });
+
+    // for (let i = 0; i < uniqueTitlesAndPositions.length; i++){
+    //     let item  = uniqueTitlesAndPositions[i];
+
+    //     nodes.push({id: "title_"+item.title, type: 'roundTitle', position: { x: item.positionX, y: item.positionY}, style: { width: 100, height: 100}, data: { roundTitle: item.title }})
+
+
+
+    // }
+
+    // let lossNodes = [];
+
+    // for (let i = 0; i < lossLinkMarks.length; i++) {
+    //     let mark = lossLinkMarks[i].id;
+    //     let match = lossLinkMarks[i].match;
+
+    //     let id = "match_"+mark
+
+    //     let node = nodes.find(x => {return x.id === id})
+
+    //     let lossNodeId = "sendLoss"+node.id;
+    //     let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+160, y: node.position.y+12.5}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
+    //     edges.push({id: "e-"+lossNodeId+"-"+node.id, target: node.id, source: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
+    //     lossNodes.push(lossNode);
+    // }
+
+    // return {nodes: nodes.concat(lossNodes), edges: edges}
+}
+
+function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
+
+  // console.log(match)
+
+  
+
+
+  if (match !== undefined && match !== null){
+
+    // let sorted = match.parents.sort((a, b) => {
+    //   return a.parentMatch.matchNumber - b.parentMatch.matchNumber;
+    // });#
+
+    
+
+
+    let nodes =[]
+    let edges = []
+    let lossLinkMarks = []
+    let roundTitlesAndPositions = []
+
+    roundTitlesAndPositions.push({title: match.matchTitle, positionX: x, positionY: titleY})
+    
+  
+    let height = 25
+    let width = 100
+
+    let nx = x;
+    // console.log(match);
+    // if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false) {nx += 50;}
+
+    let splitpoint = 0.5;
+    if (match.inheritsParentMatch1Winner == true && match.inheritsParentMatch2Winner == true){
+      splitpoint = match.parentMatch1.height / (match.parentMatch1.height + match.parentMatch2.height)
+    }
+    // console.log("Split-point: " + splitpoint)
+    
+    
+
+
+    let y = minY + ((maxY -minY) * splitpoint)
+
+    // console.log(match.id + " " + minY + " " + maxY + " " + splitpoint + " " + y)
+
+    let node_id = "match_"+match.id
+    nodes.push({id: node_id, type: 'matchUser', position: { x: nx, y: y-25}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
+    
+    
+    let topNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: [], roundTitlesAndPositions : []};
+    let botNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: [], roundTitlesAndPositions : []};
+
+
+    //Makes it so if only one parent is a winner, then we dont brach, we draw in a straight line
+    let nMinY = minY;
+    let nMaxY = maxY
+    
+    if (match.inheritsParentMatch1Winner == true){
+      nMinY = y;
+    }
+    if (match.inheritsParentMatch2Winner == true){
+      nMaxY = y;
+    }
+
+    // if (match.id == 46){console.log(nMinY + " " + nMaxY)}
+
+    let topnx = x - 200;
+    let botnx = x - 200
+
+    let nTitleY = titleY;
+
+    if(match.matchNumber == 0 && style === "double"){
+      let p1Depth = match.parentMatch1.depth;
+      let p2Depth = match.parentMatch2.depth;
+      if (p2Depth > p1Depth)  {
+           topnx -= (p2Depth - p1Depth) * 200
+      } 
+      if (p1Depth > p2Depth) {
+        botnx -= (p1Depth - p2Depth) * 200
+      }
+
+      nMinY += roundLabelHeight * (1-splitpoint)
+      nMaxY -= roundLabelHeight * splitpoint
+
+      nTitleY = nMaxY
+     
+    }
+    
+    if (match.inheritsParentMatch1Winner == true) {
+      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, topnx, style, depth +1, titleY)
+    }
+    if (match.inheritsParentMatch2Winner == true) {
+      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, botnx, style, depth +1, nTitleY)
+    }
+
+    let lossNodes = []
+
+    
+    if (match.parentMatch1 !== null){
+      let parent1_node_id = "match_"+match.parentMatch1.id
+      let col = match.inheritsParentMatch1Winner == true ? 'green' : 'red';
+      if (match.inheritsParentMatch1Winner == true) {
+        edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id,  data: {dist:50}, target: parent1_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
+      }
+      else if (match.inheritsParentMatch1Winner == false){
+        let lossNodeId = "receiveLoss1"+node_id;
+        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y-40}, style: { width: 25, height: 25}, data: { label: match.parentMatch1.matchNumber, showRightHandle: true }}
+        edges.push({id: "e-"+lossNodeId+"-"+match.id, target: lossNodeId, source: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
+        lossNodes.push(receiveLossNode);
+
+        lossLinkMarks.push({id: match.parentMatch1.id, match: match.parentMatch1});
+      }
+    }
+    if (match.parentMatch2 !== null){
+      let parent2_node_id = "match_"+match.parentMatch2.id
+      let col = match.inheritsParentMatch2Winner == true ? 'green' : 'red';
+      if (match.inheritsParentMatch2Winner == true) {
+        edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, data: {dist:50} , target:parent2_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
+      }
+      else if (match.inheritsParentMatch2Winner == false){
+        let lossNodeId = "receiveLoss2"+node_id;
+        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y+15}, style: { width: 25, height: 25}, data: { label: match.parentMatch2.matchNumber, showRightHandle: true }}
+        edges.push({id: "e-"+lossNodeId+"-"+match.id, target: lossNodeId, source: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
+        lossNodes.push(receiveLossNode);
+
+        lossLinkMarks.push({id: match.parentMatch2.id, match: match.parentMatch2});
+      }
+    } 
+
+      
+  
+    // console.log(lossLinkMarks)
+    
+
+
+    return {
+      nodes: nodes.concat(topNodesAndEdges.nodes).concat(botNodesAndEdges.nodes).concat(lossNodes), 
+      edges: edges.concat(topNodesAndEdges.edges).concat(botNodesAndEdges.edges),
+      lossLinkMarks: lossLinkMarks.concat(topNodesAndEdges.lossLinkMarks).concat(botNodesAndEdges.lossLinkMarks),
+      roundTitlesAndPositions: roundTitlesAndPositions.concat(topNodesAndEdges.roundTitlesAndPositions).concat(botNodesAndEdges.roundTitlesAndPositions)
+    }
+  }
+
+  
+ 
+
+
+  return {nodes: [], edges: [], lossLinkMarks: [], roundTitlesAndPositions: []};
+}
 
 function find_canvas_size(setCanvasDimensions, topMatch){
     let height = topMatch?.height;
