@@ -74,63 +74,51 @@ function makeNodes(topMatch, canvasDimensions){
 
     let {nodes, edges, lossLinkMarks, roundTitlesAndPositions} = makeNodesRecursive(topMatch, roundLabelHeight, nHeight, width-200, topMatch?.tournament?.style, 0, 0)
 
-    // const seen = new Set();
+    const seen = new Set();
 
-    // const uniqueTitlesAndPositions = roundTitlesAndPositions.filter(item => {
-    // // Create a unique key for the pair
-    // const key = `${item.title}|${item.positionX}`;
+    const uniqueTitlesAndPositions = roundTitlesAndPositions.filter(item => {
+    // Create a unique key for the pair
+    const key = `${item.title}|${item.positionX}`;
     
-    //     if (seen.has(key)) {
-    //     return false;
-    //     } else {
-    //     seen.add(key); 
-    //     return true; 
-    // }
-    // });
+        if (seen.has(key)) {
+        return false;
+        } else {
+        seen.add(key); 
+        return true; 
+    }
+    });
 
-    // for (let i = 0; i < uniqueTitlesAndPositions.length; i++){
-    //     let item  = uniqueTitlesAndPositions[i];
+    for (let i = 0; i < uniqueTitlesAndPositions.length; i++){
+        let item  = uniqueTitlesAndPositions[i];
 
-    //     nodes.push({id: "title_"+item.title, type: 'roundTitle', position: { x: item.positionX, y: item.positionY}, style: { width: 100, height: 100}, data: { roundTitle: item.title }})
+        nodes.push({id: "title_"+item.title, type: 'roundTitle', position: { x: item.positionX, y: item.positionY}, style: { width: 100, height: 100}, data: { roundTitle: item.title }})
 
 
 
-    // }
+    }
 
-    // let lossNodes = [];
+    let lossNodes = [];
 
-    // for (let i = 0; i < lossLinkMarks.length; i++) {
-    //     let mark = lossLinkMarks[i].id;
-    //     let match = lossLinkMarks[i].match;
+    for (let i = 0; i < lossLinkMarks.length; i++) {
+        let mark = lossLinkMarks[i].id;
+        let match = lossLinkMarks[i].match;
 
-    //     let id = "match_"+mark
+        let id = "match_"+mark
 
-    //     let node = nodes.find(x => {return x.id === id})
+        let node = nodes.find(x => {return x.id === id})
 
-    //     let lossNodeId = "sendLoss"+node.id;
-    //     let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+160, y: node.position.y+12.5}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
-    //     edges.push({id: "e-"+lossNodeId+"-"+node.id, target: node.id, source: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
-    //     lossNodes.push(lossNode);
-    // }
+        let lossNodeId = "sendLoss"+node.id;
+        let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+160, y: node.position.y+12.5}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
+        edges.push({id: "e-"+lossNodeId+"-"+node.id, target: node.id, source: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
+        lossNodes.push(lossNode);
+    }
 
-    // return {nodes: nodes.concat(lossNodes), edges: edges}
+    return {nodes: nodes.concat(lossNodes), edges: edges}
 }
 
 function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
 
-  // console.log(match)
-
-  
-
-
   if (match !== undefined && match !== null){
-
-    // let sorted = match.parents.sort((a, b) => {
-    //   return a.parentMatch.matchNumber - b.parentMatch.matchNumber;
-    // });#
-
-    
-
 
     let nodes =[]
     let edges = []
@@ -139,26 +127,20 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
 
     roundTitlesAndPositions.push({title: match.matchTitle, positionX: x, positionY: titleY})
     
-  
     let height = 25
     let width = 100
 
     let nx = x;
-    // console.log(match);
-    // if (match.inheritsParentMatch1Winner == false || match.inheritsParentMatch2Winner == false) {nx += 50;}
 
     let splitpoint = 0.5;
     if (match.inheritsParentMatch1Winner == true && match.inheritsParentMatch2Winner == true){
       splitpoint = match.parentMatch1.height / (match.parentMatch1.height + match.parentMatch2.height)
     }
-    // console.log("Split-point: " + splitpoint)
     
     
 
 
     let y = minY + ((maxY -minY) * splitpoint)
-
-    // console.log(match.id + " " + minY + " " + maxY + " " + splitpoint + " " + y)
 
     let node_id = "match_"+match.id
     nodes.push({id: node_id, type: 'matchUser', position: { x: nx, y: y-25}, style: { width: width, height: height*2}, data: { match: match, showLeftHandle: true, showRightHandle: true }})
@@ -168,7 +150,6 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
     let botNodesAndEdges = {nodes: [], edges: [], lossLinkMarks: [], roundTitlesAndPositions : []};
 
 
-    //Makes it so if only one parent is a winner, then we dont brach, we draw in a straight line
     let nMinY = minY;
     let nMaxY = maxY
     
@@ -178,8 +159,6 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
     if (match.inheritsParentMatch2Winner == true){
       nMaxY = y;
     }
-
-    // if (match.id == 46){console.log(nMinY + " " + nMaxY)}
 
     let topnx = x - 200;
     let botnx = x - 200
@@ -243,12 +222,6 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
         lossLinkMarks.push({id: match.parentMatch2.id, match: match.parentMatch2});
       }
     } 
-
-      
-  
-    // console.log(lossLinkMarks)
-    
-
 
     return {
       nodes: nodes.concat(topNodesAndEdges.nodes).concat(botNodesAndEdges.nodes).concat(lossNodes), 
