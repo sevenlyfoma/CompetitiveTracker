@@ -27,6 +27,8 @@ import FirstCornerDefinedDistanceStepEdge from './CustomNodesEdges/FirstCornerDe
 
 import {fetchData, sendData} from '../../helpers/Fetcher';
 
+import './TournamentBracketPage.css'
+
 const nodeTypes = {boundary: BoundaryNode, matchUser: MatchNode, loss: LossNode, roundTitle: RoundTitleNode};
 const edgeTypes = {fcddse: FirstCornerDefinedDistanceStepEdge};
 
@@ -120,6 +122,12 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
 
   if (match !== undefined && match !== null){
 
+    let p1Match = match.parents[0]?.parentMatch;
+    let p2Match = match.parents[1]?.parentMatch;
+
+    let p1IWin = match.parents[0]?.inheritsParentMatchWinner;
+    let p2IWin = match.parents[1]?.inheritsParentMatchWinner;
+
     let nodes =[]
     let edges = []
     let lossLinkMarks = []
@@ -133,8 +141,8 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
     let nx = x;
 
     let splitpoint = 0.5;
-    if (match.inheritsParentMatch1Winner == true && match.inheritsParentMatch2Winner == true){
-      splitpoint = match.parentMatch1.height / (match.parentMatch1.height + match.parentMatch2.height)
+    if (p1IWin == true && p2IWin == true){
+      splitpoint = p1Match.height / (p1Match.height + p2Match.height)
     }
     
     
@@ -153,10 +161,10 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
     let nMinY = minY;
     let nMaxY = maxY
     
-    if (match.inheritsParentMatch1Winner == true){
+    if (p1IWin == true){
       nMinY = y;
     }
-    if (match.inheritsParentMatch2Winner == true){
+    if (p2IWin == true){
       nMaxY = y;
     }
 
@@ -166,8 +174,8 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
     let nTitleY = titleY;
 
     if(match.matchNumber == 0 && style === "double"){
-      let p1Depth = match.parentMatch1.depth;
-      let p2Depth = match.parentMatch2.depth;
+      let p1Depth = p1Match.depth;
+      let p2Depth = p2Match.depth;
       if (p2Depth > p1Depth)  {
            topnx -= (p2Depth - p1Depth) * 200
       } 
@@ -182,44 +190,44 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY){
      
     }
     
-    if (match.inheritsParentMatch1Winner == true) {
-      topNodesAndEdges = makeNodesRecursive(match.parentMatch1, minY, nMaxY, topnx, style, depth +1, titleY)
+    if (p1IWin == true) {
+      topNodesAndEdges = makeNodesRecursive(p1Match, minY, nMaxY, topnx, style, depth +1, titleY)
     }
-    if (match.inheritsParentMatch2Winner == true) {
-      botNodesAndEdges = makeNodesRecursive(match.parentMatch2, nMinY, maxY, botnx, style, depth +1, nTitleY)
+    if (p2IWin == true) {
+      botNodesAndEdges = makeNodesRecursive(p2Match, nMinY, maxY, botnx, style, depth +1, nTitleY)
     }
 
     let lossNodes = []
 
     
-    if (match.parentMatch1 !== null){
-      let parent1_node_id = "match_"+match.parentMatch1.id
-      let col = match.inheritsParentMatch1Winner == true ? 'green' : 'red';
-      if (match.inheritsParentMatch1Winner == true) {
-        edges.push({id: "e-"+match.parentMatch1.id+"-"+match.id,  data: {dist:50}, target: parent1_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
+    if (p1Match !== null){
+      let parent1_node_id = "match_"+p1Match.id
+      let col = p1IWin == true ? 'green' : 'red';
+      if (p1IWin == true) {
+        edges.push({id: "e-"+p1Match.id+"-"+match.id,  data: {dist:50}, target: parent1_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
       }
-      else if (match.inheritsParentMatch1Winner == false){
+      else if (p1IWin == false){
         let lossNodeId = "receiveLoss1"+node_id;
-        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y-40}, style: { width: 25, height: 25}, data: { label: match.parentMatch1.matchNumber, showRightHandle: true }}
+        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y-40}, style: { width: 25, height: 25}, data: { label: p1Match.matchNumber, showRightHandle: true }}
         edges.push({id: "e-"+lossNodeId+"-"+match.id, target: lossNodeId, source: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
         lossNodes.push(receiveLossNode);
 
-        lossLinkMarks.push({id: match.parentMatch1.id, match: match.parentMatch1});
+        lossLinkMarks.push({id: p1Match.id, match: p1Match});
       }
     }
-    if (match.parentMatch2 !== null){
-      let parent2_node_id = "match_"+match.parentMatch2.id
-      let col = match.inheritsParentMatch2Winner == true ? 'green' : 'red';
-      if (match.inheritsParentMatch2Winner == true) {
-        edges.push({id: "e-"+match.parentMatch2.id+"-"+match.id, data: {dist:50} , target:parent2_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
+    if (p2Match !== null){
+      let parent2_node_id = "match_"+p2Match.id
+      let col = p2IWin == true ? 'green' : 'red';
+      if (p2IWin == true) {
+        edges.push({id: "e-"+p2Match.id+"-"+match.id, data: {dist:50} , target:parent2_node_id, source: node_id, type: "fcddse", style : {stroke: col, strokeWidth: 3,},})
       }
-      else if (match.inheritsParentMatch2Winner == false){
+      else if (p2IWin == false){
         let lossNodeId = "receiveLoss2"+node_id;
-        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y+15}, style: { width: 25, height: 25}, data: { label: match.parentMatch2.matchNumber, showRightHandle: true }}
+        let receiveLossNode = {id: lossNodeId, type: 'loss', position: { x: nx-75, y: y+15}, style: { width: 25, height: 25}, data: { label: p2Match.matchNumber, showRightHandle: true }}
         edges.push({id: "e-"+lossNodeId+"-"+match.id, target: lossNodeId, source: node_id, type: "step", style : {stroke: col, strokeWidth: 3,},})
         lossNodes.push(receiveLossNode);
 
-        lossLinkMarks.push({id: match.parentMatch2.id, match: match.parentMatch2});
+        lossLinkMarks.push({id: p2Match.id, match: p2Match});
       }
     } 
 
@@ -310,7 +318,13 @@ function TournamentBracketPageInner({selectedTournament}) {
 
     const initialNodes = [];
 
-    const totalNodes = initialNodes.concat(boundaryBoxes)
+    const initialEdges = [];
+
+    const matchNodesAndEdges = makeNodes(topTournamentMatch, canvasDimensions);
+
+    const totalNodes = initialNodes.concat(boundaryBoxes).concat(matchNodesAndEdges.nodes);
+
+    const totalEdges = initialEdges.concat(matchNodesAndEdges.edges)
 
     const translateLimit = [
         [-1000, -1000],
@@ -343,6 +357,7 @@ function TournamentBracketPageInner({selectedTournament}) {
         <ReactFlow 
             style={{ display: 'flex', flexGrow: 1, backgroundColor: '#ffffff' }}
             nodes={totalNodes}
+            edges={totalEdges}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             translateExtent={translateLimit}

@@ -1,0 +1,75 @@
+.matchUserNodeDiv {
+  color: black;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.matchUserNodeInner {
+  color: black;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  /* justify-content: left; */
+  flex-direction: row;
+
+  flex-shrink: 0; /* Keep an eye on this */
+}
+
+.matchUserNodeInner p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin: 0; 
+  padding: 0 5px;
+  box-sizing: border-box;
+}
+
+
+
+
+.matchUserNodeOuter {
+  color: black;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  /* justify-content: left; */
+  flex-direction: row;
+}
+
+.matchUserNodeOuter button {
+  box-sizing: border-box; 
+  margin: 0;             
+  padding: 0;            
+  flex-shrink: 0;  
+  background-color: blue;
+  border-radius: 0;
+}
+
+.matchUserNodeOuter button:hover {
+  box-sizing: border-box; 
+  margin: 0;             
+  padding: 0;            
+  flex-shrink: 0;  
+  background-color: cyan;
+  border-radius: 0;
+}
+
+.lossNode {
+  color: red;
+  border: 2px solid red;
+  background-color: white;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
