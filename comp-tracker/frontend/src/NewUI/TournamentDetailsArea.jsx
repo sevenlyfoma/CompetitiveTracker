@@ -218,6 +218,10 @@ function TournamentDetailsArea({selectedTournament, setSelectedTournament, tourn
             
         }
     }, [selectedTournament]);
+
+    const [selectedMatch, setSelectedMatch] = useState(null);
+    
+    useEffect(() => {console.log("Updated selected Match: " + selectedMatch);}, [selectedMatch]);
     
     return (
         <Box sx={{gap: 2, display: 'flex', bgcolor: 'white', height:'100%', width: "100%"}} >
@@ -225,7 +229,7 @@ function TournamentDetailsArea({selectedTournament, setSelectedTournament, tourn
                 ( <>
                 
                 {selectedTournament?.closed ? 
-                    (<TournamentBracketPage selectedTournament={selectedTournament} />) 
+                    (<TournamentBracketPage selectedTournament={selectedTournament} setSelectedMatch={setSelectedMatch}/>) 
                 :
                     (<OpenTournamentArea tournamentList={tournamentList} setTournamentList={setTournamentList} entrants={entrants} selectedTournament={selectedTournament} setSelectedTournament={setSelectedTournament} fetchEntrants={fetchEntrants}/>)}
                 </>

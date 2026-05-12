@@ -4,7 +4,7 @@ import { Position, Handle } from 'reactflow';
 const MatchNode = ({ data }) => {
   const navigate = useNavigate();
 
-  const {match, showLeftHandle, showRightHandle} = data;
+  const {match, showLeftHandle, showRightHandle, setSelectedMatch} = data;
 
   let label1 = "n/a";
   let label2 = "n/a";
@@ -38,7 +38,7 @@ const MatchNode = ({ data }) => {
       
       }}
 
-      onClick={() => navigate(`/tournaments/matches/${match.tournament.id}/${match.id}`)}
+      onClick={() => {setSelectedMatch(match); console.log("set selected match:" + match.id)}}
     
     >
       {/* <button 
