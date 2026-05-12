@@ -295,6 +295,25 @@ function appendDimensions(match){
 }
 
 function TournamentBracketPageInner({selectedTournament}) {
+
+    const { setViewport, getViewport } = useReactFlow();
+
+    const handleMove = useCallback((event, viewport) => {
+        if (viewport.y > 0) {
+            setViewport(
+            { ...viewport, y: 0 }, 
+            { duration: 0 }
+            );
+        }
+        if (viewport.x > 0) {
+            setViewport(
+            { ...viewport, x: 0 }, 
+            { duration: 0 }
+            );
+        }
+    }, [setViewport]);
+
+
     const [canvasDimensions, setCanvasDimensions] = useState({width: 4000, height: 4000})
 
     const [topTournamentMatchRaw, setTopTournamentMatchRaw] = useState(null);
@@ -310,9 +329,22 @@ function TournamentBracketPageInner({selectedTournament}) {
     
     }, [topTournamentMatchRaw]);
 
-    useEffect(() => {find_canvas_size(setCanvasDimensions, topTournamentMatch)}, [topTournamentMatch]);
+    useEffect(() => {
+        find_canvas_size(setCanvasDimensions, topTournamentMatch)
+        
+    
+    }, [topTournamentMatch]);
 
-    useEffect(() => {console.log(canvasDimensions)}, [canvasDimensions]);
+    useEffect(() => {console.log(canvasDimensions); 
+        setViewport(
+            { x: 0, y: 0, zoom: 0.8 }, 
+            { duration: 0 }
+            );
+
+        
+    
+    
+    }, [canvasDimensions]);
 
     const boundaryBoxes = create_boundary_boxes(canvasDimensions);
 
@@ -331,26 +363,13 @@ function TournamentBracketPageInner({selectedTournament}) {
         [canvasDimensions.width, canvasDimensions.height],
     ];
 
-    const { setViewport, getViewport } = useReactFlow();
+    
       
-    const handleMove = useCallback((event, viewport) => {
-        if (viewport.y > 0) {
-            setViewport(
-            { ...viewport, y: 0 }, 
-            { duration: 0 }
-            );
-        }
-        if (viewport.x > 0) {
-            setViewport(
-            { ...viewport, x: 0 }, 
-            { duration: 0 }
-            );
-        }
-    }, [setViewport]);
+    
 
 
     return (
-        <Stack sx={{gap: 2, display: 'flex', bgcolor: 'blue', flexGrow: 1}}>
+        <Stack sx={{gap: 2, display: 'flex', flexGrow: 1}}>
 
         <h2>Bracket for {selectedTournament.tournamentName}</h2>
 

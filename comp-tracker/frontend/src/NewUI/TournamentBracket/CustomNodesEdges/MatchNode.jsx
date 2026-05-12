@@ -8,8 +8,12 @@ const MatchNode = ({ data }) => {
 
   let label1 = "n/a";
   let label2 = "n/a";
-  if (match.user1 !== null){label1 = match.user1.name}
-  if (match.user2 !== null){label2 = match.user2.name}
+  if (match.parents[0]?.user != null){
+    label1 =match.parents[0]?.user?.name
+  }
+  if (match.parents[1]?.user != null){
+    label2 =match.parents[1]?.user?.name
+  }
 
   let user1BgColor = null;
   let user2BgColor = null;
@@ -27,14 +31,23 @@ const MatchNode = ({ data }) => {
 
 
   return (
-    <div className="matchUserNodeOuter" style={{width: '100%', height: '100%',}}>
-      <button 
-        style={{width: '20%', height: '100%',}} 
-        onClick={() => navigate(`/tournaments/matches/${match.tournament.id}/${match.id}`)}>
-
-      </button>
+    <div className="matchUserNodeOuter" 
+      style={{
+        width: '100%', height: '100%',
+        cursor: 'pointer',
       
-      <div className="matchUserNodeDiv" style={{width: '80%', height: '100%',}}>
+      }}
+
+      onClick={() => navigate(`/tournaments/matches/${match.tournament.id}/${match.id}`)}
+    
+    >
+      {/* <button 
+        style={{width: '20%', height: '100%',}} 
+       >
+
+      </button> */}
+      
+      <div className="matchUserNodeDiv" style={{width: '100%', height: '100%',}}>
         
         {showLeftHandle && (<Handle className='matchUserNodeHandle' type="source" position={Position.Left} />)}
         

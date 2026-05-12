@@ -8,8 +8,11 @@
   flex-direction: column;
 }
 
+
+
 .matchUserNodeInner {
   color: black;
+  background-color: transparent;
   border: 1px solid black;
   box-sizing: border-box;  
   display: flex;  
@@ -22,6 +25,7 @@
 }
 
 .matchUserNodeInner p {
+  background-color: transparent;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -35,8 +39,8 @@
 
 
 .matchUserNodeOuter {
-  color: black;
-  border: 1px solid black;
+  /* color: black; */
+  /* border: 1px solid black; */
   box-sizing: border-box;  
   display: flex;  
   align-items: center;
@@ -45,22 +49,10 @@
   flex-direction: row;
 }
 
-.matchUserNodeOuter button {
-  box-sizing: border-box; 
-  margin: 0;             
-  padding: 0;            
-  flex-shrink: 0;  
-  background-color: blue;
-  border-radius: 0;
-}
-
-.matchUserNodeOuter button:hover {
-  box-sizing: border-box; 
-  margin: 0;             
-  padding: 0;            
-  flex-shrink: 0;  
-  background-color: cyan;
-  border-radius: 0;
+.matchUserNodeOuter:hover {
+  background-color: #999999; /* Slight tint on hover */
+  transform: translateY(-2px); /* Subtle "lift" effect */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 .lossNode {
