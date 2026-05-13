@@ -34,6 +34,10 @@ const edgeTypes = {fcddse: FirstCornerDefinedDistanceStepEdge};
 
 const roundLabelHeight = 100;
 
+const labelWidth = 200;
+
+const minGapWith = 300;
+
 function create_boundary_boxes(canvasDimensions){
 
     const {width, height} = canvasDimensions;
@@ -74,7 +78,7 @@ function makeNodes(topMatch, canvasDimensions, setSelectedMatch){
 
     let nHeight = height;
 
-    let {nodes, edges, lossLinkMarks, roundTitlesAndPositions} = makeNodesRecursive(topMatch, roundLabelHeight, nHeight, width-200, topMatch?.tournament?.style, 0, 0, setSelectedMatch)
+    let {nodes, edges, lossLinkMarks, roundTitlesAndPositions} = makeNodesRecursive(topMatch, roundLabelHeight, nHeight, width-(minGapWith), topMatch?.tournament?.style, 0, 0, setSelectedMatch)
 
     const seen = new Set();
 
@@ -110,7 +114,7 @@ function makeNodes(topMatch, canvasDimensions, setSelectedMatch){
         let node = nodes.find(x => {return x.id === id})
 
         let lossNodeId = "sendLoss"+node.id;
-        let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+160, y: node.position.y+12.5}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
+        let lossNode = {id: lossNodeId, type: 'loss', position: { x: node.position.x+labelWidth+60, y: node.position.y+12.5}, style: { width: 25, height: 25}, data: { label: match.matchNumber, showLeftHandle: true }}
         edges.push({id: "e-"+lossNodeId+"-"+node.id, target: node.id, source: lossNodeId, type: "step", style : {stroke: "red", strokeWidth: 3,},})
         lossNodes.push(lossNode);
     }
@@ -136,7 +140,7 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY, setSelec
         roundTitlesAndPositions.push({title: match.matchTitle, positionX: x, positionY: titleY})
         
         let height = 25
-        let width = 100
+        let width = labelWidth
 
         let nx = x;
 
@@ -168,8 +172,8 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY, setSelec
         nMaxY = y;
         }
 
-        let topnx = x - 200;
-        let botnx = x - 200
+        let topnx = x - minGapWith;
+        let botnx = x - minGapWith;
 
         let nTitleY = titleY;
 
@@ -177,10 +181,10 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY, setSelec
         let p1Depth = p1Match.depth;
         let p2Depth = p2Match.depth;
         if (p2Depth > p1Depth)  {
-            topnx -= (p2Depth - p1Depth) * 200
+            topnx -= (p2Depth - p1Depth) * minGapWith
         } 
         if (p1Depth > p2Depth) {
-            botnx -= (p1Depth - p2Depth) * 200
+            botnx -= (p1Depth - p2Depth) * minGapWith
         }
 
         nMinY += roundLabelHeight * (1-splitpoint)
@@ -253,7 +257,7 @@ function find_canvas_size(setCanvasDimensions, topMatch){
     let bracketNo = 1;
     if (topMatch?.tournament?.style === "double") {bracketNo = 2;}
 
-    let dimensions = {height: 100 + (100 * height) + (bracketNo * roundLabelHeight), width: 100 + 200 * depth};
+    let dimensions = {height: 100 + (100 * height) + (bracketNo * roundLabelHeight), width: 100 + minGapWith  * depth};
 
     setCanvasDimensions(dimensions)
 

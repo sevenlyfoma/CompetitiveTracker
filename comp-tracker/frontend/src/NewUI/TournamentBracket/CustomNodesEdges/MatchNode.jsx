@@ -31,7 +31,8 @@ const MatchNode = ({ data }) => {
 
 
   return (
-    <div className="matchUserNodeOuter" 
+    <div 
+      className="matchUserNodeOuter nopan"
       style={{
         width: '100%', height: '100%',
         cursor: 'pointer',
