@@ -195,12 +195,41 @@ function OpenTournamentArea({selectedTournament, setSelectedTournament, entrants
     )
 }
 
+function MatchDetailsArea({selectedMatch, setSelectedMatch}){
+
+    return (
+        <>
+        {   selectedMatch != null ? 
+            (<>
+                <Stack>
+                    <h1>{selectedMatch.id}</h1>
+
+                </Stack>
+                
+            
+            
+            </>) 
+            
+            
+            
+            
+            : (<></>)
+
+
+        }
+        
+        </>
+    )
+}
+
 
 function TournamentDetailsArea({selectedTournament, setSelectedTournament, tournamentList, setTournamentList}){
 
     const [entrants, setEntrants] = useState([]);
 
     const [topMatchRaw, setTopMatchRaw] = useState({});
+
+    const [selectedMatch, setSelectedMatch] = useState(null);
 
     const fetchEntrants = () => {fetchData(`/api/tournament_entrants/${selectedTournament.id}`, setEntrants);}
 
@@ -217,14 +246,18 @@ function TournamentDetailsArea({selectedTournament, setSelectedTournament, tourn
 
             
         }
+
+        setSelectedMatch(null);
+        
     }, [selectedTournament]);
 
-    const [selectedMatch, setSelectedMatch] = useState(null);
+   
     
     useEffect(() => {console.log("Updated selected Match: " + selectedMatch);}, [selectedMatch]);
     
     return (
         <Box sx={{gap: 2, display: 'flex', bgcolor: 'white', height:'100%', width: "100%"}} >
+            <MatchDetailsArea selectedMatch={selectedMatch} setSelectedMatch={setSelectedMatch}/>
             {selectedTournament?.id != null ? 
                 ( <>
                 
