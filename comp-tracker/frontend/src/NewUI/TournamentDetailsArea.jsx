@@ -197,12 +197,22 @@ function OpenTournamentArea({selectedTournament, setSelectedTournament, entrants
 
 function MatchDetailsArea({selectedMatch, setSelectedMatch}){
 
+    console.log(selectedMatch)
+    
+
+    //Surround with a paper?
+
+    let user1 = selectedMatch?.parents[0]?.user?.name ?? "Participant yet to be determined";
+    let user2 = selectedMatch?.parents[1]?.user?.name ?? "Participant yet to be determined";
+
     return (
         <>
         {   selectedMatch != null ? 
             (<>
                 <Stack>
-                    <h1>{selectedMatch.id}</h1>
+                    <h1>{selectedMatch.matchTitle}</h1>
+                    <h2>{user1}  vs {user2}</h2>
+
 
                 </Stack>
                 
