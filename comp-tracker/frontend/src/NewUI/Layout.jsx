@@ -58,6 +58,16 @@ function HorizontalNav() {
           >
             Tournaments
           </Button>
+
+          <Button 
+            component={Link} 
+            to="/create/tournament" 
+            startIcon={<AddIcon />}
+            color="inherit"
+          >
+            Create New Tournament
+          </Button>
+
         </Box>
       </Toolbar>
     </AppBar>

@@ -14,6 +14,8 @@ import UserCreatePage from './NewUI/UserCreatePage.jsx';
 
 import TournamentHome from './NewUI/TournamentHome.jsx';
 
+import TournamentCreatePage from './NewUI/TournamentCreatePage.jsx';
+
 // import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
 import CssBaseline from '@mui/material/CssBaseline';
@@ -29,6 +31,7 @@ function App() {
           <Route path='home' element={<HomePage />} />
           <Route path='create/user' element={<UserCreatePage />} />
           <Route path='tournaments' element={<TournamentHome />} />
+          <Route path='create/tournament' element={<TournamentCreatePage />} />
           {/* <Route path="" element={< UserList />} />
           <Route path="userpages/:userID" element={<UserMatchList />} />
           <Route path="tournaments" element={<TournamentList />} />
