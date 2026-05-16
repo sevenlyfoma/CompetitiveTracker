@@ -7,14 +7,14 @@ import { Toaster } from 'react-hot-toast';
 // import TournamentList from './TournamentList.jsx';
 // import TournamentEntrantList from './TournamentEntrantList.jsx';
 // import TournamentMatchPage from './TournamentMatchPage.jsx';
-import Layout from './NewUI/Layout.jsx';
-import HomePage from './NewUI/Homepage.jsx';
+import Layout from './Components/Layout.jsx';
+import HomePage from './Components/Homepage.jsx';
 
-import UserCreatePage from './NewUI/UserCreatePage.jsx';
+import UserCreatePage from './Components/UserCreatePage.jsx';
 
-import TournamentHome from './NewUI/TournamentHome.jsx';
+import TournamentHome from './Components/TournamentHome.jsx';
 
-import TournamentCreatePage from './NewUI/TournamentCreatePage.jsx';
+import TournamentCreatePage from './Components/TournamentCreatePage.jsx';
 
 // import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
