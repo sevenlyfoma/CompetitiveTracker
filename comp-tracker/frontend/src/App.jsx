@@ -2,11 +2,6 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 import { Toaster } from 'react-hot-toast';
 
-// import UserList from './UserList.jsx'
-// import UserMatchList from './UserMatchList.jsx'
-// import TournamentList from './TournamentList.jsx';
-// import TournamentEntrantList from './TournamentEntrantList.jsx';
-// import TournamentMatchPage from './TournamentMatchPage.jsx';
 import Layout from './Components/Layout.jsx';
 import HomePage from './Components/Homepage.jsx';
 
@@ -15,8 +10,6 @@ import UserCreatePage from './Components/UserCreatePage.jsx';
 import TournamentHome from './Components/TournamentHome.jsx';
 
 import TournamentCreatePage from './Components/TournamentCreatePage.jsx';
-
-// import TournamentBracketPage from '../TournamentBracket/TournamentBracketPage.jsx';
 
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -32,12 +25,6 @@ function App() {
           <Route path='create/user' element={<UserCreatePage />} />
           <Route path='tournaments' element={<TournamentHome />} />
           <Route path='create/tournament' element={<TournamentCreatePage />} />
-          {/* <Route path="" element={< UserList />} />
-          <Route path="userpages/:userID" element={<UserMatchList />} />
-          <Route path="tournaments" element={<TournamentList />} />
-          <Route path="tournaments/open/:tournamentID" element={<TournamentEntrantList/>} />
-          <Route path="tournaments/closed/:tournamentID" element={<TournamentBracketPage/>} />
-          <Route path="tournaments/matches/:tournamentID/:tournamentMatchID" element={<TournamentMatchPage />} /> */}
          </Route>
       </Routes>
     </BrowserRouter>
