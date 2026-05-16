@@ -8,25 +8,46 @@ const MatchNode = ({ data }) => {
 
   let label1 = "n/a";
   let label2 = "n/a";
+
+  
+
+  let sortedParents = match?.parents?.sort((a,b) => a.id - b.id);
+
   if (match.parents[0]?.user != null){
-    label1 =match.parents[0]?.user?.name
+    label1 = sortedParents[0]?.user?.name
   }
   if (match.parents[1]?.user != null){
-    label2 =match.parents[1]?.user?.name
+    label2 = sortedParents[1]?.user?.name
   }
 
   let user1BgColor = null;
   let user2BgColor = null;
 
   if (match?.matchRecord != null){
-    if (match?.matchRecord?.winner?.id == match?.user1?.id){
-      user1BgColor = "lightgreen";
-      user2BgColor = "red";
+    let sortedParticipants = match?.matchRecord?.participants?.sort((a,b) => a.id - b.id)
+
+    let sUser1BgColor = null;
+    let sUser2BgColor = null;
+
+    if (sortedParticipants[0].points == 1){
+      sUser1BgColor = "lightgreen";
+      sUser2BgColor = "red";
     }
     else {
-      user1BgColor = "red";
-      user2BgColor = "lightgreen";
+      sUser1BgColor = "red";
+      sUser2BgColor = "lightgreen";
     }
+
+    if (sortedParticipants[0].user.id == sortedParents[0].user.id){
+      user1BgColor = sUser1BgColor;
+      user2BgColor = sUser2BgColor;
+    }
+    else{
+      user2BgColor = sUser1BgColor;
+      user1BgColor = sUser2BgColor;
+    }
+
+
   }
 
 

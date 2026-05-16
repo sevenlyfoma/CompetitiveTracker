@@ -126,11 +126,13 @@ function makeNodesRecursive(match, minY, maxY, x, style, depth, titleY, setSelec
 
     if (match !== undefined && match !== null){
 
-        let p1Match = match.parents[0]?.parentMatch;
-        let p2Match = match.parents[1]?.parentMatch;
+        let sortedParents = match.parents?.sort((a,b) => a.id - b.id);
 
-        let p1IWin = match.parents[0]?.inheritsParentMatchWinner;
-        let p2IWin = match.parents[1]?.inheritsParentMatchWinner;
+        let p1Match = sortedParents[0]?.parentMatch;
+        let p2Match = sortedParents[1]?.parentMatch;
+
+        let p1IWin = sortedParents[0]?.inheritsParentMatchWinner;
+        let p2IWin = sortedParents[1]?.inheritsParentMatchWinner;
 
         let nodes =[]
         let edges = []
