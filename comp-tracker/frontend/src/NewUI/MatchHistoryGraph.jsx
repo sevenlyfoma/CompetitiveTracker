@@ -73,7 +73,7 @@ const LineChart = ({user, matches}) => {
 
     };
 
-    return <Line options={options} data={data} />;
+    return <Line options={options} data={data} style={{width:"100%", height:"100%"}}/>;
 };
 
 
