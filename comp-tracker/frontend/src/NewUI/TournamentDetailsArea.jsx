@@ -31,7 +31,7 @@ import {TextField} from '@mui/material';
 import toast from 'react-hot-toast';
 
 import TournamentBracketPage from './TournamentBracket/TournamentBracketPage';
-
+import MatchDetailsArea from './MatchDetailsArea';
 
 function TournamentNotSelectedArea({message}){
     return (
@@ -195,42 +195,7 @@ function OpenTournamentArea({selectedTournament, setSelectedTournament, entrants
     )
 }
 
-function MatchDetailsArea({selectedMatch, setSelectedMatch}){
 
-    console.log(selectedMatch)
-    
-
-    //Surround with a paper?
-
-    let user1 = selectedMatch?.parents[0]?.user?.name ?? "Participant yet to be determined";
-    let user2 = selectedMatch?.parents[1]?.user?.name ?? "Participant yet to be determined";
-
-    return (
-        <>
-        {   selectedMatch != null ? 
-            (<>
-                <Stack>
-                    <h1>{selectedMatch.matchTitle}</h1>
-                    <h2>{user1}  vs {user2}</h2>
-
-
-                </Stack>
-                
-            
-            
-            </>) 
-            
-            
-            
-            
-            : (<></>)
-
-
-        }
-        
-        </>
-    )
-}
 
 
 function TournamentDetailsArea({selectedTournament, setSelectedTournament, tournamentList, setTournamentList}){
@@ -267,12 +232,28 @@ function TournamentDetailsArea({selectedTournament, setSelectedTournament, tourn
     
     return (
         <Box sx={{gap: 2, display: 'flex', bgcolor: 'white', height:'100%', width: "100%"}} >
-            <MatchDetailsArea selectedMatch={selectedMatch} setSelectedMatch={setSelectedMatch}/>
+           
             {selectedTournament?.id != null ? 
                 ( <>
                 
                 {selectedTournament?.closed ? 
-                    (<TournamentBracketPage selectedTournament={selectedTournament} setSelectedMatch={setSelectedMatch}/>) 
+                    (
+                        <>
+                            {   selectedMatch != null ? 
+                                (<>
+                                     <MatchDetailsArea selectedMatch={selectedMatch} setSelectedMatch={setSelectedMatch}/>
+                                </>) 
+                                : 
+                                (<>
+                                    <TournamentBracketPage selectedTournament={selectedTournament} setSelectedMatch={setSelectedMatch}/>
+                                </>)
+
+
+                            }
+
+                        </>
+                    
+                    )
                 :
                     (<OpenTournamentArea tournamentList={tournamentList} setTournamentList={setTournamentList} entrants={entrants} selectedTournament={selectedTournament} setSelectedTournament={setSelectedTournament} fetchEntrants={fetchEntrants}/>)}
                 </>
