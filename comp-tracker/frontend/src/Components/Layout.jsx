@@ -34,7 +34,7 @@ function HorizontalNav() {
 
           <Button 
             component={Link} 
-            to="/home" 
+            to="/" 
             startIcon={<HomeIcon />}
             color="inherit"
           >
