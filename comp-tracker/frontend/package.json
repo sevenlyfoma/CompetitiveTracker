@@ -11,11 +11,17 @@
   },
   "proxy": "http://localhost:8080",
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@fontsource/roboto": "^5.2.10",
+    "@mui/icons-material": "^9.0.0",
+    "@mui/material": "^9.0.0",
     "chart.js": "^4.5.1",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
+    "react-pro-sidebar": "^1.1.0",
     "react-router-dom": "^7.13.1",
     "react-select": "^5.10.2",
     "reactflow": "^11.11.4"

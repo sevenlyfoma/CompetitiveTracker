@@ -1,0 +1,67 @@
+.matchUserNodeDiv {
+  color: black;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+
+
+.matchUserNodeInner {
+  color: black;
+  background-color: transparent;
+  border: 1px solid black;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  /* justify-content: left; */
+  flex-direction: row;
+
+  flex-shrink: 0; /* Keep an eye on this */
+}
+
+.matchUserNodeInner p {
+  background-color: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin: 0; 
+  padding: 0 5px;
+  box-sizing: border-box;
+}
+
+
+
+
+.matchUserNodeOuter {
+  /* color: black; */
+  /* border: 1px solid black; */
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  /* justify-content: left; */
+  flex-direction: row;
+}
+
+.matchUserNodeOuter:hover {
+  background-color: #999999; /* Slight tint on hover */
+  transform: translateY(-2px); /* Subtle "lift" effect */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.lossNode {
+  color: red;
+  border: 2px solid red;
+  background-color: white;
+  box-sizing: border-box;  
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

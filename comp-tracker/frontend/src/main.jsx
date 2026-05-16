@@ -1,4 +1,4 @@
-import { StrictMode } from 'react' // React core stuff
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 
