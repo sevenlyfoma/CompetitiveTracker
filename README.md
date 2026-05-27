@@ -1,16 +1,14 @@
 # CompetitiveTracker
 Application for storing and acessing data on players in competive games
 
+Application aimed at adiminstrators for a competitive ecosystem
 
-# TODO
+Features
+- Store information on players, including match history
+- Enroll players in tournaments, and automatically build a seeded tournament with those players
+- Tournaments can either be single or double elimination
+- Decide the results of tournament matches
 
-- Refactor react to be tidier
-    - The codde in the fetch statements needs to be deduplicated across the code base
+![playerInfo](Gifs/UserGif.gif)
 
-
-- Refactor tournamentService to be tidier
-    -Requires refactoring parent matches and match participants to be in lists instead of formerly defined user 1 user 2 etc
-
-- Overhaul UI
-
-- Refactor SuccessDTO, theres probably an inbuilt to do what i want to do anyway
+![tourneyInfo](Gifs/TourneyGif.gif)
